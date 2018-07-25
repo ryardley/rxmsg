@@ -7,13 +7,16 @@ This should allow us to migrate messaging to an abstract messaging layer.
 Initially this will be based on RabbitMQ but should be able at a later date be transposable to Kafka
 
 ```javascript
-import { createKafkaConnector } from 'blockbid-messaging';
+import {
+  createRabbitConnector,
+  createLocalConnector
+} from 'blockbid-messaging';
 
-const connector = createRabbitMQConnector({
+const rabbitConnector = createRabbitConnector({
   // options to be merged into config for concrete client
 });
 
-const foodConnection = createConnection(connector).channel('food');
+const foodConnection = createConnection(rabbitConnector).channel('food');
 
 const consumerObservable = foodConnection.createConsumer();
 const producerObservable = foodConnection.createProducer();
