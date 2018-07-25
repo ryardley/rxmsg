@@ -12,15 +12,19 @@ import {
   createLocalConnector
 } from 'blockbid-messaging';
 
-const rabbitConnector = createRabbitConnector({
+const { connector, createChannel } = createRabbitConnector({
   // options to be merged into config for concrete client
 });
 
-const foodConnection = createConnection(rabbitConnector).channel('food');
+const foodConnection = createConnection(connector).channel();
 
-const consumerObservable = foodConnection.createConsumer();
-const producerObservable = foodConnection.createProducer();
+const consumerObservable = foodConnection.createConsumer({ queue: 'bar' });
+const producerObservable = foodConnection.createProducer({
+  exchange: 'food',
+  routingKey: 'cherries'
+});
 
+// Here we have a shared() observable so we can filter and map results and listen as many times as required.
 consumerObservable.subscribe(msg => {
   console.log(`Just recieved ${msg}`);
 });
