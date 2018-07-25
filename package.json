@@ -1,0 +1,15 @@
+{
+  "name": "blockbid-messages",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "blockbid-tools": "blockbid/blockbid-tools#v1.0.3"
+  },
+  "scripts": {
+    "test": "bbt test",
+    "build": "bbt build",
+    "lint": "bbt lint",
+    "format": "bbt format"
+  }
+}
