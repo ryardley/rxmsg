@@ -4,38 +4,82 @@ This library makes it easy to send messages in a distributed network transparent
 way via various brokers including RabbitMQ, Direct Websocket (YTBI) and Kafka (YTBI).
 
 ```javascript
+// TODO: These are rough declarations
+type DestinationType = {
+  via: string,
+  to: string,
+}
+
+type MessageType = {
+  payload: *,
+  destination: DestinationType,
+}
+
+interface IConsumer = {
+  getMessageStream(*): Rx.Observable;
+}
+
+interface IProducer = {
+  publish(msg:MessageType):Promise;
+}
+
+interface IMessageMiddleware = IConsumer & IProducer;
+```
+
+```javascript
 import {
-  createRabbitConnector,
-  createBus,
-  createConsumer,
-  createProducer
+  // Plugins
+  createLoggerMiddleware,
+  createRabbitMiddleware,
+
+  // Core
+  createMessageClient
 } from 'blockbid-messaging';
 
-const connector = createRabbitConnector({
-  // options to be merged into config for concrete client
-  uri: 'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc';
-});
+(async () => {
+  try {
 
-const broker:MessageBroker = createBroker(connector);
+    const rabbitMiddleware = createRabbitMiddleware({
+      uri: 'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc';
+    });
 
-// const consumer = createConsumer({ bus, queue: 'bar' });
-// const producer = createProducer({
-//   bus,
-//   exchange: 'food',
-//   routingKey: 'cherries'
-// });
-const consumer:MessageConsumer = createConsumer(broker, { queue: 'myqueue' });
-const producer:MessageProducer = createProducer(broker);
+    const loggerMiddleware = createLoggerMiddleware({
+      logger: console.log.bind(console)
+    });
 
+    // Middlware is always client layer first broker layer last
+    const messageClient = createMessageClient(
+      loggerMiddleware,
+      rabbitMiddleware
+    );
 
+    const consumer = messageClient.createConsumer();
+    const producer = messageClient.createProducer();
 
-// Here we have a shared() observable so we can filter and map results and listen as many times as required.
-consumer.subscribe(msg => {
-  console.log(`Just recieved ${msg}`);
-});
+    // Get the messages
+    const messageStream = consumer.getMessageStream();
 
-producer.send('foo');
-producer.send('bar');
-producer.send('baz');
-producer.close();
+    messageStream.subscribe(({payload}) => console.log(`Just recieved ${payload}`), console.error);
+
+    // Messages have a payload and can contain a number of dynamic metadata keys
+    const dest = {via: 'my-exchange', to: 'my-destination-consumer'};
+    await producer.publish({ dest, payload: 'foo', meta: { ding:'pop' } });
+    await producer.publish({ dest, payload: 'bar' });
+    await producer.publish({ dest, payload: {baz:'baz'} }); // can be object
+
+    await producer.destroy(); // Free up memory
+  } catch(err) {
+    console.error(err);
+  }
+
+  setTimeout(() => {
+    messageStream.unsubscribe();
+  }, 3000);
+})();
 ```
+
+For maintainability we will use a functional middleware pattern.
+
+References
+
+https://aws.amazon.com/blogs/compute/building-scalable-applications-and-microservices-adding-messaging-to-your-toolbox/
