@@ -1,29 +1,34 @@
 # blockbid-messaging
 
 This library makes it easy to send messages in a distributed network transparent
-way via various brokers including RabbitMQ, Direct Websocket (YTBI) and Kafka (YTBI).
+way via various brokers including RabbitMQ. At a later point it should be able
+to work locally through spawned processes, via a direct Websocket (YTBI) and Kafka (YTBI).
+
+- Favour Modular plugin system
+- Favour functional style
+-
 
 ```javascript
-// TODO: These are rough declarations
-type DestinationType = {
-  via: string,
-  to: string,
-}
+type Destination = {
+  via: string, // exchange or topic
+  to: string // address
+};
 
-type MessageType = {
+type Message = {
   payload: *,
-  destination: DestinationType,
-}
+  dest: Destination,
+  meta: *
+};
 
-interface IConsumer = {
-  getMessageStream(*): Rx.Observable;
-}
+type MessageConsumer = {
+  getMessageStream: () => Rx.Observable
+};
 
-interface IProducer = {
-  publish(msg:MessageType):Promise;
-}
+type MessageProducer = {
+  publish: (msg: Message) => Promise
+};
 
-interface IMessageMiddleware = IConsumer & IProducer;
+type MessagePlugin = Consumer & Producer;
 ```
 
 ```javascript
@@ -48,15 +53,15 @@ import {
     });
 
     // Middlware is always client layer first broker layer last
-    const messageClient = createMessageClient(
+    const {createConsumer, createProducer} = createMessageClient(
       loggerMiddleware,
       rabbitMiddleware
     );
 
-    const consumer = messageClient.createConsumer();
-    const producer = messageClient.createProducer();
+    const consumer = createConsumer();
+    const producer = createProducer();
 
-    // Get the messages
+    // Get messages as an RxJS stream
     const messageStream = consumer.getMessageStream();
 
     messageStream.subscribe(({payload}) => console.log(`Just recieved ${payload}`), console.error);
@@ -65,7 +70,7 @@ import {
     const dest = {via: 'my-exchange', to: 'my-destination-consumer'};
     await producer.publish({ dest, payload: 'foo', meta: { ding:'pop' } });
     await producer.publish({ dest, payload: 'bar' });
-    await producer.publish({ dest, payload: {baz:'baz'} }); // can be object
+    await producer.publish({ dest, payload: {baz:'baz'} }); // can be object that will be serialised
 
     await producer.destroy(); // Free up memory
   } catch(err) {
@@ -77,8 +82,6 @@ import {
   }, 3000);
 })();
 ```
-
-For maintainability we will use a functional middleware pattern.
 
 References
 
