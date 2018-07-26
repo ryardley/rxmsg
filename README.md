@@ -118,11 +118,11 @@ import transformMessageSomehow from './transformMessageSomehow';
   }
 
   setTimeout(() => {
-    messageStream.unsubscribe();
+    consumer.destroy();
   }, 3000);
 })();
 ```
 
-References
+## References
 
 https://aws.amazon.com/blogs/compute/building-scalable-applications-and-microservices-adding-messaging-to-your-toolbox/
