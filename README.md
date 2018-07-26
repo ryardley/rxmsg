@@ -42,9 +42,10 @@ import {
 
 (async () => {
   try {
-
     const rabbitMiddleware = createRabbitMiddleware({
-      uri: 'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc';
+      uri:
+        'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc'
+      // more config ...
     });
 
     const loggerMiddleware = createLoggerMiddleware({
@@ -52,7 +53,7 @@ import {
     });
 
     // Middlware is always clientside first brokerside last
-    const {createConsumer, createProducer} = createMessageClient(
+    const { createConsumer, createProducer } = createMessageClient(
       // v client v //
       loggerMiddleware,
       rabbitMiddleware
@@ -66,16 +67,19 @@ import {
     // Get messages as an RxJS stream
     const messageStream = consumer.getMessageStream();
 
-    messageStream.subscribe(({payload}) => console.log(`Just recieved ${payload}`), console.error);
+    messageStream.subscribe(
+      ({ payload }) => console.log(`Just recieved ${payload}`),
+      console.error
+    );
 
     // Messages have a payload and can contain a number of dynamic metadata keys
-    const dest = {via: 'my-exchange', to: 'my-destination-consumer'};
-    await producer.publish({ dest, payload: 'foo', meta: { ding:'pop' } });
+    const dest = { via: 'my-exchange', to: 'my-destination-consumer' };
+    await producer.publish({ dest, payload: 'foo', meta: { ding: 'pop' } });
     await producer.publish({ dest, payload: 'bar' });
-    await producer.publish({ dest, payload: {baz:'baz'} }); // can be object that will be serialised
+    await producer.publish({ dest, payload: { baz: 'baz' } }); // can be object that will be serialised
 
     await producer.destroy(); // Free up memory
-  } catch(err) {
+  } catch (err) {
     console.error(err);
   }
 
