@@ -4,9 +4,8 @@ This library makes it easy to send messages in a distributed network transparent
 way via various brokers including RabbitMQ. At a later point it should be able
 to work locally through spawned processes, via a direct Websocket (YTBI) and Kafka (YTBI).
 
-- Favour Modular plugin system
-- Favour functional style
--
+- Modular middleware system inspired by Redux and Express
+- Favour higher order functional configuration over classes inheritence and DI
 
 ```javascript
 type Destination = {
@@ -58,6 +57,7 @@ import {
       rabbitMiddleware
     );
 
+    // Create consumer and producer
     const consumer = createConsumer();
     const producer = createProducer();
 
