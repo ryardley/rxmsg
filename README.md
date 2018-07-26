@@ -16,7 +16,7 @@ Some principles:
 - Favour higher order functional configuration over classes inheritence and DI
 - Basic framework should work in all V8 environments.
 
-```javascript
+```typescript
 import { Observable } from 'rxjs';
 
 export interface IDestination {
@@ -55,14 +55,14 @@ export type ConsumerMiddleware = (
 
 export type Middleware =
   | {
-      consumer: ConsumerMiddleware,
-      producer: ProducerMiddleware
+      consumer: ConsumerMiddleware;
+      producer: ProducerMiddleware;
     }
   | ConsumerMiddleware
   | ProducerMiddleware;
 ```
 
-```javascript
+```typescript
 import {
   // Plugins
   createLoggerMiddleware,
