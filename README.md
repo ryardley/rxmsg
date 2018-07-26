@@ -1,11 +1,20 @@
 # blockbid-messaging
 
 This library makes it easy to send messages in a distributed network transparent
-way via various brokers including RabbitMQ. At a later point it should be able
-to work locally through spawned processes, via a direct Websocket (YTBI) and Kafka (YTBI).
+way via various brokers but initially via RabbitMQ.
+
+At a later point we should have plugins to make it work:
+
+- via Kafka
+- in the browser using socker.io
+- on the server via socket.io
+- locally through node spawned processes
+
+Some principles:
 
 - Modular middleware system inspired by Redux and Express
 - Favour higher order functional configuration over classes inheritence and DI
+- Basic framework should work in all V8 environments.
 
 ```javascript
 type Destination = {
