@@ -1,3 +1,1 @@
-export default function index(person: string) {
-  return `Hello, ${person}`;
-}
+export { default as createMessageClient } from './createMessageClient';

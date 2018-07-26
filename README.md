@@ -28,15 +28,16 @@ type Message = {
   meta: *
 };
 
-type MessageConsumer = {
-  getMessageStream: () => Rx.Observable
-};
+type MiddlewareConsumer = (?Rx.Observable) => Rx.Observable;
+type MiddlewareProducer = Rx.Observable => ?Rx.Observable;
 
-type MessageProducer = {
-  publish: (msg: Message) => Promise
-};
+type Middleware =
+  | { consumer: MiddlewareConsumer, producer: MiddlewareProducer }
+  | MiddlewareConsumer
+  | MiddlewareProducer;
 
-type MessagePlugin = Consumer & Producer;
+type MessageProducer = (msg: Message) => Promise;
+type MessageConsumer = () => Rx.Observable;
 ```
 
 ```javascript
@@ -48,6 +49,7 @@ import {
   // Core
   createMessageClient
 } from 'blockbid-messaging';
+import transformMessageSomehow from './transformMessageSomehow';
 
 (async () => {
   try {
@@ -62,20 +64,18 @@ import {
     });
 
     // Middlware is always clientside first brokerside last
-    const { createConsumer, createProducer } = createMessageClient(
-      // v client v //
+    const client = createMessageClient(
+      transformMessageSomehow,
       loggerMiddleware,
       rabbitMiddleware
-      // ^ broker ^ //
     );
 
     // Create consumer and producer
-    const consumer = createConsumer();
-    const producer = createProducer();
+    const consumer = client.createConsumer();
+    const producer = client.createProducer();
 
     // Get messages as an RxJS stream
-    const messageStream = consumer.getMessageStream();
-
+    const messageStream = consumer.messageStream();
     messageStream.subscribe(
       ({ payload }) => console.log(`Just recieved ${payload}`),
       console.error
