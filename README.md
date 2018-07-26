@@ -51,10 +51,12 @@ import {
       logger: console.log.bind(console)
     });
 
-    // Middlware is always client layer first broker layer last
+    // Middlware is always clientside first brokerside last
     const {createConsumer, createProducer} = createMessageClient(
+      // v client v //
       loggerMiddleware,
       rabbitMiddleware
+      // ^ broker ^ //
     );
 
     // Create consumer and producer
