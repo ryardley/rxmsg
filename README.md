@@ -17,27 +17,49 @@ Some principles:
 - Basic framework should work in all V8 environments.
 
 ```javascript
-type Destination = {
-  via: string, // exchange or topic
-  to: string // address
-};
+import { Observable } from 'rxjs';
 
-type Message = {
-  payload: *,
-  dest: Destination,
-  meta: *
-};
+export interface IDestination {
+  via: string;
+  to: string;
+}
 
-type MiddlewareConsumer = (?Rx.Observable) => Rx.Observable;
-type MiddlewareProducer = Rx.Observable => ?Rx.Observable;
+export interface IMessage {
+  payload: {};
+  meta?: {};
+  dest?: IDestination;
+}
 
-type Middleware =
-  | { consumer: MiddlewareConsumer, producer: MiddlewareProducer }
-  | MiddlewareConsumer
-  | MiddlewareProducer;
+export interface IMessageClient {
+  createProducer: () => any;
+  createConsumer: () => any;
+}
 
-type MessageProducer = (msg: Message) => Promise;
-type MessageConsumer = () => Rx.Observable;
+export interface IProducer {
+  publish: (a: IMessage) => Promise<void>;
+  destroy: () => Promise<{}>;
+}
+
+export interface IConsumer {
+  messageStream: () => Observable<IMessage>;
+  destroy: () => Promise<{}>;
+}
+
+export type ProducerMiddleware = (
+  a: Observable<IMessage> | void
+) => Observable<IMessage>;
+
+export type ConsumerMiddleware = (
+  a: Observable<IMessage>
+) => Observable<IMessage> | void;
+
+export type Middleware =
+  | {
+      consumer: ConsumerMiddleware,
+      producer: ProducerMiddleware
+    }
+  | ConsumerMiddleware
+  | ProducerMiddleware;
 ```
 
 ```javascript
@@ -53,36 +75,39 @@ import transformMessageSomehow from './transformMessageSomehow';
 
 (async () => {
   try {
-    const rabbitMiddleware = createRabbitMiddleware({
+    const rabbitMiddleware: Middleware = createRabbitMiddleware({
       uri:
         'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc'
       // more config ...
     });
 
-    const loggerMiddleware = createLoggerMiddleware({
+    const loggerMiddleware: Middleware = createLoggerMiddleware({
       logger: console.log.bind(console)
     });
 
     // Middlware is always clientside first brokerside last
-    const client = createMessageClient(
+    const client: IMessageClient = createMessageClient(
       transformMessageSomehow,
       loggerMiddleware,
       rabbitMiddleware
     );
 
     // Create consumer and producer
-    const consumer = client.createConsumer();
-    const producer = client.createProducer();
+    const consumer: IConsumer = client.createConsumer();
+    const producer: IProducer = client.createProducer();
 
     // Get messages as an RxJS stream
-    const messageStream = consumer.messageStream();
+    const messageStream: Observable<IMessage> = consumer.messageStream();
     messageStream.subscribe(
       ({ payload }) => console.log(`Just recieved ${payload}`),
       console.error
     );
 
     // Messages have a payload and can contain a number of dynamic metadata keys
-    const dest = { via: 'my-exchange', to: 'my-destination-consumer' };
+    const dest: IDestination = {
+      via: 'my-exchange',
+      to: 'my-destination-consumer'
+    };
     await producer.publish({ dest, payload: 'foo', meta: { ding: 'pop' } });
     await producer.publish({ dest, payload: 'bar' });
     await producer.publish({ dest, payload: { baz: 'baz' } }); // can be object that will be serialised

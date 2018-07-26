@@ -6,18 +6,33 @@ export interface IDestination {
 }
 
 export interface IMessage {
-  payload: any;
-  meta?: any;
+  payload: {};
+  meta?: {};
   dest?: IDestination;
 }
 
+export interface IMessageClient {
+  createProducer: () => any;
+  createConsumer: () => any;
+}
+
+export interface IProducer {
+  publish: (a: IMessage) => Promise<void>;
+  destroy: () => Promise<{}>;
+}
+
+export interface IConsumer {
+  messageStream: () => Observable<IMessage>;
+  destroy: () => Promise<{}>;
+}
+
 export type ProducerMiddleware = (
-  a: Observable<IMessage> | undefined
+  a: Observable<IMessage> | void
 ) => Observable<IMessage>;
 
 export type ConsumerMiddleware = (
   a: Observable<IMessage>
-) => Observable<IMessage> | undefined;
+) => Observable<IMessage> | void;
 
 export type Middleware =
   | {
