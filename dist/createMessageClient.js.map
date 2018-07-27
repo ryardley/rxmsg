@@ -1,1 +1,0 @@
-{"version":3,"file":"createMessageClient.js","sourceRoot":"","sources":["../src/createMessageClient.ts"],"names":[],"mappings":";;AACA,6BAA4C,GAAG,UAAwB;IACrE,IAAI,CAAC,UAAU,IAAI,UAAU,CAAC,MAAM,KAAK,CAAC,EAAE;QAC1C,MAAM,IAAI,KAAK,CAAC,2CAA2C,CAAC,CAAC;KAC9D;AACH,CAAC;AAJD,sCAIC"}
