@@ -1,0 +1,1 @@
+{"version":3,"file":"consumer.js","sourceRoot":"","sources":["../src/consumer.ts"],"names":[],"mappings":";;AAAA,+BAA4B;AAE5B,6CAAiD;AAEpC,QAAA,cAAc,GAAG,CAAC,GAAG,UAAwB,EAAE,EAAE;IAC5D,MAAM,cAAc,GAAG,WAAI,CAAC,EAAE,CAAC,CAAC;IAChC,MAAM,kBAAkB,GAAG,8BAAiB,CAAC,GAAG,UAAU,CAAC,CAAC;IAC5D,OAAO,kBAAkB,CAAC,cAAc,CAAC,CAAC;AAC5C,CAAC,CAAC"}
