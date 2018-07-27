@@ -27,14 +27,17 @@ describe('combineMiddleware', () => {
     });
 
     expect(log).toEqual([
+      // First message
       'middleware1: 1',
       'middleware2: 1',
       'middleware3: 1',
       'subscribe: 1',
+      // Second message
       'middleware1: 2',
       'middleware2: 2',
       'middleware3: 2',
       'subscribe: 2',
+      // Third message
       'middleware1: 3',
       'middleware2: 3',
       'middleware3: 3',
