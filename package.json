@@ -1,10 +1,11 @@
 {
   "name": "blockbid-messages",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT",
   "devDependencies": {
-    "@types/rx": "^4.1.1"
+    "@types/rx": "^4.1.1",
+    "blockbid-tools": "blockbid/blockbid-tools"
   },
   "scripts": {
     "test": "bbt test",
@@ -13,7 +14,6 @@
     "format": "bbt format"
   },
   "dependencies": {
-    "blockbid-tools": "blockbid/blockbid-tools",
     "rxjs": "^6.2.2"
   }
 }
