@@ -1,1 +1,2 @@
-export { default as createMessageClient } from './createMessageClient';
+export { createProducer } from './producer';
+export { createConsumer } from './consumer';

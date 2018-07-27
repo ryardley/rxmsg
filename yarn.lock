@@ -17,8 +17,8 @@
     js-tokens "^3.0.0"
 
 "@types/jest@^23.3.0":
-  version "23.3.0"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.0.tgz#5dd70033b616a6228042244ebd992f6426808810"
+  version "23.3.1"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.1.tgz#a4319aedb071d478e6f407d1c4578ec8156829cf"
 
 "@types/rx-core-binding@*":
   version "4.0.4"
@@ -473,9 +473,9 @@ binary-extensions@^1.0.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.11.0.tgz#46aa1751fb6a2f93ee5e689bb1087d4b14c6c205"
 
-blockbid-tools@blockbid/blockbid-tools#v1.0.4:
-  version "1.0.4"
-  resolved "git+ssh://git@github.com/blockbid/blockbid-tools.git#560351d54d2fd90a0acad08433d29b2c6c32e073"
+blockbid-tools@blockbid/blockbid-tools:
+  version "1.0.3"
+  resolved "git+ssh://git@github.com/blockbid/blockbid-tools.git#e9a4e0241fadc6dde1f6cc9ae9a08fa1c0833915"
   dependencies:
     "@types/jest" "^23.3.0"
     jest "^23.4.1"
@@ -3248,8 +3248,8 @@ tslib@^1.8.0, tslib@^1.8.1, tslib@^1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
 
 tslint-config-blockbid@Blockbid/tslint-config-blockbid:
-  version "1.0.0"
-  resolved "git+ssh://git@github.com/Blockbid/tslint-config-blockbid.git#01e0e070099d3b98a0cb454de102323c0c068854"
+  version "1.1.0"
+  resolved "git+ssh://git@github.com/Blockbid/tslint-config-blockbid.git#215e9345b6eead03f07803e6a688b626eb5ffbb2"
 
 tslint-config-prettier@^1.14.0:
   version "1.14.0"

@@ -1,43 +1,18 @@
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 export interface IDestination {
-  via: string;
+  via?: string;
   to: string;
 }
 
 export interface IMessage {
   payload: {};
-  meta?: {};
+  meta?: { [key: string]: any };
   dest?: IDestination;
+  [key: string]: any;
 }
 
-export interface IMessageClient {
-  createProducer: () => any;
-  createConsumer: () => any;
-}
+export type Producer = Subject<IMessage>;
+export type Consumer = Observable<IMessage>;
 
-export interface IProducer {
-  publish: (a: IMessage) => Promise<void>;
-  destroy: () => Promise<{}>;
-}
-
-export interface IConsumer {
-  messageStream: () => Observable<IMessage>;
-  destroy: () => Promise<{}>;
-}
-
-export type ProducerMiddleware = (
-  a: Observable<IMessage> | void
-) => Observable<IMessage>;
-
-export type ConsumerMiddleware = (
-  a: Observable<IMessage>
-) => Observable<IMessage> | void;
-
-export type Middleware =
-  | {
-      consumer: ConsumerMiddleware;
-      producer: ProducerMiddleware;
-    }
-  | ConsumerMiddleware
-  | ProducerMiddleware;
+export type Middleware = (a: Observable<IMessage>) => Observable<IMessage>;

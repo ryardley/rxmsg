@@ -15,12 +15,13 @@ Some principles:
 - Modular middleware system inspired by Redux and Express
 - Favour higher order functional configuration over classes inheritence and DI
 - Basic framework should work in all V8 environments.
+- Favour Simplicity over complexity
 
 ```typescript
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 export interface IDestination {
-  via: string;
+  via?: string;
   to: string;
 }
 
@@ -28,99 +29,79 @@ export interface IMessage {
   payload: {};
   meta?: {};
   dest?: IDestination;
+  [key: string]: any;
 }
 
-export interface IMessageClient {
-  createProducer: () => any;
-  createConsumer: () => any;
-}
+export type Producer = Subject<IMessage>;
+export type Consumer = Observable<IMessage>;
 
-export interface IProducer {
-  publish: (a: IMessage) => Promise<void>;
-  destroy: () => Promise<{}>;
-}
-
-export interface IConsumer {
-  messageStream: () => Observable<IMessage>;
-  destroy: () => Promise<{}>;
-}
-
-export type ProducerMiddleware = (
-  a: Observable<IMessage> | void
-) => Observable<IMessage>;
-
-export type ConsumerMiddleware = (
-  a: Observable<IMessage>
-) => Observable<IMessage> | void;
-
-export type Middleware =
-  | {
-      consumer: ConsumerMiddleware;
-      producer: ProducerMiddleware;
-    }
-  | ConsumerMiddleware
-  | ProducerMiddleware;
+export type Middleware = (a: Observable<IMessage>) => Observable<IMessage>;
 ```
 
 ```typescript
 import {
   // Plugins
-  createLoggerMiddleware,
   createRabbitMiddleware,
+  createConsumer,
+  createProducer,
 
   // Core
   createMessageClient
 } from 'blockbid-messaging';
-import transformMessageSomehow from './transformMessageSomehow';
 
-(async () => {
-  try {
-    const rabbitMiddleware: Middleware = createRabbitMiddleware({
-      uri:
-        'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc'
-      // more config ...
-    });
+import { map } from 'rxjs/operators';
 
-    const loggerMiddleware: Middleware = createLoggerMiddleware({
-      logger: console.log.bind(console)
-    });
+const rabbitMiddleware: Middleware = createRabbitMiddleware({
+  uri:
+    'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc'
+  // more config ...
+});
 
-    // Middlware is always clientside first brokerside last
-    const client: IMessageClient = createMessageClient(
-      transformMessageSomehow,
-      loggerMiddleware,
-      rabbitMiddleware
-    );
+const transformMessageSomehow: Middleware = o =>
+  o.pipe(
+    map(msg => ({
+      ...msg,
+      foo: 'foo'
+    }))
+  );
 
-    // Create consumer and producer
-    const consumer: IConsumer = client.createConsumer();
-    const producer: IProducer = client.createProducer();
+const loggerMiddleware: Middleware = o => o.pipe(tap(m => console.log(m)));
 
-    // Get messages as an RxJS stream
-    const messageStream: Observable<IMessage> = consumer.messageStream();
-    messageStream.subscribe(
-      ({ payload }) => console.log(`Just recieved ${payload}`),
-      console.error
-    );
+// Create consumer and producer
+// Consumer is just an Observable
+const consumer: Consumer = createConsumer(
+  rabbitMiddleware,
+  loggerMiddleware,
+  transformMessageSomehow
+);
 
-    // Messages have a payload and can contain a number of dynamic metadata keys
-    const dest: IDestination = {
-      via: 'my-exchange',
-      to: 'my-destination-consumer'
-    };
-    await producer.publish({ dest, payload: 'foo', meta: { ding: 'pop' } });
-    await producer.publish({ dest, payload: 'bar' });
-    await producer.publish({ dest, payload: { baz: 'baz' } }); // can be object that will be serialised
+// Producer is just a Subject
+const producer: Producer = createProducer(
+  transformMessageSomehow,
+  loggerMiddleware,
+  rabbitMiddleware
+);
 
-    await producer.destroy(); // Free up memory
-  } catch (err) {
-    console.error(err);
-  }
+// Get messages as an RxJS stream
+// const messageStream: Observable<Message> = consumer.messageStream();
+const subscription = consumer.subscribe(
+  ({ payload }) => console.log(`Just recieved ${payload}`),
+  console.error
+);
 
-  setTimeout(() => {
-    consumer.destroy();
-  }, 3000);
-})();
+// Messages have a payload and can contain a number of dynamic metadata keys
+const dest: IDestination = {
+  via: 'my-exchange',
+  to: 'my-destination-consumer'
+};
+
+producer.next({ dest, payload: 'foo', meta: { ding: 'pop' } });
+producer.next({ dest, payload: 'bar' });
+producer.next({ dest, payload: { baz: 'baz' } }); // can be object that will be
+
+setTimeout(() => {
+  subscription.unsubscribe();
+}, 3000);
 ```
 
 ## References

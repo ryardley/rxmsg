@@ -4,8 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@types/rx": "^4.1.1",
-    "blockbid-tools": "blockbid/blockbid-tools#v1.0.4"
+    "@types/rx": "^4.1.1"
   },
   "scripts": {
     "test": "bbt test",
@@ -14,6 +13,7 @@
     "format": "bbt format"
   },
   "dependencies": {
+    "blockbid-tools": "blockbid/blockbid-tools",
     "rxjs": "^6.2.2"
   }
 }
