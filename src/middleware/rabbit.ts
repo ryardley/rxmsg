@@ -2,6 +2,8 @@ import amqp from 'amqplib';
 import { Observable, Observer } from 'rxjs';
 import { IMessage, MiddlewareCreator } from '../domain';
 
+// TODO: I think we need some way to declaratively specify the exchange structure
+
 interface IRabbitConfig {
   uri: string;
   queue?: string;
