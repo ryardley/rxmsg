@@ -1,5 +1,7 @@
 # blockbid-messaging
 
+_Please note this is under development and is still in the design phase and is not yet ready for use_
+
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers but initially via RabbitMQ.
 
@@ -51,57 +53,63 @@ import {
 
 import { map } from 'rxjs/operators';
 
-const rabbitMiddleware: Middleware = createRabbitMiddleware({
-  uri:
-    'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc'
-  // more config ...
-});
+(async () => {
+  try {
+    const rabbitMiddleware: Middleware = createRabbitMiddleware({
+      uri:
+        'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc'
+      // more config ...
+    });
 
-const transformMessageSomehow: Middleware = o =>
-  o.pipe(
-    map(msg => ({
-      ...msg,
-      foo: 'foo'
-    }))
-  );
+    const transformMessageSomehow: Middleware = stream =>
+      stream.pipe(
+        map(msg => ({
+          ...msg,
+          foo: 'foo'
+        }))
+      );
 
-const loggerMiddleware: Middleware = o => o.pipe(tap(m => console.log(m)));
+    const loggerMiddleware: Middleware = stream =>
+      stream.pipe(tap(console.log.bind(console)));
 
-// Create consumer and producer
-// Consumer is just an Observable
-const consumer: Consumer = createConsumer(
-  rabbitMiddleware,
-  loggerMiddleware,
-  transformMessageSomehow
-);
+    // Create consumer and producer
+    // Consumer is just an Observable
+    const consumer: Consumer = createConsumer(
+      rabbitMiddleware,
+      loggerMiddleware,
+      transformMessageSomehow
+    );
 
-// Producer is just a Subject
-const producer: Producer = createProducer(
-  transformMessageSomehow,
-  loggerMiddleware,
-  rabbitMiddleware
-);
+    const producer: Subject = createProducer(
+      transformMessageSomehow,
+      loggerMiddleware,
+      rabbitMiddleware
+    );
 
-// Get messages as an RxJS stream
-// const messageStream: Observable<Message> = consumer.messageStream();
-const subscription = consumer.subscribe(
-  ({ payload }) => console.log(`Just recieved ${payload}`),
-  console.error
-);
+    // Get messages as an RxJS stream
+    // const messageStream: Observable<Message> = consumer.messageStream();
+    const subscription = consumer.subscribe(
+      ({ payload }) => console.log(`Just recieved ${payload}`),
+      console.error
+    );
 
-// Messages have a payload and can contain a number of dynamic metadata keys
-const dest: IDestination = {
-  via: 'my-exchange',
-  to: 'my-destination-consumer'
-};
+    // Messages have a payload and can contain a number of dynamic metadata keys
+    const dest: IDestination = {
+      via: 'my-exchange',
+      to: 'my-destination-consumer'
+    };
 
-producer.next({ dest, payload: 'foo', meta: { ding: 'pop' } });
-producer.next({ dest, payload: 'bar' });
-producer.next({ dest, payload: { baz: 'baz' } }); // can be object that will be
+    producer.next({ dest, payload: 'foo', meta: { ding: 'pop' } });
+    producer.next({ dest, payload: 'bar' });
+    producer.next({ dest, payload: { baz: 'baz' } }); // can be object that will be
+  } catch (err) {
+    console.error(err);
+  }
 
-setTimeout(() => {
-  subscription.unsubscribe();
-}, 3000);
+  setTimeout(() => {
+    subscription.unsubscribe();
+  }, 3000);
+})();
 ```
 
 ## References

@@ -15,5 +15,5 @@ it('should send messages from the middleware to the consumer', () => {
   };
   const consumer = createConsumer(middleware);
   consumer.subscribe(mockFn);
-  expect(mockFn.mock.calls.length).toBe(3);
+  expect(mockFn.mock.calls.length).toBe(4);
 });
