@@ -1,12 +1,12 @@
 import { Observable, Subject } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { IConfigObject, IMessage, MiddlewareCreator } from '../domain';
+import { IMessage, MiddlewareCreator } from '../domain';
 
 const receiveStream = new Subject<IMessage>();
 
-interface ILoopBackConfig extends IConfigObject {
+type ILoopBackConfig = {
   delay?: number;
-}
+} | void;
 
 // Recieve messages
 const createReceiver: MiddlewareCreator<ILoopBackConfig> = () => () => {
@@ -26,7 +26,7 @@ const createSender: MiddlewareCreator<ILoopBackConfig> = config => (
   return sendStream;
 };
 
-export default (c?: ILoopBackConfig) => ({
-  receiver: createReceiver(c),
-  sender: createSender(c)
+export default (config?: ILoopBackConfig) => ({
+  receiver: createReceiver(config),
+  sender: createSender(config)
 });
