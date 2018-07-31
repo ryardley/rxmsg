@@ -1,27 +1,32 @@
-// import amqp from 'amqplib';
-// import { from, Observable } from 'rxjs';
-// import { IMessage, Middleware } from '../domain';
+import { Observable, Subject } from 'rxjs';
+import { delay } from 'rxjs/operators';
+import { IConfigObject, IMessage, MiddlewareCreator } from '../domain';
 
-// // const amqpUrl =
-// //   'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv';
+const receiveStream = new Subject<IMessage>();
 
-// const nullObservable: Observable<IMessage> = from<IMessage>([]);
+interface ILoopBackConfig extends IConfigObject {
+  delay?: number;
+}
 
-// interface IRabbitConfig {
-//   amqpUrl: string;
-//   noAck: boolean; // no idea if this is a good default
-// }
+// Recieve messages
+const createReceiver: MiddlewareCreator<ILoopBackConfig> = () => () => {
+  return receiveStream.asObservable();
+};
 
-// type RabbitMiddlewareCreator = (c: IRabbitConfig) => Middleware;
+// Forward messages
+const createSender: MiddlewareCreator<ILoopBackConfig> = config => (
+  sendStream: Observable<IMessage>
+) => {
+  const mappedStream =
+    config && typeof config.delay
+      ? sendStream.pipe(delay(config.delay))
+      : sendStream;
 
-// // Recieve messages from Rabbit
-// const createConsumer: RabbitMiddlewareCreator = config => () => {
-//   return stream;
-// };
+  mappedStream.subscribe(receiveStream);
+  return sendStream;
+};
 
-// // Send messages from Rabbit
-// const createProducer: RabbitMiddlewareCreator = ({ amqpUrl }) => (
-//   stream: Observable<IMessage>
-// ) => {
-//   return nullObservable;
-// };
+export default (c?: ILoopBackConfig) => ({
+  receiver: createReceiver(c),
+  sender: createSender(c)
+});

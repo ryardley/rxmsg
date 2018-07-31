@@ -9,12 +9,12 @@ interface ILoopBackConfig extends IConfigObject {
 }
 
 // Recieve messages
-const receiver: MiddlewareCreator<ILoopBackConfig> = () => () => {
+const createReceiver: MiddlewareCreator<ILoopBackConfig> = () => () => {
   return receiveStream.asObservable();
 };
 
 // Forward messages
-const sender: MiddlewareCreator<ILoopBackConfig> = config => (
+const createSender: MiddlewareCreator<ILoopBackConfig> = config => (
   sendStream: Observable<IMessage>
 ) => {
   const mappedStream =
@@ -27,6 +27,6 @@ const sender: MiddlewareCreator<ILoopBackConfig> = config => (
 };
 
 export default (c?: ILoopBackConfig) => ({
-  receiver: receiver(c),
-  sender: sender(c)
+  receiver: createReceiver(c),
+  sender: createSender(c)
 });
