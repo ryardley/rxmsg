@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Observer } from 'rxjs';
 import { IMessage, MiddlewareCreator } from '../domain';
 
 interface IRabbitConfig {
@@ -69,24 +69,23 @@ const createReceiver: MiddlewareCreator<IRabbitConfig> = config => () => {
   // TODO: need to carefully think about error handling scenarios
   // TODO: perhaps we need to have different message types for sending and
   //       recieving as reieving will have ack callbacks
-  const subject = new Subject<IMessage>();
-  createChannel(config).then(channel => {
-    channel.assertQueue(config.queue, { durable: true });
-    channel.consume(
-      config.queue,
-      msg => {
-        const payload = JSON.parse(msg.content.toString());
-        const ack = () => channel.ack(msg);
-        subject.next({
-          ack,
-          payload
-        });
-      },
-      { noAck: false }
-    );
+  return Observable.create((observer: Observer<IMessage>) => {
+    createChannel(config).then(channel => {
+      channel.assertQueue(config.queue, { durable: true });
+      channel.consume(
+        config.queue,
+        msg => {
+          const payload = JSON.parse(msg.content.toString());
+          const ack = () => channel.ack(msg);
+          observer.next({
+            ack, // ack's must be called after the consumer has finished with the message
+            payload
+          });
+        },
+        { noAck: false }
+      );
+    });
   });
-
-  return subject.asObservable();
 };
 
 export default (c?: IRabbitConfig) => ({
