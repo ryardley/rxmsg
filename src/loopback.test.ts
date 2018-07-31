@@ -2,15 +2,12 @@ import { createConsumer, createProducer } from './index';
 import loopbackMiddleware from './middleware/loopback';
 
 describe('Using the loopback middleware synchronously', () => {
-  const {
-    receiver: loopbackReceiver,
-    sender: loopbackSender
-  } = loopbackMiddleware();
+  const { receiver, sender } = loopbackMiddleware();
 
   it('should send and receive messages synchronously via a loopback middleware', () => {
     const log = [];
-    const producer = createProducer(loopbackSender);
-    const consumer = createConsumer(loopbackReceiver);
+    const producer = createProducer(sender);
+    const consumer = createConsumer(receiver);
 
     consumer.subscribe(msg => {
       log.push(msg);
@@ -31,15 +28,14 @@ describe('Using the loopback middleware synchronously', () => {
 });
 
 describe('Using the loopback middleware asynchronously', () => {
-  const {
-    receiver: loopbackReceiver,
-    sender: loopbackSender
-  } = loopbackMiddleware({ delay: 300 });
+  const { receiver, sender } = loopbackMiddleware({
+    delay: 300
+  });
 
-  it('should send and receive messages synchronously via a loopback middleware', done => {
+  it('should send and receive messages asynchronously via a loopback middleware', done => {
     const log = [];
-    const producer = createProducer(loopbackSender);
-    const consumer = createConsumer(loopbackReceiver);
+    const producer = createProducer(sender);
+    const consumer = createConsumer(receiver);
 
     consumer.subscribe(msg => {
       log.push(msg);
