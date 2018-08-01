@@ -1,12 +1,15 @@
 import amqp from 'amqplib';
 import { Observable, Observer } from 'rxjs';
 import { IMessage, MiddlewareCreator } from '../domain';
-
 // TODO: I think we need some way to declaratively specify the exchange structure
+
+function log(msg) {
+  console.log(msg); // tslint:disable-line
+}
 
 interface IRabbitConfig {
   uri: string;
-  queue?: string;
+  queue: string;
   socketOptions?: {
     noDelay?: boolean;
     cert?: Buffer;
@@ -45,6 +48,7 @@ async function getConnection(config: IRabbitConfig) {
   return singletonConn;
 }
 
+// TODOL: Listen for process kill and disconnect
 async function createChannel(config: IRabbitConfig) {
   const conn = await getConnection(config);
   return await conn.createChannel();
@@ -55,13 +59,27 @@ const createSender: MiddlewareCreator<IRabbitConfig> = config => (
   stream: Observable<IMessage>
 ) => {
   // TODO: How do we handle memory leaks wrt subscriptions
-  createChannel(config).then((channel: amqp.Channel) => {
-    stream.subscribe(({ dest, ...msg }) => {
-      const exchange = (dest && dest.exchange) || '';
-      const queue = (dest && dest.queue) || '';
-      channel.publish(exchange, queue, new Buffer(JSON.stringify(msg.payload)));
-    });
-  });
+  createChannel(config)
+    .then((channel: amqp.Channel) => {
+      stream.subscribe(({ dest, ...msg }) => {
+        log('Sending ' + JSON.stringify(msg));
+        // const exchange = (dest && dest.exchange) || '';
+        const exchange = ''; // for now leave this as empty
+        const queue = (dest && dest.queue) || '';
+
+        channel.assertQueue(queue, { durable: true });
+
+        // if (exchange) {
+        //   channel.assertExchange(exchange, '');
+        // }
+        channel.publish(
+          exchange,
+          queue,
+          new Buffer(JSON.stringify(msg.payload))
+        );
+      });
+    })
+    .catch(e => log(e));
 
   return stream;
 };
@@ -72,21 +90,25 @@ const createReceiver: MiddlewareCreator<IRabbitConfig> = config => () => {
   // TODO: perhaps we need to have different message types for sending and
   //       recieving as reieving will have ack callbacks
   return Observable.create((observer: Observer<IMessage>) => {
-    createChannel(config).then(channel => {
-      channel.assertQueue(config.queue, { durable: true });
-      channel.consume(
-        config.queue,
-        msg => {
-          const payload = JSON.parse(msg.content.toString());
-          const ack = () => channel.ack(msg);
-          observer.next({
-            ack, // ack's must be called after the consumer has finished with the message
-            payload
-          });
-        },
-        { noAck: false }
-      );
-    });
+    createChannel(config)
+      .then(channel => {
+        // how are we configuring queue?
+        channel.assertQueue(config.queue, { durable: true });
+
+        channel.consume(
+          config.queue,
+          msg => {
+            const payload = JSON.parse(msg.content.toString());
+            const ack = () => channel.ack(msg);
+            observer.next({
+              ack, // ack's must be called after the consumer has finished with the message
+              payload
+            });
+          }
+          // { noAck: false }
+        );
+      })
+      .catch(e => log(e));
   });
 };
 

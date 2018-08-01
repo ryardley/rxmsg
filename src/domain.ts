@@ -1,8 +1,8 @@
 import { Observable, Subject } from 'rxjs';
 
 export interface IRabbitDestination {
-  exchange: string;
-  queue: string;
+  exchange?: string;
+  queue?: string;
 }
 
 export interface IMessage {

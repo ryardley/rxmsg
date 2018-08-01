@@ -22,3 +22,18 @@ it('should send messages from the producer to the middleware', () => {
 
   expect(mockFn.mock.calls.length).toBe(3);
 });
+
+it('should store messages until it is subscribed', done => {
+  const middleware: Middleware = o => {
+    const mockFn = jest.fn();
+    setTimeout(() => {
+      o.subscribe(mockFn);
+      expect(mockFn.mock.calls).toEqual([[{ payload: 1 }], [{ payload: 2 }]]);
+      done();
+    }, 100);
+    return from([]); // nullStream;
+  };
+  const producer = createProducer(middleware);
+  producer.next({ payload: 1 });
+  producer.next({ payload: 2 });
+});
