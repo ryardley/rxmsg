@@ -3,7 +3,7 @@ import { Observable, Observer } from 'rxjs';
 import { IMessage, MiddlewareCreator } from '../domain';
 // TODO: I think we need some way to declaratively specify the exchange structure
 
-function log(msg) {
+function log(msg: string) {
   console.log(msg); // tslint:disable-line
 }
 
