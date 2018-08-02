@@ -5,8 +5,10 @@
   "license": "MIT",
   "devDependencies": {
     "@types/amqplib": "^0.5.8",
+    "@types/lodash": "^4.14.115",
     "@types/rx": "^4.1.1",
     "blockbid-tools": "blockbid/blockbid-tools",
+    "proxyquire": "^2.0.1",
     "ts-node": "^7.0.0"
   },
   "scripts": {
@@ -17,6 +19,7 @@
   },
   "dependencies": {
     "amqplib": "^0.5.2",
+    "lodash": "^4.17.10",
     "rxjs": "^6.2.2"
   }
 }

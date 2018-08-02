@@ -17,101 +17,113 @@ Some principles:
 - Modular middleware system inspired by Redux and Express
 - Favour higher order functional configuration over classes inheritence and DI
 - Basic framework should work in all V8 environments.
+- Middleware might be environment specific
 - Favour Simplicity over complexity
 
-```typescript
-import { Observable, Subject } from 'rxjs';
-
-export interface IDestination {
-  via?: string;
-  to: string;
-}
-
-export interface IMessage {
-  payload: {};
-  meta?: {};
-  dest?: IDestination;
-  [key: string]: any;
-}
-
-export type Producer = Subject<IMessage>;
-export type Consumer = Observable<IMessage>;
-
-export type Middleware = (a: Observable<IMessage>) => Observable<IMessage>;
-```
+## Example Usage
 
 ```typescript
 import {
-  // Plugins
-  createRabbitMiddleware,
+  rabbitMiddleware,
   createConsumer,
-  createProducer,
-
-  // Core
-  createMessageClient
+  createProducer
 } from 'blockbid-messaging';
 
-import { map } from 'rxjs/operators';
-
-(async () => {
-  try {
-    const rabbitMiddleware: Middleware = createRabbitMiddleware({
-      uri:
-        'amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc'
-      // more config ...
-    });
-
-    const transformMessageSomehow: Middleware = stream =>
-      stream.pipe(
-        map(msg => ({
-          ...msg,
-          foo: 'foo'
-        }))
-      );
-
-    const loggerMiddleware: Middleware = stream =>
-      stream.pipe(tap(console.log.bind(console)));
-
-    // Create consumer and producer
-    // Consumer is just an Observable
-    const consumer: Consumer = createConsumer(
-      rabbitMiddleware,
-      loggerMiddleware,
-      transformMessageSomehow
-    );
-
-    const producer: Subject = createProducer(
-      transformMessageSomehow,
-      loggerMiddleware,
-      rabbitMiddleware
-    );
-
-    // Get messages as an RxJS stream
-    // const messageStream: Observable<Message> = consumer.messageStream();
-    const subscription = consumer.subscribe(
-      ({ payload }) => console.log(`Just recieved ${payload}`),
-      console.error
-    );
-
-    // Messages have a payload and can contain a number of dynamic metadata keys
-    const dest: IDestination = {
-      via: 'my-exchange',
-      to: 'my-destination-consumer'
-    };
-
-    producer.next({ dest, payload: 'foo', meta: { ding: 'pop' } });
-    producer.next({ dest, payload: 'bar' });
-    producer.next({ dest, payload: { baz: 'baz' } }); // can be object that will be
-  } catch (err) {
-    console.error(err);
+const rabbit = rabbitMiddleware({
+  uri: 'amqp://user:password@moose.rmq.cloudamqp.com/endpoint',
+  // define structure here
+  structures: {
+    queues: {
+      fast: { durable: true },
+      slow: { durable: true }
+    },
+    exchanges: {
+      tasks: {
+        type: 'fanout'
+      }
+    },
+    bindings: [
+      {
+        source: 'tasks',
+        destintation: 'fast',
+        pattern: '*.fast'
+      },
+      {
+        source: 'tasks',
+        destintation: 'slow',
+        pattern: '*.slow'
+      }
+    ]
   }
+});
 
-  setTimeout(() => {
-    subscription.unsubscribe();
-  }, 3000);
-})();
+// Log whatever message this receives
+// Middlware is simply a function that takes an Observable and returns an Observable
+const logger: Middleware = stream => stream.pipe(tap(m => console.log(m)));
+
+// fastConsumer is simply an Rx.Observable
+createConsumer(
+  // Middleware list
+  rabbit.receiver({ queue: 'fast', noAck: true }), //  first recieve message from rabbit
+  logger // then log the message
+).subscribe(
+  ({ content }) => console.log(`Just recieved ${content} on FAST channel.`), // report message
+  console.error.bind(console) // send errors to the console
+);
+
+// slowConsumer is simply an Rx.Observable
+createConsumer(
+  rabbit.receiver({ queue: 'slow' }), //  first recieve message from rabbit
+  logger // then log it
+).subscribe(
+  ({ content }) => console.log(`Just recieved ${content} on SLOW channel.`), // report message
+  console.error.bind(console) // send errors to the console
+);
+
+// Producer is simply an Rx.Observer
+const producer = createProducer(
+  logger, // first log the incoming message
+  // could add other middleware to modify the message or produce side effects
+  // or even send the message to multiple exchanges etc.
+  rabbit.sender() // then send it to rabbit
+);
+
+// Middleware can simply be wrapped around the producer like this too.
+// This producer will now log twice!
+const fastProducer = logger(producer).pipe(
+  map(msg => ({
+    destination: {
+      exchange: 'tasks',
+      routeKey: 'tasks.fast'
+    },
+    ...msg
+  }))
+);
+
+const slowProducer = producer.pipe(
+  map(msg => ({
+    destination: {
+      exchange: 'tasks',
+      routeKey: 'tasks.slow'
+    },
+    ...msg
+  }))
+);
+
+fastProducer.next({
+  content: 'send this to the fast queue'
+});
+
+slowProducer.next({
+  content: 'send this to the slow queue'
+});
 ```
 
 ## References
 
+https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
+https://www.rabbitmq.com/tutorials/tutorial-two-javascript.html
+https://www.rabbitmq.com/tutorials/tutorial-three-javascript.html
+https://www.rabbitmq.com/tutorials/tutorial-four-javascript.html
+https://www.rabbitmq.com/tutorials/tutorial-five-javascript.html
 https://aws.amazon.com/blogs/compute/building-scalable-applications-and-microservices-adding-messaging-to-your-toolbox/

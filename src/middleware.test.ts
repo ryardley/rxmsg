@@ -8,11 +8,11 @@ describe('combineMiddleware', () => {
     const log = [];
 
     const middleware1: Middleware = o =>
-      o.pipe(tap(msg => log.push(`middleware1: ${msg.payload}`)));
+      o.pipe(tap(msg => log.push(`middleware1: ${msg.content}`)));
     const middleware2: Middleware = o =>
-      o.pipe(tap(msg => log.push(`middleware2: ${msg.payload}`)));
+      o.pipe(tap(msg => log.push(`middleware2: ${msg.content}`)));
     const middleware3: Middleware = o =>
-      o.pipe(tap(msg => log.push(`middleware3: ${msg.payload}`)));
+      o.pipe(tap(msg => log.push(`middleware3: ${msg.content}`)));
 
     const middlewareFunc = combineMiddleware(
       middleware1,
@@ -21,9 +21,9 @@ describe('combineMiddleware', () => {
     );
 
     const s = middlewareFunc(
-      from([{ payload: 1 }, { payload: 2 }, { payload: 3 }])
+      from([{ content: 1 }, { content: 2 }, { content: 3 }])
     ).subscribe(msg => {
-      log.push(`subscribe: ${msg.payload}`);
+      log.push(`subscribe: ${msg.content}`);
     });
 
     expect(log).toEqual([
@@ -50,8 +50,8 @@ describe('combineMiddleware', () => {
   describe('no middleware function', () => {
     it('should send the observer through', () => {
       const log = [];
-      combineMiddleware()(from([{ payload: 1 }, { payload: 2 }])).subscribe(
-        msg => log.push(`subscribe: ${msg.payload}`)
+      combineMiddleware()(from([{ content: 1 }, { content: 2 }])).subscribe(
+        msg => log.push(`subscribe: ${msg.content}`)
       );
       expect(log).toEqual(['subscribe: 1', 'subscribe: 2']);
     });

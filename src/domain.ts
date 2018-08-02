@@ -1,19 +1,12 @@
 import { Observable, Subject } from 'rxjs';
 
-export interface IRabbitDestination {
-  exchange?: string;
-  queue?: string;
-}
-
 export interface IMessage {
-  payload: any;
+  content: any;
   ack?: () => void;
-  meta?: { [key: string]: any };
-  dest?: IRabbitDestination;
 }
 
 export type MiddlewareCreator<T> = (c: T) => Middleware;
-
+export type ConfiguredMiddlewareCreator<T, Q> = (c: T) => MiddlewareCreator<Q>;
 export type Producer = Subject<IMessage>;
 export type Consumer = Observable<IMessage>;
 

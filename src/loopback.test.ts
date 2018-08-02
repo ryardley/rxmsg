@@ -13,16 +13,16 @@ describe('Using the loopback middleware synchronously', () => {
       log.push(msg);
     });
 
-    producer.next({ payload: 'One' });
-    producer.next({ payload: 'Two' });
-    producer.next({ payload: 'Three' });
-    producer.next({ payload: 'Four' });
+    producer.next({ content: 'One' });
+    producer.next({ content: 'Two' });
+    producer.next({ content: 'Three' });
+    producer.next({ content: 'Four' });
 
     expect(log).toEqual([
-      { payload: 'One' },
-      { payload: 'Two' },
-      { payload: 'Three' },
-      { payload: 'Four' }
+      { content: 'One' },
+      { content: 'Two' },
+      { content: 'Three' },
+      { content: 'Four' }
     ]);
   });
 });
@@ -41,19 +41,19 @@ describe('Using the loopback middleware asynchronously', () => {
       log.push(msg);
       if (log.length === 4) {
         expect(log).toEqual([
-          { payload: 'One' },
-          { payload: 'Two' },
-          { payload: 'Three' },
-          { payload: 'Four' }
+          { content: 'One' },
+          { content: 'Two' },
+          { content: 'Three' },
+          { content: 'Four' }
         ]);
         done();
       }
     });
 
-    producer.next({ payload: 'One' });
-    producer.next({ payload: 'Two' });
-    producer.next({ payload: 'Three' });
-    producer.next({ payload: 'Four' });
+    producer.next({ content: 'One' });
+    producer.next({ content: 'Two' });
+    producer.next({ content: 'Three' });
+    producer.next({ content: 'Four' });
 
     expect(log).toEqual([]);
   });
