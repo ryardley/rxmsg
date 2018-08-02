@@ -5,20 +5,19 @@ _Please note this is under development and is still in the design phase and is n
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers but initially via RabbitMQ.
 
-At a later point we should have plugins to make it work:
+At a later point we should have plugins to make it work with various messaging paradigms:
 
-- via Kafka
-- in the browser using socker.io
-- on the server via socket.io
-- locally through node spawned processes
+- Kafka
+- socket.io (browser/server)
+- Communicate between threads / workers
 
 Some principles:
 
-- Modular middleware system inspired by Redux and Express
-- Favour higher order functional configuration over classes inheritence and DI
+- Avoid API complexity.
+- Keep middleware modular.
+- Favour higher order functional configuration over classes.
 - Basic framework should work in all V8 environments.
-- Middleware might be environment specific
-- Favour Simplicity over complexity
+- Middleware might be environment specific. Eg. RabbitMiddlewarerequires node.
 
 ## Example Usage
 
@@ -29,101 +28,192 @@ import {
   createProducer
 } from 'blockbid-messaging';
 
-const rabbit = rabbitMiddleware({
+const { sender, receiver } = rabbitMiddleware({
   uri: 'amqp://user:password@moose.rmq.cloudamqp.com/endpoint',
   // define structure here
   structures: {
-    queues: {
-      fast: { durable: true },
-      slow: { durable: true }
-    },
-    exchanges: {
-      tasks: {
-        type: 'fanout'
+    queues: [
+      { name: 'fast', durable: true }, // These queues are used below
+      { name: 'slow', durable: true },
+      'logs' // Using strings will create a queue with the name logs and the default props
+    ],
+    exchanges: [
+      {
+        name: 'tasks',
+        type: 'topic'
       }
-    },
+    ],
     bindings: [
       {
         source: 'tasks',
-        destintation: 'fast',
+        type: 'queue',
+        destintation: 'fast', // this requires that the queue be defined above
         pattern: '*.fast'
       },
       {
         source: 'tasks',
-        destintation: 'slow',
+        type: 'queue',
+        destintation: 'slow', // this requires that the queue be defined above
         pattern: '*.slow'
       }
     ]
   }
 });
 
-// Log whatever message this receives
-// Middlware is simply a function that takes an Observable and returns an Observable
-const logger: Middleware = stream => stream.pipe(tap(m => console.log(m)));
+// Example Middlware
+// Middleware is simply a function that takes an Observable and returns an Observable
+const logger = prefix => {
+  return stream =>
+    stream.pipe(tap(m => console.log(`${prefix}:${JSON.stringify(m)}`)));
+};
 
-// fastConsumer is simply an Rx.Observable
-createConsumer(
-  // Middleware list
-  rabbit.receiver({ queue: 'fast', noAck: true }), //  first recieve message from rabbit
-  logger // then log the message
-).subscribe(
-  ({ content }) => console.log(`Just recieved ${content} on FAST channel.`), // report message
-  console.error.bind(console) // send errors to the console
+const reportError = console.error.bind(console);
+
+const fastConsumer = createConsumer(
+  // List of middleware functions:
+  // 1. First recieve message from rabbit define it to not require acks
+  // 2. Then log the message with the tag `consumer-fast`
+  receiver({ queue: 'fast', noAck: true }),
+  logger('consumer-fast')
 );
 
-// slowConsumer is simply an Rx.Observable
-createConsumer(
-  rabbit.receiver({ queue: 'slow' }), //  first recieve message from rabbit
-  logger // then log it
-).subscribe(
-  ({ content }) => console.log(`Just recieved ${content} on SLOW channel.`), // report message
-  console.error.bind(console) // send errors to the console
+const slowConsumer = createConsumer(
+  // List of middleware functions:
+  // 1. First recieve message from rabbit
+  // 2. Then log the message with the tag `consumer-slow`
+  receiver({ queue: 'slow' }), // receiver(<IRabbitBinding | IRabbitQueue>);
+  logger('consumer-slow')
 );
 
-// Producer is simply an Rx.Observer
 const producer = createProducer(
-  logger, // first log the incoming message
-  // could add other middleware to modify the message or produce side effects
-  // or even send the message to multiple exchanges etc.
-  rabbit.sender() // then send it to rabbit
+  // List of middleware functions:
+  // 1. First log the message with the tag `producer`
+  // 2. Then send the message to rabbit
+  logger('producer'),
+  sender()
 );
 
 // Middleware can simply be wrapped around the producer like this too.
 // This producer will now log twice!
-const fastProducer = logger(producer).pipe(
-  map(msg => ({
-    destination: {
-      exchange: 'tasks',
-      routeKey: 'tasks.fast'
-    },
-    ...msg
-  }))
+const doubleLogger = logger('double-log')(producer);
+
+// fastConsumer is simply an Rx.Observable https://rxjs-dev.firebaseapp.com/api/index/class/Observable
+fastConsumer.subscribe(
+  msg => console.log(`Just recieved ${msg.content} on FAST channel.`),
+  reportError
 );
 
-const slowProducer = producer.pipe(
-  map(msg => ({
-    destination: {
-      exchange: 'tasks',
-      routeKey: 'tasks.slow'
-    },
-    ...msg
-  }))
+// slowConsumer is simply an Rx.Observable https://rxjs-dev.firebaseapp.com/api/index/class/Observable
+slowConsumer.subscribe(msg => {
+  console.log(`Just recieved ${msg.content} on SLOW channel.`);
+  msg.ack(); // acknowledge the message
+}, reportError);
+
+// Producer is simply an Rx.Observer https://rxjs-dev.firebaseapp.com/api/index/interface/Observer
+producer.next({
+  destination: 'fast',
+  content: 'This will go straight to the fast queue and bypass all exchanges'
+});
+
+doubleLogger.next({
+  destination: {
+    exchange: 'tasks',
+    routeKey: 'somefoo.fast'
+  },
+  content: 'send this to the fast queue via the tasks exchange'
+});
+
+producer.next({
+  destination: {
+    exchange: 'tasks',
+    routeKey: 'somefoo.slow'
+  },
+  content: 'send this to the slow queue via the tasks exchange'
+});
+```
+
+## Examples:
+
+### Hello World
+
+Solutions to rabbit tutorials
+
+https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
+
+```typescript
+const { sender, receiver } = createRabbitMiddleware({
+  uri: 'amqp://user:password@domain.com/user'
+});
+
+// P -> Q
+const producer = createProducer(
+  sender({
+    queue: {
+      name: 'hello',
+      durable: false
+    }
+  })
 );
 
-fastProducer.next({
-  content: 'send this to the fast queue'
+producer.next({
+  destination: 'hello',
+  content: 'Hello World!'
 });
 
-slowProducer.next({
-  content: 'send this to the slow queue'
+// Q -> C
+const consumer = createConsumer(
+  receiver({
+    queue: {
+      name: 'hello',
+      durable: false
+    },
+    noAck: true
+  })
+);
+
+consumer.subscribe(msg => {
+  console.log(' [x] Received %s', msg.content);
 });
+```
+
+As they have a shared queue you can combine queue assertions in a master config
+
+```typescript
+const { sender, receiver } = createRabbitMiddleware({
+  uri: 'amqp://user:password@domain.com/user',
+  declarations: {
+    queues: [
+      {
+        name: 'hello',
+        durable: false
+      }
+    ]
+  }
+});
+
+const producer = createProducer(
+  sender({
+    queue: 'hello'
+  })
+);
+
+// ...
+
+const consumer = createConsumer(
+  receiver({
+    queue: 'hello',
+    noAck: true
+  })
+);
+
+// ...
 ```
 
 ## References
 
-https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
-https://www.rabbitmq.com/tutorials/tutorial-two-javascript.html
-https://www.rabbitmq.com/tutorials/tutorial-three-javascript.html
-https://www.rabbitmq.com/tutorials/tutorial-four-javascript.html
-https://www.rabbitmq.com/tutorials/tutorial-five-javascript.html
-https://aws.amazon.com/blogs/compute/building-scalable-applications-and-microservices-adding-messaging-to-your-toolbox/
+- https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
+- https://www.rabbitmq.com/tutorials/tutorial-two-javascript.html
+- https://www.rabbitmq.com/tutorials/tutorial-three-javascript.html
+- https://www.rabbitmq.com/tutorials/tutorial-four-javascript.html
+- https://www.rabbitmq.com/tutorials/tutorial-five-javascript.html
+- https://aws.amazon.com/blogs/compute/building-scalable-applications-and-microservices-adding-messaging-to-your-toolbox/

@@ -1,7 +1,7 @@
 import { ConfiguredMiddlewareCreator, IMessage } from '../../domain';
 
 export interface IRabbitQueue {
-  // name: string;
+  name: string;
   durable?: boolean;
   exclusive?: boolean;
   autoDelete?: boolean;
@@ -9,7 +9,7 @@ export interface IRabbitQueue {
 }
 
 export interface IRabbitConsumer {
-  queue: string;
+  queue: string | IRabbitQueue;
   consumerTag?: string; // best to ignore this as given automatically
   // noLocal: boolean; // ignored
   noAck?: boolean; // if true will dequeue messages as soon as they have been sent
@@ -21,12 +21,12 @@ export interface IRabbitConsumer {
 // Destination information
 // For reference Kafka client might have things like: topic, partitionKey, partition
 export interface IRabbitDestination {
-  exchange?: string;
-  routingKey: string;
+  exchange: string;
+  routeKey: string;
 }
 
 export interface IRabbitMessage extends IMessage {
-  destination: IRabbitDestination;
+  destination: IRabbitDestination | string;
   metadata?: {
     // Message metadata will differ based onclient
     expiration?: string;
@@ -57,7 +57,7 @@ export interface IRabbitReturnMessage extends IMessage {
 }
 
 export interface IRabbitExchange {
-  // name: string;
+  name: string;
   type: 'fanout' | 'topic' | 'direct';
   durable?: boolean;
   internal?: boolean;
@@ -67,11 +67,11 @@ export interface IRabbitExchange {
 }
 
 export interface IRabbitBinding {
-  source: string;
-  type: 'exchange' | 'queue';
-  destination: string;
+  arguments?: any;
+  destination: IRabbitQueue | IRabbitExchange | string;
   pattern: string;
-  args: any;
+  source: IRabbitExchange | string;
+  type: 'exchange' | 'queue';
 }
 
 export interface IRabbitConnectionConfig {
@@ -86,11 +86,11 @@ export interface IRabbitConnectionConfig {
 }
 
 export interface IRabbitConfig extends IRabbitConnectionConfig {
-  structures?: IBroker;
+  declarations?: IRabbitStructure;
 }
 
-export interface IBroker {
-  queues?: IRabbitQueue[];
+export interface IRabbitStructure {
+  queues?: Array<IRabbitQueue | string>;
   exchanges?: IRabbitExchange[];
   bindings?: IRabbitBinding[];
 }

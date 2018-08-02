@@ -20,7 +20,7 @@ const createReceiver: RabbitConsumerMiddlewareCreator = channelConfig => ({
     createChannel(channelConfig)
       .then(channel => {
         // fix up all this promise crap
-        assertChannelStructure(channel, channelConfig.structures).then(() => {
+        assertChannelStructure(channel, channelConfig.declarations).then(() => {
           channel.consume(
             queue,
             msg => {
@@ -31,6 +31,7 @@ const createReceiver: RabbitConsumerMiddlewareCreator = channelConfig => ({
               observer.next({
                 ack, // ack's must be called after the consumer has finished with the message
                 content
+                // TODO: send message metadata too
               });
             },
             consumeConfig
