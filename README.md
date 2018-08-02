@@ -315,7 +315,7 @@ import {
 const { sender, receiver, close } = rabbitMiddleware({
   uri: 'amqp://user:password@moose.rmq.cloudamqp.com/endpoint',
   // define structure here
-  structures: {
+  declarations: {
     queues: [
       { name: 'fast', durable: false }, // These queues are used below
       { name: 'slow', durable: false },
