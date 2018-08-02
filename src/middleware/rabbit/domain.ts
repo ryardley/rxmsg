@@ -1,17 +1,29 @@
+import { Channel, Replies } from 'amqplib';
 import { ConfiguredMiddlewareCreator, IMessage } from '../../domain';
 
-export interface IRabbitQueue {
+export type IRabbitQueue =
+  | {
+      name: string;
+      durable?: boolean;
+      exclusive?: boolean;
+      autoDelete?: boolean;
+      arguments?: any;
+    }
+  | string;
+
+export interface IRabbitExchange {
   name: string;
+  type: 'fanout' | 'topic' | 'direct';
   durable?: boolean;
-  exclusive?: boolean;
+  internal?: boolean;
   autoDelete?: boolean;
+  alternateExchange?: string;
   arguments?: any;
 }
 
 export interface IRabbitConsumer {
-  queue: string | IRabbitQueue;
+  queue: IRabbitQueue;
   consumerTag?: string; // best to ignore this as given automatically
-  // noLocal: boolean; // ignored
   noAck?: boolean; // if true will dequeue messages as soon as they have been sent
   exclusive?: boolean; // wont let anyone else consume this queue,
   priority?: number;
@@ -19,28 +31,49 @@ export interface IRabbitConsumer {
   prefetch?: number;
 }
 
-// Destination information
-// For reference Kafka client might have things like: topic, partitionKey, partition
-export interface IRabbitDestination {
-  exchange: string;
-  routeKey: string;
+export interface IRabbitConnection {
+  uri: string;
+  socketOptions?: {
+    noDelay?: boolean;
+    cert?: Buffer;
+    key?: Buffer;
+    passphrase?: string;
+    ca?: Buffer[];
+  };
 }
 
+export interface IRabbitDeclarations {
+  queues?: IRabbitQueue[]; // queues can be represented as strings
+  exchanges?: IRabbitExchange[];
+  bindings?: IRabbitBinding[];
+}
+
+export type IRabbitConfig =
+  | (IRabbitConnection & {
+      declarations?: IRabbitDeclarations;
+    })
+  | string; // can use a simple connection string if happy with defaults
+
+// Destination information
+// For reference Kafka client might have things like:
+//   topic, partitionKey, partition
+export type IRabbitRoute =
+  | {
+      exchange: string;
+      key?: string;
+    }
+  | string;
+
 export interface IRabbitMessage extends IMessage {
-  destination: IRabbitDestination | string;
-  metadata?: {
-    // Message metadata will differ based onclient
+  route: IRabbitRoute;
+  meta?: {
     expiration?: string;
     userId?: string;
     persistent?: boolean;
     cc?: string | string[];
     priority?: number;
-    // deliveryMode: boolean; // deprecate
-    // used by rabbit not sent to consumers
-    mandatory?: true;
-    bcc?: string | string[];
-    immediate?: boolean;
-    // ignored by rabbit but used by other apps
+
+    // following is ignored by rabbit but used by other apps
     contentType?: string;
     contentEncoding?: string;
     headers?: object;
@@ -53,49 +86,37 @@ export interface IRabbitMessage extends IMessage {
   };
 }
 
-export interface IRabbitReturnMessage extends IMessage {
+export interface IRabbitMessageProducer extends IRabbitMessage {
+  mandatory?: true;
+  bcc?: string | string[];
+  immediate?: boolean;
+}
+
+export interface IRabbitMessageConsumer extends IRabbitMessage {
   ack: () => void;
 }
 
-export interface IRabbitExchange {
-  name: string;
-  type: 'fanout' | 'topic' | 'direct';
-  durable?: boolean;
-  internal?: boolean;
-  autoDelete?: boolean;
-  alternateExchange?: string;
-  arguments?: any;
-}
+export type IRabbitBinding =
+  | {
+      arguments?: any;
+      destination?: IRabbitQueue; // if not provided default to anon queue
+      pattern: string;
+      source: string;
+      type?: 'exchange' | 'queue'; // default to queue
+    }
+  | string;
 
-export interface IRabbitBinding {
-  arguments?: any;
-  destination: IRabbitQueue | IRabbitExchange | string;
-  pattern: string;
-  source: IRabbitExchange | string;
-  type: 'exchange' | 'queue';
-}
+//////////////
+// FUCTIONS //
+//////////////
 
-export interface IRabbitConnectionConfig {
-  uri: string;
-  socketOptions?: {
-    noDelay?: boolean;
-    cert?: Buffer;
-    key?: Buffer;
-    passphrase?: string;
-    ca?: Buffer[];
-  };
-}
+// Function to take a queue and assert it
+export type RabbitQueueAsserter = (
+  channel: Channel,
+  c: IRabbitQueue
+) => Replies.AssertQueue;
 
-export interface IRabbitConfig extends IRabbitConnectionConfig {
-  declarations?: IRabbitStructure;
-}
-
-export interface IRabbitStructure {
-  queues?: Array<IRabbitQueue | string>;
-  exchanges?: IRabbitExchange[];
-  bindings?: IRabbitBinding[];
-}
-
+// this seems pretty implemetation heavy might be better closer to functions
 export type RabbitConsumerMiddlewareCreator = ConfiguredMiddlewareCreator<
   IRabbitConfig,
   IRabbitConsumer

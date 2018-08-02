@@ -43,7 +43,7 @@ function runProducer() {
   );
 
   producer.next({
-    to: 'hello',
+    route: 'hello',
     content: 'Hello World!'
   });
 }
@@ -84,7 +84,7 @@ function runProducer() {
   const producer = createProducer(sender());
 
   producer.next({
-    to: 'hello',
+    route: 'hello',
     content: 'Hello World!'
   });
 }
@@ -124,7 +124,7 @@ function runProducer() {
   const producer = createProducer(sender());
 
   producer.next({
-    to: 'task_queue',
+    route: 'task_queue',
     persistent: true,
     content: 'Hello World!'
   });
@@ -173,7 +173,7 @@ function runProducer() {
   const producer = createProducer(sender());
 
   producer.next({
-    to: { exchange: 'logs' },
+    route: { exchange: 'logs' },
     content: 'Hello World!'
   });
 }
@@ -229,7 +229,7 @@ function runProducer(msg = 'Hello World', severity = 'info') {
   const producer = createProducer(sender());
 
   producer.next({
-    to: { exchange: 'direct_logs', routeKey: severity },
+    route: { exchange: 'direct_logs', key: severity },
     content: msg
   });
 }
@@ -243,7 +243,7 @@ function runConsumer(labels: array) {
   );
 
   consumer.subscribe(msg => {
-    console.log(" [x] %s: '%s'", msg.to.routeKey, msg.content);
+    console.log(" [x] %s: '%s'", msg.route.key, msg.content);
   });
 }
 ```
@@ -272,7 +272,7 @@ function emitLog(msg = 'Hello World', key = 'anonymous.info') {
   const producer = createProducer(sender());
 
   producer.next({
-    to: { exchange: 'topic_logs', routeKey: key },
+    route: { exchange: 'topic_logs', key: key },
     content: msg
   });
 }
@@ -286,7 +286,7 @@ function recieveLog(patterns: array) {
   );
 
   consumer.subscribe(msg => {
-    console.log(" [x] %s: '%s'", msg.to.routeKey, msg.content);
+    console.log(" [x] %s: '%s'", msg.route.key, msg.content);
   });
 }
 /*
@@ -395,22 +395,22 @@ slowConsumer.subscribe(msg => {
 
 // Producer is simply an Rx.Observer https://rxjs-dev.firebaseapp.com/api/index/interface/Observer
 producer.next({
-  to: 'fast',
+  route: 'fast',
   content: 'This will go straight to the fast queue and bypass all exchanges'
 });
 
 doubleLogger.next({
-  to: {
+  route: {
     exchange: 'tasks',
-    routeKey: 'somefoo.fast'
+    key: 'somefoo.fast'
   },
   content: 'send this to the fast queue via the tasks exchange'
 });
 
 producer.next({
-  to: {
+  route: {
     exchange: 'tasks',
-    routeKey: 'somefoo.slow'
+    key: 'somefoo.slow'
   },
   content: 'send this to the slow queue via the tasks exchange'
 });
