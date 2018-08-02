@@ -16,6 +16,7 @@ export interface IRabbitConsumer {
   exclusive?: boolean; // wont let anyone else consume this queue,
   priority?: number;
   arguments?: object;
+  prefetch?: number;
 }
 
 // Destination information

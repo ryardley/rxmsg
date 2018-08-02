@@ -27,7 +27,7 @@ const createReceiver: RabbitConsumerMiddlewareCreator = channelConfig => ({
               const content = JSON.parse(msg.content.toString());
               const ack = consumeConfig.noAck
                 ? (): void => undefined
-                : () => channel.ack(msg);
+                : (allUpTo: boolean = false) => channel.ack(msg, allUpTo);
               observer.next({
                 ack, // ack's must be called after the consumer has finished with the message
                 content

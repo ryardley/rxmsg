@@ -28,7 +28,7 @@ import {
   createProducer
 } from 'blockbid-messaging';
 
-const { sender, receiver } = rabbitMiddleware({
+const { sender, receiver, close } = rabbitMiddleware({
   uri: 'amqp://user:password@moose.rmq.cloudamqp.com/endpoint',
   // define structure here
   structures: {
@@ -130,6 +130,12 @@ producer.next({
   },
   content: 'send this to the slow queue via the tasks exchange'
 });
+
+// dont forget to close the connection and exit.
+setTimeout(() => {
+  close();
+  process.exit();
+}, 500);
 ```
 
 ## Examples:
@@ -145,35 +151,37 @@ const { sender, receiver } = createRabbitMiddleware({
   uri: 'amqp://user:password@domain.com/user'
 });
 
-// P -> Q
-const producer = createProducer(
-  sender({
-    queue: {
-      name: 'hello',
-      durable: false
-    }
-  })
-);
+function runProducer() {
+  const producer = createProducer(
+    sender({
+      queue: {
+        name: 'hello',
+        durable: false
+      }
+    })
+  );
 
-producer.next({
-  destination: 'hello',
-  content: 'Hello World!'
-});
+  producer.next({
+    destination: 'hello',
+    content: 'Hello World!'
+  });
+}
 
-// Q -> C
-const consumer = createConsumer(
-  receiver({
-    queue: {
-      name: 'hello',
-      durable: false
-    },
-    noAck: true
-  })
-);
+function runConsumer() {
+  const consumer = createConsumer(
+    receiver({
+      queue: {
+        name: 'hello',
+        durable: false
+      },
+      noAck: true
+    })
+  );
 
-consumer.subscribe(msg => {
-  console.log(' [x] Received %s', msg.content);
-});
+  consumer.subscribe(msg => {
+    console.log(' [x] Received %s', msg.content);
+  });
+}
 ```
 
 As they have a shared queue you can combine queue assertions in a master config
@@ -191,22 +199,215 @@ const { sender, receiver } = createRabbitMiddleware({
   }
 });
 
-const producer = createProducer(
-  sender({
-    queue: 'hello'
-  })
-);
+function runProducer() {
+  const producer = createProducer(sender());
 
-// ...
+  producer.next({
+    destination: 'hello',
+    content: 'Hello World!'
+  });
+}
 
-const consumer = createConsumer(
-  receiver({
-    queue: 'hello',
-    noAck: true
-  })
-);
+function runConsumer() {
+  const consumer = createConsumer(
+    receiver({
+      queue: 'hello',
+      noAck: true
+    })
+  );
 
-// ...
+  consumer.subscribe(msg => {
+    console.log(' [x] Received %s', msg.content);
+  });
+}
+```
+
+### Work Queues
+
+Solutions to rabbit tutorials
+
+https://www.rabbitmq.com/tutorials/tutorial-two-javascript.html
+
+```typescript
+const { sender, receiver } = createRabbitMiddleware({
+  uri: 'amqp://user:password@domain.com/user',
+  declarations: {
+    queues: {
+      name: 'task_queue',
+      durable: true
+    }
+  }
+});
+
+function runProducer() {
+  const producer = createProducer(sender());
+
+  producer.next({
+    destination: 'task_queue',
+    persistent: true,
+    content: 'Hello World!'
+  });
+}
+
+function runConsumer() {
+  const consumer = createConsumer(
+    receiver({
+      prefetch: 1
+    })
+  );
+
+  consumer.subscribe(msg => {
+    const secs = msg.content.split('.').length - 1;
+
+    console.log(' [x] Received %s', msg.content);
+    setTimeout(() => {
+      console.log(' [x] Done');
+      msg.ack();
+    }, secs * 1000);
+  });
+}
+```
+
+### Publish / Subscribe
+
+Solutions to rabbit tutorials
+
+https://www.rabbitmq.com/tutorials/tutorial-three-javascript.html
+
+```typescript
+const { sender, receiver } = createRabbitMiddleware({
+  uri: 'amqp://user:password@domain.com/user',
+  declarations: {
+    exchanges: [
+      {
+        name: 'logs',
+        type: 'fanout',
+        durable: false
+      }
+    ]
+  }
+});
+
+function runProducer() {
+  const producer = createProducer(sender());
+
+  producer.next({
+    destination: { exchange: 'logs' },
+    content: 'Hello World!'
+  });
+}
+
+function runConsumer() {
+  const consumer = createConsumer(
+    receiver({
+      noAck: true,
+      bindings: [
+        /*
+        {
+          destination: { // default destination is anonimous and exclusive
+            name: '',
+            exclusive: true
+          },
+          source: 'logs' // * REQUIRED
+          type: 'queue', // default binding type
+          pattern: '' // default pattern is not pattern
+        }
+        */
+        'logs' // string is equivalent
+      ]
+    })
+  );
+
+  consumer.subscribe(msg => {
+    console.log(' [x] Received %s', msg.content);
+  });
+}
+```
+
+## Routing
+
+Solutions to rabbit tutorials
+
+https://www.rabbitmq.com/tutorials/tutorial-four-javascript.html
+
+```typescript
+const { sender, receiver } = createRabbitMiddleware({
+  uri: 'amqp://user:password@domain.com/user',
+  declarations: {
+    exchanges: [
+      {
+        name: 'direct_logs',
+        type: 'direct',
+        durable: false
+      }
+    ]
+  }
+});
+
+function runProducer(msg = 'Hello World', severity = 'info') {
+  const producer = createProducer(sender());
+
+  producer.next({
+    destination: { exchange: 'direct_logs', routeKey: severity },
+    content: msg
+  });
+}
+
+function runConsumer(labels: array) {
+  const consumer = createConsumer(
+    receiver({
+      noAck: true,
+      bindings: labels.map(label => ({ source: 'direct_logs', pattern: label }))
+    })
+  );
+
+  consumer.subscribe(msg => {
+    console.log(" [x] %s: '%s'", msg.destination.routeKey, msg.content);
+  });
+}
+```
+
+## Topics
+
+Solutions to rabbit tutorials
+
+https://www.rabbitmq.com/tutorials/tutorial-five-javascript.html
+
+```typescript
+const { sender, receiver } = createRabbitMiddleware({
+  uri: 'amqp://user:password@domain.com/user',
+  declarations: {
+    exchanges: [
+      {
+        name: 'topic_logs',
+        type: 'topic',
+        durable: false
+      }
+    ]
+  }
+});
+
+function runProducer(msg = 'Hello World', key = 'anonymous.info') {
+  const producer = createProducer(sender());
+
+  producer.next({
+    destination: { exchange: 'topic_logs', routeKey: key },
+    content: msg
+  });
+}
+
+function runConsumer(patterns: array) {
+  const consumer = createConsumer(
+    receiver({
+      noAck: true,
+      bindings: patterns.map(pattern => ({ source: 'topic_logs', pattern }))
+    })
+  );
+
+  consumer.subscribe(msg => {
+    console.log(" [x] %s: '%s'", msg.destination.routeKey, msg.content);
+  });
+}
 ```
 
 ## References
