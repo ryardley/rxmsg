@@ -28,7 +28,7 @@ Solutions to rabbit tutorials
 https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
 
 ```typescript
-import { createAmqpConnector } from 'blockbid-messages/rabbit';
+import { createAmqpConnector } from 'blockbid-messages/amqp';
 
 const { sender, receiver } = createAmqpConnector(
   'amqp://user:password@domain.com/user'
