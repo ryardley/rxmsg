@@ -28,7 +28,9 @@ Solutions to rabbit tutorials
 https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
 
 ```typescript
-const { sender, receiver } = createRabbitMiddleware(
+import { createAmqpConnector } from 'blockbid-messages/rabbit';
+
+const { sender, receiver } = createAmqpConnector(
   'amqp://user:password@domain.com/user'
 );
 
@@ -68,7 +70,7 @@ function runConsumer() {
 As they have a shared queue you can combine queue assertions in a master config
 
 ```typescript
-const { sender, receiver } = createRabbitMiddleware({
+const { sender, receiver } = createAmqpConnector({
   uri: 'amqp://user:password@domain.com/user',
   declarations: {
     queues: [
@@ -110,7 +112,7 @@ Solutions to rabbit tutorials
 https://www.rabbitmq.com/tutorials/tutorial-two-javascript.html
 
 ```typescript
-const { sender, receiver } = createRabbitMiddleware({
+const { sender, receiver } = createAmqpConnector({
   uri: 'amqp://user:password@domain.com/user',
   declarations: {
     queues: {
@@ -156,7 +158,7 @@ Solutions to rabbit tutorials
 https://www.rabbitmq.com/tutorials/tutorial-three-javascript.html
 
 ```typescript
-const { sender, receiver } = createRabbitMiddleware({
+const { sender, receiver } = createAmqpConnector({
   uri: 'amqp://user:password@domain.com/user',
   declarations: {
     exchanges: [
@@ -212,7 +214,7 @@ Solutions to rabbit tutorials
 https://www.rabbitmq.com/tutorials/tutorial-four-javascript.html
 
 ```typescript
-const { sender, receiver } = createRabbitMiddleware({
+const { sender, receiver } = createAmqpConnector({
   uri: 'amqp://user:password@domain.com/user',
   declarations: {
     exchanges: [
@@ -255,7 +257,7 @@ Solutions to rabbit tutorials
 https://www.rabbitmq.com/tutorials/tutorial-five-javascript.html
 
 ```typescript
-const { sender, receiver } = createRabbitMiddleware({
+const { sender, receiver } = createAmqpConnector({
   uri: 'amqp://user:password@domain.com/user',
   declarations: {
     exchanges: [
