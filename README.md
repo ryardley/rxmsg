@@ -28,9 +28,9 @@ Solutions to rabbit tutorials
 https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
 
 ```typescript
-const { sender, receiver } = createRabbitMiddleware({
-  uri: 'amqp://user:password@domain.com/user'
-});
+const { sender, receiver } = createRabbitMiddleware(
+  'amqp://user:password@domain.com/user'
+);
 
 function runProducer() {
   const producer = createProducer(
