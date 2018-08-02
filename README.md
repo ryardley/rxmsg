@@ -7,17 +7,18 @@ way via various brokers but initially via RabbitMQ.
 
 At a later point we should have plugins to make it work with various messaging paradigms:
 
-- Kafka
+- Communicate locally between threads / workers
 - socket.io (browser/server)
-- Communicate between threads / workers
+- Kafka
 
 Some principles:
 
 - Avoid API complexity.
-- Keep middleware modular.
+- Declarative over imperative.
+- Modular message decoration.
 - Favour higher order functional configuration over classes.
 - Basic framework should work in all V8 environments.
-- Middleware might be environment specific. Eg. RabbitMiddlewarerequires node.
+- Middleware might be environment specific. Eg. `blockbid-messages/amqp` requires node. `blockbid-messages/socketio-browser` may require browser objects.
 
 ## Example Usage
 
