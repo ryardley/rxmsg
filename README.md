@@ -17,8 +17,15 @@ Some principles:
 - Declarative over imperative.
 - Modular message decoration.
 - Favour higher order functional configuration over classes.
+
+Environments
+
 - Basic framework should work in all V8 environments.
 - Middleware might be environment specific. Eg. `blockbid-messages/amqp` requires node. `blockbid-messages/socketio-browser` may require browser objects.
+
+Fault resillience
+
+- If anything fails it will throw an Error and close the connection and retry X times
 
 ## Example Usage
 
@@ -38,10 +45,12 @@ const { sender, receiver } = createAmqpConnector(
 function runProducer() {
   const producer = createProducer(
     sender({
-      queue: {
-        name: 'hello',
-        durable: false
-      }
+      queues: [
+        {
+          name: 'hello',
+          durable: false
+        }
+      ]
     })
   );
 
@@ -136,6 +145,7 @@ function runProducer() {
 function runConsumer() {
   const consumer = createConsumer(
     receiver({
+      queue: 'task_queue',
       prefetch: 1
     })
   );
@@ -184,6 +194,7 @@ function runProducer() {
 function runConsumer() {
   const consumer = createConsumer(
     receiver({
+      queue: '',
       noAck: true,
       bindings: [
         /*
@@ -317,11 +328,11 @@ const { sender, receiver, close } = rabbitMiddleware({
   uri: 'amqp://user:password@moose.rmq.cloudamqp.com/endpoint',
   // define structure here
   declarations: {
-    queues: [
-      { name: 'fast', durable: false }, // These queues are used below
-      { name: 'slow', durable: false },
-      'logs' // Using strings will create a queue with the name logs and the default props
-    ],
+    queues: {
+      fast: { name: 'fast', durable: false }, // These queues are used below
+      slow: { name: 'slow', durable: false },
+      logs: { name: 'logs' }
+    },
     exchanges: [
       {
         name: 'tasks',
