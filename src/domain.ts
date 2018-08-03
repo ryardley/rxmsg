@@ -2,6 +2,7 @@ import { Observable, Subject } from 'rxjs';
 
 export interface IMessage {
   content: any;
+  route?: any;
   ack?: () => void;
 }
 

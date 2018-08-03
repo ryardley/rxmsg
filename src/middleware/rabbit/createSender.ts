@@ -1,47 +1,54 @@
-import amqp from 'amqplib';
+// tslint:disable:no-console
 import { Observable } from 'rxjs';
-import { MiddlewareCreator } from '../../domain';
-import assertChannelStructure from './assertChannelStructure';
+
+import { assertDeclarations } from './assertions';
 import createChannel from './createChannel';
-import { IRabbitConfig, IRabbitDestination, IRabbitMessage } from './domain';
+import { IRabbitConfig, IRabbitMessageProducer, IRabbitRoute } from './domain';
 
-// TODO: use a real logger
-const log = console.log.bind(console); // tslint:disable-line
+function getRouteValues(
+  route: IRabbitRoute
+): { exchange: string; key: string } {
+  return typeof route === 'string'
+    ? {
+        exchange: '',
+        key: route
+      }
+    : {
+        exchange: route.exchange,
+        key: route.key || ''
+      };
+}
 
-function castToObjectDestination(
-  queueNameOrDestination: IRabbitDestination | string
-): IRabbitDestination {
-  if (typeof queueNameOrDestination === 'string') {
-    return {
-      exchange: '',
-      routeKey: queueNameOrDestination
-    };
-  }
-  return queueNameOrDestination;
+async function setupSender(
+  config: IRabbitConfig,
+  stream: Observable<IRabbitMessageProducer>
+) {
+  const channel = await createChannel(config);
+  await assertDeclarations(channel, config.declarations);
+  stream.subscribe(({ route, meta, ...msg }) => {
+    const { exchange, key } = getRouteValues(route);
+
+    console.log(
+      `gonna publish ${exchange}, ${key}, ${msg.content}, ${JSON.stringify(
+        meta
+      )}`
+    );
+    channel.publish(
+      exchange,
+      key,
+      new Buffer(JSON.stringify(msg.content)),
+      meta
+    );
+  });
 }
 
 // Forward messages
-const createSender: MiddlewareCreator<IRabbitConfig> = config => (
-  stream: Observable<IRabbitMessage>
+const createSender = (config: IRabbitConfig) => () => (
+  stream: Observable<IRabbitMessageProducer>
 ) => {
-  // TODO: How do we handle memory leaks wrt subscriptions?
-  createChannel(config)
-    .then((channel: amqp.Channel) => {
-      // fix up all this promise crap
-      assertChannelStructure(channel, config.declarations).then(() => {
-        stream.subscribe(({ destination, ...msg }) => {
-          log('Sending ' + JSON.stringify(msg));
-          const { exchange, routeKey } = castToObjectDestination(destination);
-
-          channel.publish(
-            exchange,
-            routeKey,
-            new Buffer(JSON.stringify(msg.content))
-          );
-        });
-      });
-    })
-    .catch(e => log(e));
+  setupSender(config, stream).catch((e: Error) => {
+    throw e;
+  });
 
   return stream;
 };

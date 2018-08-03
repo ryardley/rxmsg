@@ -1,44 +1,71 @@
+// tslint:disable:no-console
 import { Observable, Observer } from 'rxjs';
-import assertChannelStructure from './assertChannelStructure';
+import {
+  assertBindings,
+  assertDeclarations,
+  assertQueue,
+  containsQueue,
+  enrichQueue
+} from './assertions';
 import createChannel from './createChannel';
 
 import {
-  IRabbitReturnMessage,
-  RabbitConsumerMiddlewareCreator
+  IRabbitConfig,
+  IRabbitMessageConsumer,
+  IRabbitReceiver
 } from './domain';
 
-// TODO: use a real logger
-const log = console.log.bind(console); // tslint:disable-line
+async function setupReceiver(
+  config: IRabbitConfig,
+  { queue, prefetch, bindings = [], ...receiverConfig }: IRabbitReceiver,
+  observer: Observer<IRabbitMessageConsumer>
+) {
+  console.log(JSON.stringify({ queue, prefetch, receiverConfig }));
+  const channel = await createChannel(config);
+  await assertDeclarations(channel, config.declarations);
+
+  // TODO this is clumsy and needs fixing
+  let queueName: string;
+  if (!containsQueue(config.declarations.queues, queue)) {
+    // TODO: fix naming
+    const { queue: queueString } = await assertQueue(channel, queue);
+    queueName = queueString;
+  } else {
+    queueName = enrichQueue(queue).name;
+  }
+
+  await assertBindings(channel, bindings, queueName);
+
+  // Prefetch is set
+  if (typeof prefetch === 'number') {
+    channel.prefetch(prefetch);
+  }
+
+  // consume the channel
+  channel.consume(
+    queueName,
+    msg => {
+      const rxMsg: IRabbitMessageConsumer = {
+        ack: !receiverConfig.noAck
+          ? (allUpTo: boolean = false) => channel.ack(msg, allUpTo)
+          : undefined,
+        content: JSON.parse(msg.content.toString())
+      };
+      console.log('got message!');
+      observer.next(rxMsg);
+    },
+    receiverConfig
+  );
+}
 
 // Recieve messages
-const createReceiver: RabbitConsumerMiddlewareCreator = channelConfig => ({
-  queue,
-  ...consumeConfig
-}) => () => {
-  // TODO: need to carefully think about error handling scenarios
-  return Observable.create((observer: Observer<IRabbitReturnMessage>) => {
-    createChannel(channelConfig)
-      .then(channel => {
-        // fix up all this promise crap
-        assertChannelStructure(channel, channelConfig.declarations).then(() => {
-          channel.consume(
-            queue,
-            msg => {
-              const content = JSON.parse(msg.content.toString());
-              const ack = consumeConfig.noAck
-                ? (): void => undefined
-                : (allUpTo: boolean = false) => channel.ack(msg, allUpTo);
-              observer.next({
-                ack, // ack's must be called after the consumer has finished with the message
-                content
-                // TODO: send message metadata too
-              });
-            },
-            consumeConfig
-          );
-        });
-      })
-      .catch(e => log(e));
+const createReceiver = (config: IRabbitConfig) => (
+  receiverConfig: IRabbitReceiver
+) => () => {
+  return Observable.create((observer: Observer<IRabbitMessageConsumer>) => {
+    setupReceiver(config, receiverConfig, observer).catch(e => {
+      throw e;
+    });
   });
 };
 

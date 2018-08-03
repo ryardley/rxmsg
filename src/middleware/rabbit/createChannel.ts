@@ -17,10 +17,13 @@ async function createConnection(config: IRabbitConfig) {
   }
 }
 
+// TODO: fix concurrent connections issue
+
 // we only need a single TCP connection per node and can use channels
-let singletonConn: amqp.Connection;
-async function getConnection(config: IRabbitConfig) {
+let singletonConn: amqp.Connection = null;
+export async function getConnection(config: IRabbitConfig) {
   if (!singletonConn) {
+    console.log('Creating connection...'); // tslint:disable-line
     try {
       singletonConn = await createConnection(config);
     } catch (err) {
@@ -28,6 +31,11 @@ async function getConnection(config: IRabbitConfig) {
     }
   }
   return singletonConn;
+}
+
+export async function closeConnection(config: IRabbitConfig) {
+  const conn = await getConnection(config);
+  return await conn.close();
 }
 
 // TODO: Listen for process kill and disconnect? Maybe this happens automatically

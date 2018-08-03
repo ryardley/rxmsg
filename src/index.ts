@@ -1,3 +1,3 @@
 export { createProducer } from './producer';
 export { createConsumer } from './consumer';
-export { default as rabbitMiddleware } from './middleware/rabbit';
+export { default as createAmqpConnector } from './middleware/rabbit';

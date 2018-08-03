@@ -1,5 +1,4 @@
-import { Channel, Replies } from 'amqplib';
-import { ConfiguredMiddlewareCreator, IMessage } from '../../domain';
+import { IMessage } from '../../domain';
 
 export type IRabbitQueue =
   | {
@@ -21,14 +20,15 @@ export interface IRabbitExchange {
   arguments?: any;
 }
 
-export interface IRabbitConsumer {
-  queue: IRabbitQueue;
+export interface IRabbitReceiver {
+  queue?: string; // default to '' <- anon
   consumerTag?: string; // best to ignore this as given automatically
   noAck?: boolean; // if true will dequeue messages as soon as they have been sent
   exclusive?: boolean; // wont let anyone else consume this queue,
   priority?: number;
   arguments?: object;
   prefetch?: number;
+  bindings?: IRabbitBinding[];
 }
 
 export interface IRabbitConnection {
@@ -48,11 +48,9 @@ export interface IRabbitDeclarations {
   bindings?: IRabbitBinding[];
 }
 
-export type IRabbitConfig =
-  | (IRabbitConnection & {
-      declarations?: IRabbitDeclarations;
-    })
-  | string; // can use a simple connection string if happy with defaults
+export type IRabbitConfig = IRabbitConnection & {
+  declarations?: IRabbitDeclarations;
+};
 
 // Destination information
 // For reference Kafka client might have things like:
@@ -65,7 +63,7 @@ export type IRabbitRoute =
   | string;
 
 export interface IRabbitMessage extends IMessage {
-  route: IRabbitRoute;
+  route?: IRabbitRoute;
   meta?: {
     expiration?: string;
     userId?: string;
@@ -93,31 +91,29 @@ export interface IRabbitMessageProducer extends IRabbitMessage {
 }
 
 export interface IRabbitMessageConsumer extends IRabbitMessage {
-  ack: () => void;
+  ack?: () => void;
 }
 
-export type IRabbitBinding =
-  | {
-      arguments?: any;
-      destination?: IRabbitQueue; // if not provided default to anon queue
-      pattern: string;
-      source: string;
-      type?: 'exchange' | 'queue'; // default to queue
-    }
-  | string;
+export interface IRabbitBinding {
+  arguments?: any;
+  destination?: string; // if not provided default to anon queue if no anon que then error
+  pattern?: string; // ''
+  source: string;
+  type?: 'exchange' | 'queue'; // default to queue
+}
 
 //////////////
 // FUCTIONS //
 //////////////
 
 // Function to take a queue and assert it
-export type RabbitQueueAsserter = (
-  channel: Channel,
-  c: IRabbitQueue
-) => Replies.AssertQueue;
+// export type RabbitQueueAsserter = (
+//   channel: Channel,
+//   c: IRabbitQueue
+// ) => Replies.AssertQueue;
 
 // this seems pretty implemetation heavy might be better closer to functions
-export type RabbitConsumerMiddlewareCreator = ConfiguredMiddlewareCreator<
-  IRabbitConfig,
-  IRabbitConsumer
->;
+// export type RabbitConsumerMiddlewareCreator = ConfiguredMiddlewareCreator<
+//   IRabbitConfig,
+//   IRabbitConsumer
+// >;
