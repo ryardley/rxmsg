@@ -24,23 +24,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const rxjs_1 = require("rxjs");
 const assertions_1 = require("./assertions");
 const createChannel_1 = __importDefault(require("./createChannel"));
-function setupReceiver(config, _a, observer) {
-    var { queue: bindingQueueName, prefetch, bindings = [] } = _a, receiverConfig = __rest(_a, ["queue", "prefetch", "bindings"]);
+function setupReceiver(config, localConfig, observer) {
     return __awaiter(this, void 0, void 0, function* () {
+        const { queue = '', prefetch, bindings = [] } = localConfig, receiverConfig = __rest(localConfig, ["queue", "prefetch", "bindings"]);
         const channel = yield createChannel_1.default(config);
         yield assertions_1.assertDeclarations(channel, config.declarations);
-        let queue = bindingQueueName || '';
-        if (queue === '') {
-            const serverResponse = yield assertions_1.assertQueue(channel, queue);
-            queue = serverResponse.queue;
-        }
-        yield assertions_1.assertBindings(channel, bindings, queue);
+        const consumptionQueue = yield assertions_1.assertIfAnonymousQueue(channel, queue);
+        yield assertions_1.assertBindings(channel, bindings, consumptionQueue);
         // Prefetch is set
         if (typeof prefetch === 'number') {
             channel.prefetch(prefetch);
         }
         // consume the channel
-        channel.consume(queue, msg => {
+        channel.consume(consumptionQueue, msg => {
             // handle acknowledgement
             const { noAck } = receiverConfig;
             const ack = noAck

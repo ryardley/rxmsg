@@ -36,18 +36,21 @@ function getRouteValues(route) {
 function setupSender(config, stream) {
     return __awaiter(this, void 0, void 0, function* () {
         const channel = yield createChannel_1.default(config);
-        const decs = yield assertions_1.assertDeclarations(channel, config.declarations);
-        console.log(JSON.stringify({ decs }));
+        yield assertions_1.assertDeclarations(channel, config.declarations);
         setTimeout(() => {
             stream.subscribe((_a) => {
                 var { route, meta } = _a, msg = __rest(_a, ["route", "meta"]);
                 const { exchange, key } = getRouteValues(route);
-                console.log({ exchange, key });
-                if (channel.publish(exchange, key, Buffer.from(JSON.stringify(msg.content)), meta)) {
-                    console.log('Published');
-                }
-                else {
-                    console.log('Error publishing');
+                const content = JSON.stringify(msg.content);
+                if (!channel.publish(exchange, key, Buffer.from(content), meta)) {
+                    // Do we throw an error here? What should we do here when the
+                    // publish queue needs draining?
+                    console.log(`Error publishing: ${JSON.stringify({
+                        content,
+                        exchange,
+                        key,
+                        meta
+                    })}`);
                 }
             });
         }, 500);

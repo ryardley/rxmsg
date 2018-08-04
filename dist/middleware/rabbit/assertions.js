@@ -43,7 +43,6 @@ exports.containsQueue = containsQueue;
 function assertQueue(channel, queue) {
     return __awaiter(this, void 0, void 0, function* () {
         const _a = enrichQueue(queue), { name } = _a, opts = __rest(_a, ["name"]);
-        console.log(`Asserting queue: ${JSON.stringify({ name, opts })}`);
         return channel.assertQueue(name, opts);
     });
 }
@@ -58,26 +57,33 @@ function assertExchanges(channel, exchanges) {
     return __awaiter(this, void 0, void 0, function* () {
         return Promise.all(exchanges.map((_a) => {
             var { name, type } = _a, opts = __rest(_a, ["name", "type"]);
-            console.log(`Asserting exchanges: ${JSON.stringify({ name, type, opts })}`);
             return channel.assertExchange(name, type, opts);
         }));
     });
 }
 exports.assertExchanges = assertExchanges;
+function assertIfAnonymousQueue(channel, queue) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (queue !== '') {
+            return queue; // assume this already exists
+        }
+        const serverResponse = yield assertQueue(channel, queue);
+        return serverResponse.queue;
+    });
+}
+exports.assertIfAnonymousQueue = assertIfAnonymousQueue;
 function assertBindings(channel, bindings, defaultQueue) {
-    console.log({ bindings, defaultQueue });
     return Promise.all(bindings
         .map(enrichBinding)
         .map(({ arguments: args, destination, pattern, source, type }) => {
         const dest = destination || defaultQueue;
-        console.log({ args, dest, pattern, source, type });
         const func = {
             exchange: channel.bindExchange.bind(channel),
             queue: channel.bindQueue.bind(channel)
         }[type];
         return func(dest, source, pattern, args);
     })).catch(e => {
-        console.log({ e });
+        throw e;
     });
 }
 exports.assertBindings = assertBindings;

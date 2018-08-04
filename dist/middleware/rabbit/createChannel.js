@@ -15,6 +15,7 @@ const amqplib_1 = __importDefault(require("amqplib"));
 function throwConnectionError(err) {
     throw new Error(`Rabbit middleware could not connect to RabbitMQ. ${err}`);
 }
+// TODO: use a WeakMap() to manage connections
 function createConnection(config) {
     return __awaiter(this, void 0, void 0, function* () {
         const { uri, socketOptions } = config;
@@ -26,13 +27,13 @@ function createConnection(config) {
         }
     });
 }
-// TODO: fix concurrent connections issue
+// TODO: fix concurrent connections issue need to lock this function until
+// promise has resolved and should return same promise while it is resolving
 // we only need a single TCP connection per node and can use channels
 let singletonConn = null;
 function getConnection(config) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!singletonConn) {
-            console.log('Creating connection...'); // tslint:disable-line
             try {
                 singletonConn = yield createConnection(config);
             }
