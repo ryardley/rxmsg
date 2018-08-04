@@ -1,17 +1,11 @@
 // tslint:disable:no-console
 import { Observable, Observer } from 'rxjs';
-import {
-  assertBindings,
-  assertDeclarations,
-  assertQueue
-  // containsQueue,
-  // enrichQueue
-} from './assertions';
+import { assertBindings, assertDeclarations, assertQueue } from './assertions';
 import createChannel from './createChannel';
 
 import {
   IRabbitConfig,
-  IRabbitMessageConsumer,
+  IRabbitMessageConsumed,
   IRabbitReceiver
 } from './domain';
 
@@ -23,17 +17,15 @@ async function setupReceiver(
     bindings = [],
     ...receiverConfig
   }: IRabbitReceiver,
-  observer: Observer<IRabbitMessageConsumer>
+  observer: Observer<IRabbitMessageConsumed>
 ) {
-  console.log(
-    JSON.stringify({ queue: bindingQueueName, prefetch, receiverConfig })
-  );
   const channel = await createChannel(config);
-  const decs = await assertDeclarations(channel, config.declarations);
-  console.log(JSON.stringify({ decs }));
-  let queue = bindingQueueName;
-  if (bindingQueueName === '') {
-    const serverResponse = await assertQueue(channel, bindingQueueName);
+
+  await assertDeclarations(channel, config.declarations);
+
+  let queue = bindingQueueName || '';
+  if (queue === '') {
+    const serverResponse = await assertQueue(channel, queue);
     queue = serverResponse.queue;
   }
 
@@ -48,14 +40,24 @@ async function setupReceiver(
   channel.consume(
     queue,
     msg => {
-      const rxMsg: IRabbitMessageConsumer = {
-        ack: !receiverConfig.noAck
-          ? (allUpTo: boolean = false) => channel.ack(msg, allUpTo)
-          : undefined,
-        content: JSON.parse(msg.content.toString())
-      };
-      console.log('got message!');
-      observer.next(rxMsg);
+      // handle acknowledgement
+      const { noAck } = receiverConfig;
+      const ack = noAck
+        ? () => {} // tslint:disable-line:no-empty
+        : (allUpTo: boolean = false) => channel.ack(msg, allUpTo);
+
+      // prepare content
+      const content = JSON.parse(msg.content.toString());
+      const { fields } = msg;
+      // send
+      observer.next({
+        ack,
+        content,
+        route: {
+          exchange: fields.exchange,
+          key: fields.routingKey
+        }
+      });
     },
     receiverConfig
   );
@@ -65,7 +67,7 @@ async function setupReceiver(
 const createReceiver = (config: IRabbitConfig) => (
   receiverConfig: IRabbitReceiver
 ) => () => {
-  return Observable.create((observer: Observer<IRabbitMessageConsumer>) => {
+  return Observable.create((observer: Observer<IRabbitMessageConsumed>) => {
     setupReceiver(config, receiverConfig, observer).catch(e => {
       throw e;
     });

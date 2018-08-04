@@ -90,8 +90,12 @@ export interface IRabbitMessageProducer extends IRabbitMessage {
   immediate?: boolean;
 }
 
-export interface IRabbitMessageConsumer extends IRabbitMessage {
+export interface IRabbitMessageConsumed extends IRabbitMessage {
   ack?: () => void;
+  route: {
+    exchange: string;
+    key?: string;
+  };
 }
 
 export interface IRabbitBinding {
