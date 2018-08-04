@@ -1,5 +1,4 @@
 // tslint:disable:no-console
-import { doesNotReject } from 'assert';
 import { createAmqpConnector, createConsumer, createProducer } from '../index';
 
 it('should be able to run a fanout exchange', done => {
