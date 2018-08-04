@@ -105,19 +105,3 @@ export interface IRabbitBinding {
   source: string;
   type?: 'exchange' | 'queue'; // default to queue
 }
-
-//////////////
-// FUCTIONS //
-//////////////
-
-// Function to take a queue and assert it
-// export type RabbitQueueAsserter = (
-//   channel: Channel,
-//   c: IRabbitQueue
-// ) => Replies.AssertQueue;
-
-// this seems pretty implemetation heavy might be better closer to functions
-// export type RabbitConsumerMiddlewareCreator = ConfiguredMiddlewareCreator<
-//   IRabbitConfig,
-//   IRabbitConsumer
-// >;

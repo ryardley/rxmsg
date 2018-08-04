@@ -5,5 +5,5 @@ exports.createProducer = producer_1.createProducer;
 var consumer_1 = require("./consumer");
 exports.createConsumer = consumer_1.createConsumer;
 var rabbit_1 = require("./middleware/rabbit");
-exports.rabbitMiddleware = rabbit_1.default;
+exports.createAmqpConnector = rabbit_1.default;
 //# sourceMappingURL=index.js.map
