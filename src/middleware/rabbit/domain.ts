@@ -1,14 +1,14 @@
 import { IMessage } from '../../domain';
 
-export type IRabbitQueue =
-  | {
-      name: string;
-      durable?: boolean;
-      exclusive?: boolean;
-      autoDelete?: boolean;
-      arguments?: any;
-    }
-  | string;
+export interface IRabbitQueueFull {
+  name: string;
+  durable?: boolean;
+  exclusive?: boolean;
+  autoDelete?: boolean;
+  arguments?: any;
+}
+
+export type IRabbitQueue = IRabbitQueueFull | string;
 
 export interface IRabbitExchange {
   name: string;

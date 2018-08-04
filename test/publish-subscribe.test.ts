@@ -15,8 +15,6 @@ const { sender, receiver } = createAmqpConnector({
     'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv'
 });
 
-const producer = createProducer(sender());
-
 const consumer = createConsumer(
   receiver({
     bindings: [
@@ -31,8 +29,12 @@ consumer.subscribe(msg => {
   console.log(' [x] Received %s', msg.content);
 });
 
-console.log('Sending message...');
-producer.next({
-  content: 'Hello World!',
-  route: { exchange: 'logs' }
-});
+setTimeout(() => {
+  // Need to wait for the consumer to setup all the bindings
+  const producer = createProducer(sender());
+  console.log('Sending message...');
+  producer.next({
+    content: 'Hello World!',
+    route: { exchange: 'logs' }
+  });
+}, 1000);

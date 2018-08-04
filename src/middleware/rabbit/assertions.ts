@@ -5,12 +5,14 @@ import {
   IRabbitBinding,
   IRabbitDeclarations,
   IRabbitExchange,
-  IRabbitQueue
+  IRabbitQueue,
+  IRabbitQueueFull
 } from './domain';
 
-export function enrichQueue(queueOrString: IRabbitQueue) {
+export function enrichQueue(queueOrString: IRabbitQueue): IRabbitQueueFull {
   return typeof queueOrString === 'string'
     ? {
+        exclusive: true,
         name: queueOrString
       }
     : queueOrString;
@@ -18,7 +20,7 @@ export function enrichQueue(queueOrString: IRabbitQueue) {
 
 function enrichBinding(binding: IRabbitBinding) {
   const {
-    arguments: args = {},
+    arguments: args,
     destination = '',
     pattern = '',
     source,
@@ -34,9 +36,7 @@ function enrichBinding(binding: IRabbitBinding) {
 }
 
 export function containsQueue(array: IRabbitQueue[] = [], queue: IRabbitQueue) {
-  (array || []).find(
-    item => enrichQueue(item).name === enrichQueue(queue).name
-  );
+  array.find(item => enrichQueue(item).name === enrichQueue(queue).name);
 }
 
 export async function assertQueue(channel: Channel, queue: IRabbitQueue) {
@@ -63,22 +63,27 @@ export async function assertExchanges(
   );
 }
 
-export async function assertBindings(
+export function assertBindings(
   channel: Channel,
   bindings: IRabbitBinding[],
   defaultQueue: string
 ) {
+  console.log({ bindings, defaultQueue });
   return Promise.all(
     bindings
       .map(enrichBinding)
       .map(({ arguments: args, destination, pattern, source, type }) => {
+        const dest = destination || defaultQueue;
+        console.log({ args, dest, pattern, source, type });
         const func = {
           exchange: channel.bindExchange.bind(channel),
           queue: channel.bindQueue.bind(channel)
         }[type];
-        return func(destination || defaultQueue, source, pattern, args);
+        return func(dest, source, pattern, args);
       })
-  );
+  ).catch(e => {
+    console.log({ e });
+  });
 }
 
 export async function assertDeclarations(

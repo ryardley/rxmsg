@@ -24,22 +24,28 @@ async function setupSender(
   stream: Observable<IRabbitMessageProducer>
 ) {
   const channel = await createChannel(config);
-  await assertDeclarations(channel, config.declarations);
-  stream.subscribe(({ route, meta, ...msg }) => {
-    const { exchange, key } = getRouteValues(route);
+  const decs = await assertDeclarations(channel, config.declarations);
+  console.log(JSON.stringify({ decs }));
+  setTimeout(() => {
+    stream.subscribe(({ route, meta, ...msg }) => {
+      const { exchange, key } = getRouteValues(route);
 
-    console.log(
-      `gonna publish ${exchange}, ${key}, ${msg.content}, ${JSON.stringify(
-        meta
-      )}`
-    );
-    channel.publish(
-      exchange,
-      key,
-      new Buffer(JSON.stringify(msg.content)),
-      meta
-    );
-  });
+      console.log({ exchange, key });
+
+      if (
+        channel.publish(
+          exchange,
+          key,
+          Buffer.from(JSON.stringify(msg.content)),
+          meta
+        )
+      ) {
+        console.log('Published');
+      } else {
+        console.log('Error publishing');
+      }
+    });
+  }, 500);
 }
 
 // Forward messages

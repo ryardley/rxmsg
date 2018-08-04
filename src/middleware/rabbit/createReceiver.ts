@@ -3,9 +3,9 @@ import { Observable, Observer } from 'rxjs';
 import {
   assertBindings,
   assertDeclarations,
-  assertQueue,
-  containsQueue,
-  enrichQueue
+  assertQueue
+  // containsQueue,
+  // enrichQueue
 } from './assertions';
 import createChannel from './createChannel';
 
@@ -17,24 +17,27 @@ import {
 
 async function setupReceiver(
   config: IRabbitConfig,
-  { queue, prefetch, bindings = [], ...receiverConfig }: IRabbitReceiver,
+  {
+    queue: bindingQueueName,
+    prefetch,
+    bindings = [],
+    ...receiverConfig
+  }: IRabbitReceiver,
   observer: Observer<IRabbitMessageConsumer>
 ) {
-  console.log(JSON.stringify({ queue, prefetch, receiverConfig }));
+  console.log(
+    JSON.stringify({ queue: bindingQueueName, prefetch, receiverConfig })
+  );
   const channel = await createChannel(config);
-  await assertDeclarations(channel, config.declarations);
-
-  // TODO this is clumsy and needs fixing
-  let queueName: string;
-  if (!containsQueue(config.declarations.queues, queue)) {
-    // TODO: fix naming
-    const { queue: queueString } = await assertQueue(channel, queue);
-    queueName = queueString;
-  } else {
-    queueName = enrichQueue(queue).name;
+  const decs = await assertDeclarations(channel, config.declarations);
+  console.log(JSON.stringify({ decs }));
+  let queue = bindingQueueName;
+  if (bindingQueueName === '') {
+    const serverResponse = await assertQueue(channel, bindingQueueName);
+    queue = serverResponse.queue;
   }
 
-  await assertBindings(channel, bindings, queueName);
+  await assertBindings(channel, bindings, queue);
 
   // Prefetch is set
   if (typeof prefetch === 'number') {
@@ -43,7 +46,7 @@ async function setupReceiver(
 
   // consume the channel
   channel.consume(
-    queueName,
+    queue,
     msg => {
       const rxMsg: IRabbitMessageConsumer = {
         ack: !receiverConfig.noAck
