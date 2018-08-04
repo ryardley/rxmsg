@@ -1,6 +1,10 @@
 // tslint:disable:no-console
 import { Observable, Observer } from 'rxjs';
-import { assertBindings, assertDeclarations, assertQueue } from './assertions';
+import {
+  assertBindings,
+  assertDeclarations,
+  assertIfAnonymousQueue
+} from './assertions';
 import createChannel from './createChannel';
 
 import {
@@ -11,25 +15,20 @@ import {
 
 async function setupReceiver(
   config: IRabbitConfig,
-  {
-    queue: bindingQueueName,
+  localConfig: IRabbitReceiver,
+  observer: Observer<IRabbitMessageConsumed>
+) {
+  const {
+    queue = '',
     prefetch,
     bindings = [],
     ...receiverConfig
-  }: IRabbitReceiver,
-  observer: Observer<IRabbitMessageConsumed>
-) {
+  } = localConfig;
+
   const channel = await createChannel(config);
-
   await assertDeclarations(channel, config.declarations);
-
-  let queue = bindingQueueName || '';
-  if (queue === '') {
-    const serverResponse = await assertQueue(channel, queue);
-    queue = serverResponse.queue;
-  }
-
-  await assertBindings(channel, bindings, queue);
+  const consumptionQueue = await assertIfAnonymousQueue(channel, queue);
+  await assertBindings(channel, bindings, consumptionQueue);
 
   // Prefetch is set
   if (typeof prefetch === 'number') {
@@ -38,7 +37,7 @@ async function setupReceiver(
 
   // consume the channel
   channel.consume(
-    queue,
+    consumptionQueue,
     msg => {
       // handle acknowledgement
       const { noAck } = receiverConfig;

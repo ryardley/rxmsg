@@ -41,7 +41,6 @@ export function containsQueue(array: IRabbitQueue[] = [], queue: IRabbitQueue) {
 
 export async function assertQueue(channel: Channel, queue: IRabbitQueue) {
   const { name, ...opts } = enrichQueue(queue);
-  console.log(`Asserting queue: ${JSON.stringify({ name, opts })}`);
   return channel.assertQueue(name, opts);
 }
 
@@ -55,12 +54,18 @@ export async function assertExchanges(
 ) {
   return Promise.all(
     exchanges.map(({ name, type, ...opts }) => {
-      console.log(
-        `Asserting exchanges: ${JSON.stringify({ name, type, opts })}`
-      );
       return channel.assertExchange(name, type, opts);
     })
   );
+}
+
+export async function assertIfAnonymousQueue(channel: Channel, queue: string) {
+  if (queue !== '') {
+    return queue; // assume this already exists
+  }
+
+  const serverResponse = await assertQueue(channel, queue);
+  return serverResponse.queue;
 }
 
 export function assertBindings(
@@ -68,13 +73,11 @@ export function assertBindings(
   bindings: IRabbitBinding[],
   defaultQueue: string
 ) {
-  console.log({ bindings, defaultQueue });
   return Promise.all(
     bindings
       .map(enrichBinding)
       .map(({ arguments: args, destination, pattern, source, type }) => {
         const dest = destination || defaultQueue;
-        console.log({ args, dest, pattern, source, type });
         const func = {
           exchange: channel.bindExchange.bind(channel),
           queue: channel.bindQueue.bind(channel)
@@ -82,7 +85,7 @@ export function assertBindings(
         return func(dest, source, pattern, args);
       })
   ).catch(e => {
-    console.log({ e });
+    throw e;
   });
 }
 

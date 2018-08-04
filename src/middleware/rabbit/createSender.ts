@@ -24,25 +24,24 @@ async function setupSender(
   stream: Observable<IRabbitMessageProducer>
 ) {
   const channel = await createChannel(config);
-  const decs = await assertDeclarations(channel, config.declarations);
-  console.log(JSON.stringify({ decs }));
+  await assertDeclarations(channel, config.declarations);
+
   setTimeout(() => {
     stream.subscribe(({ route, meta, ...msg }) => {
       const { exchange, key } = getRouteValues(route);
+      const content = JSON.stringify(msg.content);
 
-      console.log({ exchange, key });
-
-      if (
-        channel.publish(
-          exchange,
-          key,
-          Buffer.from(JSON.stringify(msg.content)),
-          meta
-        )
-      ) {
-        console.log('Published');
-      } else {
-        console.log('Error publishing');
+      if (!channel.publish(exchange, key, Buffer.from(content), meta)) {
+        // Do we throw an error here? What should we do here when the
+        // publish queue needs draining?
+        console.log(
+          `Error publishing: ${JSON.stringify({
+            content,
+            exchange,
+            key,
+            meta
+          })}`
+        );
       }
     });
   }, 500);

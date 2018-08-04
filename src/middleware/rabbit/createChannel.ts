@@ -5,6 +5,8 @@ function throwConnectionError(err: Error) {
   throw new Error(`Rabbit middleware could not connect to RabbitMQ. ${err}`);
 }
 
+// TODO: use a WeakMap() to manage connections
+
 async function createConnection(config: IRabbitConfig) {
   const { uri, socketOptions } = config;
   try {
@@ -17,13 +19,13 @@ async function createConnection(config: IRabbitConfig) {
   }
 }
 
-// TODO: fix concurrent connections issue
+// TODO: fix concurrent connections issue need to lock this function until
+// promise has resolved and should return same promise while it is resolving
 
 // we only need a single TCP connection per node and can use channels
 let singletonConn: amqp.Connection = null;
 export async function getConnection(config: IRabbitConfig) {
   if (!singletonConn) {
-    console.log('Creating connection...'); // tslint:disable-line
     try {
       singletonConn = await createConnection(config);
     } catch (err) {
