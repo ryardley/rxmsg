@@ -60,7 +60,7 @@ const { sender, receiver } = createAmqpConnector({
   uri: 'amqp://user:password@somerabbitserver.io/user'
 });
 
-// Here is an RxJS Subject that sends the message
+// Here is an RxJS Observer that sends the message
 const producer = createProducer(sender());
 
 producer.next({
