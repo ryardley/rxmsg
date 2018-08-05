@@ -85,16 +85,17 @@ const sub = consumer.subscribe(msg => {
 
 For usage and examples please look at the basic (crappy) tests thrown together [here](src/__tests__)
 
-## They are based on these tutorials:
+1.  [Hello World](src/__tests__/01-hello-world.test.ts)
+1.  [Work Queues](src/__tests__/02-work-queues.test.ts)
+1.  [PubSub](src/__tests__/03-publish-subscribe.test.ts)
+1.  [Routing](src/__tests__/04-routing.test.ts)
+1.  [Topics](src/__tests__/05-topics.test.ts)
+
+# References
 
 - https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
 - https://www.rabbitmq.com/tutorials/tutorial-two-javascript.html
 - https://www.rabbitmq.com/tutorials/tutorial-three-javascript.html
 - https://www.rabbitmq.com/tutorials/tutorial-four-javascript.html
 - https://www.rabbitmq.com/tutorials/tutorial-five-javascript.html
-
-These will become more extensive and include error handling later.
-
-# PLEASE SUBMIT ISSUES AND PULL REQUESTS TO THIS REPO AS THEY ARISE!
-
 - https://aws.amazon.com/blogs/compute/building-scalable-applications-and-microservices-adding-messaging-to-your-toolbox/
