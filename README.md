@@ -40,6 +40,10 @@ You can install by referencing a version tag directly off the github repo.
 yarn add blockbid/blockbid-message#2.x
 ```
 
+### Typescript types
+
+[Not yet tested getting types exported yet. There might be config that need updating. Please add that info here.]
+
 ## Framework Usage
 
 ```typescript
@@ -77,6 +81,24 @@ const sub = consumer
   .subscribe(msg => {
     console.log(`Received: ${msg.content}`);
   });
+```
+
+## Middleware Structure
+
+Basically the structure of middleware is that you accept a stream and return a stream.
+
+```typescript
+(stream: Observable<IMessage>) => Observable<IMessage>
+```
+
+Where IMessage looks like this (this may change):
+
+```typescript
+export interface IMessage {
+  content: any;
+  route?: any;
+  ack?: () => void;
+}
 ```
 
 ## AMQP Middleware
