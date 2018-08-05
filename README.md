@@ -60,8 +60,7 @@ const producer = createProducer(
 
 // createConsumer also accepts a list of middleware
 // the message also passes top down
-// It returns an RxJS Observer that sends messages
-// Here is an RxJS Observable that will receive the message
+// It returns an RxJS Observable that will receive the message
 const consumer = createConsumer(
   receivesMessagesFromSomewhere,
   logOrTransformMessage,
