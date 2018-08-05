@@ -7,6 +7,8 @@ _Please note this is under development I don't expect the API to change much so 
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers but initially via RabbitMQ.
 
+#### Roadmap
+
 At a later point we should have plugins to make it work with various messaging paradigms:
 
 - [x] AMQP
@@ -14,14 +16,18 @@ At a later point we should have plugins to make it work with various messaging p
 - [ ] Communicate locally between threads / workers
 - [ ] socket.io (browser/server)
 
-Some principles:
+#### Principles:
 
 - Declarative over imperative.
-- Avoid complexity where possible.
-- Functional modular middleware.
-- Avoid using classes.
+- Functions over classes.
+- Simplicity over complexity.
+- Immutable over mutable.
+- Flexible and composable over fixed heirarchy.
+- Pure over impure.
+- Minmalistic sensible defaults over boilerplate.
+- Idiomatic API's over reinventing the wheel. 
 
-Environments
+#### Environments
 
 - Basic framework should work in all V8 environments. eg.
 - Middleware might be environment specific. Eg. `blockbid-messages/amqp` requires node. `blockbid-messages/socketio-browser` may require browser objects. (YTBI)
