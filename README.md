@@ -158,7 +158,19 @@ For usage and examples please look at the basic (crappy) tests thrown together [
 
 ## RxJS References
 
-NOTE: `blockbid-message` uses RxJS v6.0 so you need to pipe all your operators:
+### Docs
+
+- [RxJS API Reference](https://rxjs-dev.firebaseapp.com/)
+- [Learn RxJS](https://www.learnrxjs.io/)
+
+### Videos
+
+- [Introduction to RxJS (old version) (Video)](https://www.youtube.com/watch?v=T9wOu11uU6U&t=446s)
+- [Changes in RxJS 6 (Video)](https://www.youtube.com/watch?v=X9fdpGthrXA)
+
+### NOTE: Using version 6
+
+`blockbid-message` uses **RxJS v6.0** so you need to pipe all your operators:
 
 ```typescript
 import { filter } from 'rxjs/operators';
@@ -172,16 +184,6 @@ consumer.pipe(filter(forUserEvents(userId))).subscribe(
   () => {}
 );
 ```
-
-### Docs
-
-- [RxJS API Reference](https://rxjs-dev.firebaseapp.com/)
-- [Learn RxJS](https://www.learnrxjs.io/)
-
-### Videos
-
-- [Introduction to RxJS (old version) (Video)](https://www.youtube.com/watch?v=T9wOu11uU6U&t=446s)
-- [Changes in RxJS 6 (Video)](https://www.youtube.com/watch?v=X9fdpGthrXA)
 
 ## Other References
 
