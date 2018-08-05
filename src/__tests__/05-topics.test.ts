@@ -1,6 +1,8 @@
 // tslint:disable:no-console
 import { doesNotReject } from 'assert';
-import { createAmqpConnector, createConsumer, createProducer } from '../index';
+import { createConsumer, createProducer } from '../index';
+import createAmqpConnector from '../middleware/amqp';
+
 it('should handle topics', done => {
   const output = [];
   const { sender, receiver } = createAmqpConnector({

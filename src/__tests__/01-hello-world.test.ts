@@ -1,4 +1,5 @@
-import { createAmqpConnector, createConsumer, createProducer } from '../index';
+import { createConsumer, createProducer } from '../index';
+import createAmqpConnector from '../middleware/amqp';
 
 it('should run the hello world example', done => {
   const { sender, receiver } = createAmqpConnector({

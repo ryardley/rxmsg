@@ -1,5 +1,6 @@
 // tslint:disable:no-console
-import { createAmqpConnector, createConsumer, createProducer } from '../index';
+import { createConsumer, createProducer } from '../index';
+import createAmqpConnector from '../middleware/amqp';
 
 it('should be able to run a fanout exchange', done => {
   const { sender, receiver } = createAmqpConnector({

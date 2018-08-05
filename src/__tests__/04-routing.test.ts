@@ -1,5 +1,6 @@
 // tslint:disable:no-console
-import { createAmqpConnector, createConsumer, createProducer } from '../index';
+import { createConsumer, createProducer } from '../index';
+import createAmqpConnector from '../middleware/amqp';
 
 it('should be able to handle routing', done => {
   const output = [];

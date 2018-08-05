@@ -1,7 +1,8 @@
-# TODO
+# Tests and Use Cases
 
-# These tests are all flakey as hell!!!!
+Please note these tests are all flakey as the use a cloud Rabbit provider!
 
-# THIS IS A TERRIBLE WAY TO TEST THIS STUFF!
+##TODO
 
-# TODO: MOCK RABBIT!!!
+- [ ] Substitute amqplib within these tests for a mock
+- [ ] Simulate protocol errors within the mock and test against them

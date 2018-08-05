@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../src/middleware/amqp/index.ts"],"names":[],"mappings":";;;;;AAAA,mDAAkD;AAClD,sEAA8C;AAC9C,kEAA0C;AAG1C,kBAAe,CAAC,CAAiB,EAAE,EAAE;IACnC,OAAO;QACL,KAAK,EAAE,GAAG,EAAE,CAAC,+BAAe,CAAC,CAAC,CAAC;QAC/B,QAAQ,EAAE,wBAAc,CAAC,CAAC,CAAC;QAC3B,MAAM,EAAE,sBAAY,CAAC,CAAC,CAAC;KACxB,CAAC;AACJ,CAAC,CAAC"}
