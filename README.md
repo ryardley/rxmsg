@@ -91,6 +91,26 @@ For usage and examples please look at the basic (crappy) tests thrown together [
 1.  [Routing](src/__tests__/04-routing.test.ts)
 1.  [Topics](src/__tests__/05-topics.test.ts)
 
+## RxJS References
+
+NOTE: blockbid-message uses RxJS v6.0 so you need to pipe all your operators:
+
+```typescript
+import { filter } from 'rxjs/operators';
+
+// ...
+
+consumer.pipe(filter(forUserEvents(userId))).subscribe(
+  msg => {
+    dealWithMessage(msg.content);
+  },
+  () => {}
+);
+```
+
+- [RxJS API Reference](https://rxjs-dev.firebaseapp.com/)
+- [Learn RxJS](https://www.learnrxjs.io/)
+
 # References
 
 - https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
