@@ -149,6 +149,8 @@ const consumer = createConsumer(
 const sub = consumer.subscribe(msg => {
   console.log(`Received: ${msg.content}`);
 });
+
+sub.unsubscribe();
 ```
 
 ### Example Usage AMQP Middleware
