@@ -26,7 +26,7 @@ Environments
 - Basic framework should work in all V8 environments. eg.
 - Middleware might be environment specific. Eg. `blockbid-messages/amqp` requires node. `blockbid-messages/socketio-browser` may require browser objects. (YTBI)
 
-Fault resillience
+Fault resillience (YTBI)
 
 - [ ] Solid Error handling
 - [ ] If anything fails it will throw an Error and close the connection and retry X times
@@ -40,7 +40,11 @@ You can install by referencing a version tag directly off the github repo.
 yarn add blockbid/blockbid-message#2.x
 ```
 
-## Basic Usecase
+# AMQP Middleware
+
+AMQP Middleware is designed to work in Node environments only due to limitations with the amqplib package it is based on.
+
+## Basic Usecase with amqp middleware
 
 ```javascript
 import { createConsumer, createProducer } from 'blockbid-message';
@@ -93,7 +97,7 @@ For usage and examples please look at the basic (crappy) tests thrown together [
 
 ## RxJS References
 
-NOTE: blockbid-message uses RxJS v6.0 so you need to pipe all your operators:
+NOTE: `blockbid-message` uses RxJS v6.0 so you need to pipe all your operators:
 
 ```typescript
 import { filter } from 'rxjs/operators';
@@ -110,6 +114,8 @@ consumer.pipe(filter(forUserEvents(userId))).subscribe(
 
 - [RxJS API Reference](https://rxjs-dev.firebaseapp.com/)
 - [Learn RxJS](https://www.learnrxjs.io/)
+- [Introduction to RxJS (old version) (Video)](https://www.youtube.com/watch?v=T9wOu11uU6U&t=446s)
+- [Changes in RxJS 6 (Video)](https://www.youtube.com/watch?v=X9fdpGthrXA)
 
 # References
 
