@@ -40,11 +40,50 @@ You can install by referencing a version tag directly off the github repo.
 yarn add blockbid/blockbid-message#2.x
 ```
 
-# AMQP Middleware
+## Framework Usage
+
+```typescript
+import { createConsumer, createProducer } from 'blockbid-message';
+import { filter } from 'rxjs/opeerators';
+
+// createProducer accepts a list of middleware
+// the message passes top down
+// It returns an RxJS Observer that sends messages
+const producer = createProducer(
+  transformMessageSomehow,
+  broadCastsMessagesSomewhere
+);
+
+// createConsumer also accepts a list of middleware
+// the message also passes top down
+// It returns an RxJS Observer that sends messages
+// Here is an RxJS Observable that will receive the message
+const consumer = createConsumer(
+  receivesMessagesFromSomewhere,
+  logOrTransformMessage,
+  doSomeMoreTransformation
+);
+
+// Use RxJS's Observable#next() method to send a message
+producer.next({
+  content: 'Hello World!',
+  route: 'hello'
+});
+
+// Note that because consumer is simply an RxJS observable
+// you can apply filtering and throttling or do whatever you want to it
+const sub = consumer
+  .pipe(filter(msg => msg.userId === 'af435'))
+  .subscribe(msg => {
+    console.log(`Received: ${msg.content}`);
+  });
+```
+
+## AMQP Middleware
 
 AMQP Middleware is designed to work in Node environments only due to limitations with the amqplib package it is based on.
 
-## Basic Usecase with amqp middleware
+### Basic Usecase with amqp middleware
 
 ```javascript
 import { createConsumer, createProducer } from 'blockbid-message';
@@ -85,7 +124,7 @@ const sub = consumer.subscribe(msg => {
 });
 ```
 
-## Example Usage
+### Example Usage AMQP Middleware
 
 For usage and examples please look at the basic (crappy) tests thrown together [here](src/__tests__)
 
@@ -112,12 +151,17 @@ consumer.pipe(filter(forUserEvents(userId))).subscribe(
 );
 ```
 
+### Docs
+
 - [RxJS API Reference](https://rxjs-dev.firebaseapp.com/)
 - [Learn RxJS](https://www.learnrxjs.io/)
+
+### Videos
+
 - [Introduction to RxJS (old version) (Video)](https://www.youtube.com/watch?v=T9wOu11uU6U&t=446s)
 - [Changes in RxJS 6 (Video)](https://www.youtube.com/watch?v=X9fdpGthrXA)
 
-# References
+## Other References
 
 - https://www.rabbitmq.com/tutorials/tutorial-one-javascript.html
 - https://www.rabbitmq.com/tutorials/tutorial-two-javascript.html
