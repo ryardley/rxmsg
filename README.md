@@ -76,7 +76,7 @@ producer.next({
 // Note that because consumer is simply an RxJS observable
 // you can apply filtering and throttling or do whatever you want to it
 const sub = consumer
-  .pipe(filter(msg => msg.userId === 'af435'))
+  .pipe(filter(msg => msg.content.toLowerCase().includes('world')))
   .subscribe(msg => {
     console.log(`Received: ${msg.content}`);
   });
