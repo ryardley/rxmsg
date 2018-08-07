@@ -39,8 +39,8 @@ At a later point we should have plugins to make it work with various messaging p
 - [ ] Fix concurrent connection issues
 - [ ] Export proper typescript types
 - [ ] Revisit `blockbid-tools` and ensure it supports versioning
-- [ ] Create a retries middleware
-- [ ] Create a circuit breaker middleware
+- [ ] Determine a solid retries story
+- [ ] Determine a solid circuit breaker story
 
 ## Installation
 
