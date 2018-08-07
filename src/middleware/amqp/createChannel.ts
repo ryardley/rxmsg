@@ -7,24 +7,30 @@ function throwConnectionError(err: Error) {
 
 // TODO: use a WeakMap() to manage connections
 
-async function createConnection(config: IRabbitConfig) {
+async function createConnection(
+  config: IRabbitConfig
+): Promise<amqp.Connection | undefined> {
   const { uri, socketOptions } = config;
+  let conn;
   try {
-    return await amqp.connect(
+    conn = await amqp.connect(
       uri,
       socketOptions
     );
   } catch (err) {
     throwConnectionError(err);
   }
+  return conn;
 }
 
 // TODO: fix concurrent connections issue need to lock this function until
 // promise has resolved and should return same promise while it is resolving
 
 // we only need a single TCP connection per node and can use channels
-let singletonConn: amqp.Connection = null;
-export async function getConnection(config: IRabbitConfig) {
+let singletonConn: amqp.Connection | undefined;
+export async function getConnection(
+  config: IRabbitConfig
+): Promise<amqp.Connection | undefined> {
   if (!singletonConn) {
     try {
       singletonConn = await createConnection(config);
@@ -37,11 +43,15 @@ export async function getConnection(config: IRabbitConfig) {
 
 export async function closeConnection(config: IRabbitConfig) {
   const conn = await getConnection(config);
-  return await conn.close();
+  if (conn) {
+    return await conn.close();
+  }
 }
 
 // TODO: Listen for process kill and disconnect? Maybe this happens automatically
 export default async function createChannel(config: IRabbitConfig) {
   const conn = await getConnection(config);
-  return await conn.createChannel();
+  if (conn) {
+    return await conn.createChannel();
+  }
 }

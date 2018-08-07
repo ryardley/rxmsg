@@ -26,6 +26,9 @@ async function setupReceiver(
   } = localConfig;
 
   const channel = await createChannel(config);
+  if (!channel) {
+    return;
+  }
   await assertDeclarations(channel, config.declarations);
   const consumptionQueue = await assertIfAnonymousQueue(channel, queue);
   await assertBindings(channel, bindings, consumptionQueue);

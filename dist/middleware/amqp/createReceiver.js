@@ -28,6 +28,9 @@ function setupReceiver(config, localConfig, observer) {
     return __awaiter(this, void 0, void 0, function* () {
         const { queue = '', prefetch, bindings = [] } = localConfig, receiverConfig = __rest(localConfig, ["queue", "prefetch", "bindings"]);
         const channel = yield createChannel_1.default(config);
+        if (!channel) {
+            return;
+        }
         yield assertions_1.assertDeclarations(channel, config.declarations);
         const consumptionQueue = yield assertions_1.assertIfAnonymousQueue(channel, queue);
         yield assertions_1.assertBindings(channel, bindings, consumptionQueue);

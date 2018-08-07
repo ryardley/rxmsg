@@ -19,18 +19,20 @@ function throwConnectionError(err) {
 function createConnection(config) {
     return __awaiter(this, void 0, void 0, function* () {
         const { uri, socketOptions } = config;
+        let conn;
         try {
-            return yield amqplib_1.default.connect(uri, socketOptions);
+            conn = yield amqplib_1.default.connect(uri, socketOptions);
         }
         catch (err) {
             throwConnectionError(err);
         }
+        return conn;
     });
 }
 // TODO: fix concurrent connections issue need to lock this function until
 // promise has resolved and should return same promise while it is resolving
 // we only need a single TCP connection per node and can use channels
-let singletonConn = null;
+let singletonConn;
 function getConnection(config) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!singletonConn) {
@@ -48,7 +50,9 @@ exports.getConnection = getConnection;
 function closeConnection(config) {
     return __awaiter(this, void 0, void 0, function* () {
         const conn = yield getConnection(config);
-        return yield conn.close();
+        if (conn) {
+            return yield conn.close();
+        }
     });
 }
 exports.closeConnection = closeConnection;
@@ -56,7 +60,9 @@ exports.closeConnection = closeConnection;
 function createChannel(config) {
     return __awaiter(this, void 0, void 0, function* () {
         const conn = yield getConnection(config);
-        return yield conn.createChannel();
+        if (conn) {
+            return yield conn.createChannel();
+        }
     });
 }
 exports.default = createChannel;
