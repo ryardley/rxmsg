@@ -3,11 +3,9 @@ import { Observable } from 'rxjs';
 
 import { assertDeclarations } from './assertions';
 import createChannel from './createChannel';
-import { IAmqpConfig, IAmqpMessageProducer, IAmqpRoute } from './domain';
+import { IAmqpConfig, IAmqpMessageProducer, IAmqpRoute } from './types';
 
-function getRouteValues(
-  route: IAmqpRoute
-): { exchange: string; key: string } {
+function getRouteValues(route: IAmqpRoute): { exchange: string; key: string } {
   return typeof route === 'string'
     ? {
         exchange: '',

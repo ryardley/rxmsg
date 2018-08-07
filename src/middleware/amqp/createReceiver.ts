@@ -7,11 +7,7 @@ import {
 } from './assertions';
 import createChannel from './createChannel';
 
-import {
-  IAmqpConfig,
-  IAmqpMessageConsumed,
-  IAmqpReceiver
-} from './domain';
+import { IAmqpConfig, IAmqpMessageConsumed, IAmqpReceiver } from './types';
 
 async function setupReceiver(
   config: IAmqpConfig,

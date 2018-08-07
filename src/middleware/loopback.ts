@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { IMessage, MiddlewareCreator } from '../domain';
+import { IMessage, MiddlewareCreator } from '../types';
 
 const receiveStream = new Subject<IMessage>();
 

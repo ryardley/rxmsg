@@ -1,6 +1,6 @@
 import { from } from 'rxjs';
-import { Middleware } from './domain';
 import { combineMiddleware } from './middleware';
+import { Middleware } from './types';
 
 export const createConsumer = (...middleware: Middleware[]) => {
   const nullObservable = from([]);

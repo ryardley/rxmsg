@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { IMessage, Middleware } from './domain';
+import { IMessage, Middleware } from './types';
 
 type MiddlewareCombiner = (...a: Middleware[]) => Middleware;
 

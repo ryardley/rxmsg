@@ -1,4 +1,4 @@
-import { IMessage } from '../../domain';
+import { IMessage } from '../../types';
 
 export interface IAmqpQueueFull {
   name: string;

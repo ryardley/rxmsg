@@ -7,7 +7,7 @@ import {
   IAmqpExchange,
   IAmqpQueue,
   IAmqpQueueFull
-} from './domain';
+} from './types';
 
 export function enrichQueue(queueOrString: IAmqpQueue): IAmqpQueueFull {
   return typeof queueOrString === 'string'

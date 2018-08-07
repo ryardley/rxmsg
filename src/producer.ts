@@ -1,6 +1,6 @@
 import { ReplaySubject } from 'rxjs';
-import { IMessage, Middleware } from './domain';
 import { combineMiddleware } from './middleware';
+import { IMessage, Middleware } from './types';
 
 export const createProducer = (...middleware: Middleware[]) => {
   const subject = new ReplaySubject<IMessage>();

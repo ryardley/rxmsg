@@ -1,5 +1,4 @@
 // tslint:disable:no-console
-import { doesNotReject } from 'assert';
 import { createConsumer, createProducer } from '../index';
 import createAmqpConnector from '../middleware/amqp';
 
@@ -55,5 +54,5 @@ it('should handle topics', done => {
       "dog.exe: 'I am a Dog exe'"
     ]);
     done();
-  }, 3000);
+  }, 4000);
 });

@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { IAmqpConfig } from './domain';
+import { IAmqpConfig } from './types';
 
 function throwConnectionError(err: Error) {
   throw new Error(`Rabbit middleware could not connect to RabbitMQ. ${err}`);

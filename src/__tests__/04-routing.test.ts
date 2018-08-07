@@ -53,5 +53,5 @@ it('should be able to handle routing', done => {
   setTimeout(() => {
     expect(output).toEqual(['error-Hi I am foo']);
     done();
-  }, 3000);
+  }, 4000);
 });

@@ -1,8 +1,8 @@
 // tslint:disable:no-console
 import { ReplaySubject } from 'rxjs';
-import { createConsumer, createProducer } from '../index';
+import { createConsumer, createProducer } from '..';
 import createAmqpConnector from '../middleware/amqp';
-import { IAmqpMessageProducer } from '../middleware/amqp/domain';
+import { IAmqpMessageProducer } from '../middleware/amqp/types';
 
 it('should simulate work queues', () => {
   const { sender, receiver } = createAmqpConnector({
