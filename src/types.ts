@@ -8,4 +8,6 @@ export interface IMessage {
 }
 
 // Generic Middleware decorates a stream
-export type Middleware<T> = (a: Observable<T>) => Observable<T>;
+export type Middleware<T extends IMessage> = (
+  a: Observable<T>
+) => Observable<T>;

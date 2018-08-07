@@ -18,9 +18,7 @@ it('should simulate work queues', () => {
       'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv'
   });
 
-  const producer: ReplaySubject<IAmqpMessageProducer> = createProducer(
-    sender()
-  );
+  const producer = createProducer(sender());
 
   producer.next({
     content: 'Hello World!',
@@ -36,6 +34,7 @@ it('should simulate work queues', () => {
       queue: 'task_queue'
     })
   );
+
   const output = [];
   consumer.subscribe(msg => {
     const secs = msg.content.split('.').length - 1;
