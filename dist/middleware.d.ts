@@ -1,2 +1,2 @@
-import { Middleware } from './types';
-export declare function combineMiddleware<T>(...fns: Array<Middleware<T>>): Middleware<T>;
+import { IMessage, Middleware } from './types';
+export declare function combineMiddleware<T extends IMessage>(...fns: Array<Middleware<T>>): Middleware<T>;

@@ -4,4 +4,4 @@ export interface IMessage {
     route?: any;
     meta?: any;
 }
-export declare type Middleware<T> = (a: Observable<T>) => Observable<T>;
+export declare type Middleware<T extends IMessage> = (a: Observable<T>) => Observable<T>;

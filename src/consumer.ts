@@ -1,8 +1,8 @@
 import { from, Observable } from 'rxjs';
 import { combineMiddleware } from './middleware';
-import { Middleware } from './types';
+import { IMessage, Middleware } from './types';
 
-export function createConsumer<T>(
+export function createConsumer<T extends IMessage>(
   ...middleware: Array<Middleware<T>>
 ): Observable<T> {
   const nullObservable = from([]);
