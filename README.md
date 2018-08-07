@@ -36,6 +36,7 @@ At a later point we should have plugins to make it work with various messaging p
 
 - [ ] Mock out tests properly
 - [ ] Test Error handling toughroughly
+- [ ] Fix concurrent connection issues
 - [ ] Export proper typescript types
 - [ ] Revisit `blockbid-tools` and ensure it supports versioning
 - [ ] Create a retries middleware
