@@ -32,11 +32,14 @@ At a later point we should have plugins to make it work with various messaging p
 - Basic framework should work in all V8 environments. eg.
 - Middleware might be environment specific. Eg. `blockbid-messages/amqp` requires node. `blockbid-messages/socketio-browser` may require browser objects. (YTBI)
 
-Fault resillience (YTBI)
+#### TODO
 
-- [ ] Solid Error handling
-- [ ] If anything fails it will throw an Error and close the connection and retry X times
-- [ ] Circuit breakers (Do we need to setup config/plugins for this?)
+- [ ] Mock out tests properly
+- [ ] Test Error handling toughroughly
+- [ ] Export proper typescript types
+- [ ] Revisit `blockbid-tools` and ensure it supports versioning
+- [ ] Create a retries middleware
+- [ ] Create a circuit breaker middleware
 
 ## Installation
 
