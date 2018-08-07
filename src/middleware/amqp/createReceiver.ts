@@ -8,12 +8,12 @@ import {
 import createChannel from './createChannel';
 
 import { IMessage, Middleware } from '../../types';
-import { IAmqpConfig, IAmqpMessageConsumed, IAmqpReceiver } from './types';
+import { IAmqpConfig, IAmqpMessageIn, IAmqpReceiver } from './types';
 
 async function setupReceiver(
   config: IAmqpConfig,
   localConfig: IAmqpReceiver,
-  observer: Observer<IAmqpMessageConsumed>
+  observer: Observer<IAmqpMessageIn>
 ) {
   const {
     queue = '',
@@ -67,10 +67,10 @@ type RecieverCreator<T extends IMessage> = (
 ) => (r: IAmqpReceiver) => Middleware<T>;
 
 // Recieve messages
-const createReceiver: RecieverCreator<IAmqpMessageConsumed> = (
+const createReceiver: RecieverCreator<IAmqpMessageIn> = (
   config: IAmqpConfig
 ) => (receiverConfig: IAmqpReceiver) => () => {
-  return Observable.create((observer: Observer<IAmqpMessageConsumed>) => {
+  return Observable.create((observer: Observer<IAmqpMessageIn>) => {
     setupReceiver(config, receiverConfig, observer).catch(e => {
       throw e;
     });

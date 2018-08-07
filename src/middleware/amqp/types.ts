@@ -1,5 +1,7 @@
 import { IMessage } from '../../types';
 
+// IO Types (Types provided as args at runtime by clients)
+
 export interface IAmqpQueueFull {
   name: string;
   durable?: boolean;
@@ -63,34 +65,32 @@ export type IAmqpRoute =
   | string;
 
 export interface IAmqpMessage extends IMessage {
-  route?: IAmqpRoute;
-  meta?: {
-    expiration?: string;
-    userId?: string;
-    persistent?: boolean;
-    cc?: string | string[];
-    priority?: number;
+  route: IAmqpRoute;
+  expiration?: string;
+  userId?: string;
+  persistent?: boolean;
+  cc?: string | string[];
+  priority?: number;
 
-    // following is ignored by rabbit but used by other apps
-    contentType?: string;
-    contentEncoding?: string;
-    headers?: object;
-    correlationId?: string;
-    replyTo?: string;
-    messageId?: string;
-    timestamp?: number;
-    type?: string;
-    appId?: string;
-  };
+  // following is ignored by rabbit but used by other apps
+  contentType?: string;
+  contentEncoding?: string;
+  headers?: object;
+  correlationId?: string;
+  replyTo?: string;
+  messageId?: string;
+  timestamp?: number;
+  type?: string;
+  appId?: string;
 }
 
-export interface IAmqpMessageProducer extends IAmqpMessage {
+export interface IAmqpMessageOut extends IAmqpMessage {
   mandatory?: true;
   bcc?: string | string[];
   immediate?: boolean;
 }
 
-export interface IAmqpMessageConsumed extends IAmqpMessage {
+export interface IAmqpMessageIn extends IAmqpMessage {
   ack?: () => void;
   route: {
     exchange: string;

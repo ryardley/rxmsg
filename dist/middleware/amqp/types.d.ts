@@ -50,30 +50,28 @@ export declare type IAmqpRoute = {
     key?: string;
 } | string;
 export interface IAmqpMessage extends IMessage {
-    route?: IAmqpRoute;
-    meta?: {
-        expiration?: string;
-        userId?: string;
-        persistent?: boolean;
-        cc?: string | string[];
-        priority?: number;
-        contentType?: string;
-        contentEncoding?: string;
-        headers?: object;
-        correlationId?: string;
-        replyTo?: string;
-        messageId?: string;
-        timestamp?: number;
-        type?: string;
-        appId?: string;
-    };
+    route: IAmqpRoute;
+    expiration?: string;
+    userId?: string;
+    persistent?: boolean;
+    cc?: string | string[];
+    priority?: number;
+    contentType?: string;
+    contentEncoding?: string;
+    headers?: object;
+    correlationId?: string;
+    replyTo?: string;
+    messageId?: string;
+    timestamp?: number;
+    type?: string;
+    appId?: string;
 }
-export interface IAmqpMessageProducer extends IAmqpMessage {
+export interface IAmqpMessageOut extends IAmqpMessage {
     mandatory?: true;
     bcc?: string | string[];
     immediate?: boolean;
 }
-export interface IAmqpMessageConsumed extends IAmqpMessage {
+export interface IAmqpMessageIn extends IAmqpMessage {
     ack?: () => void;
     route: {
         exchange: string;

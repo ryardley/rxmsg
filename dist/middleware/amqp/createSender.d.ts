@@ -1,4 +1,4 @@
 import { Observable } from 'rxjs';
-import { IAmqpConfig, IAmqpMessageProducer } from './types';
-declare const createSender: (config: IAmqpConfig) => () => (stream: Observable<IAmqpMessageProducer>) => Observable<IAmqpMessageProducer>;
+import { IAmqpConfig, IAmqpMessageOut } from './types';
+declare const createSender: (config: IAmqpConfig) => () => (stream: Observable<IAmqpMessageOut>) => Observable<IAmqpMessageOut>;
 export default createSender;

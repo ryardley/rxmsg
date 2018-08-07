@@ -39,17 +39,16 @@ function setupSender(config, stream) {
         yield assertions_1.assertDeclarations(channel, config.declarations);
         setTimeout(() => {
             stream.subscribe((_a) => {
-                var { route, meta } = _a, msg = __rest(_a, ["route", "meta"]);
+                var { route } = _a, msg = __rest(_a, ["route"]);
                 const { exchange, key } = getRouteValues(route);
                 const content = JSON.stringify(msg.content);
-                if (!channel.publish(exchange, key, Buffer.from(content), meta)) {
+                if (!channel.publish(exchange, key, Buffer.from(content))) {
                     // Do we throw an error here? What should we do here when the
                     // publish queue needs draining?
                     console.log(`Error publishing: ${JSON.stringify({
                         content,
                         exchange,
-                        key,
-                        meta
+                        key
                     })}`);
                 }
             });

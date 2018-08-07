@@ -3,8 +3,7 @@ import { Observable } from 'rxjs';
 // Generic message
 export interface IMessage {
   content: any;
-  route?: any;
-  meta?: any;
+  route: any;
 }
 
 // Generic Middleware decorates a stream
