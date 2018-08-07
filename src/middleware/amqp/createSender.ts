@@ -3,10 +3,10 @@ import { Observable } from 'rxjs';
 
 import { assertDeclarations } from './assertions';
 import createChannel from './createChannel';
-import { IRabbitConfig, IRabbitMessageProducer, IRabbitRoute } from './domain';
+import { IAmqpConfig, IAmqpMessageProducer, IAmqpRoute } from './domain';
 
 function getRouteValues(
-  route: IRabbitRoute
+  route: IAmqpRoute
 ): { exchange: string; key: string } {
   return typeof route === 'string'
     ? {
@@ -20,8 +20,8 @@ function getRouteValues(
 }
 
 async function setupSender(
-  config: IRabbitConfig,
-  stream: Observable<IRabbitMessageProducer>
+  config: IAmqpConfig,
+  stream: Observable<IAmqpMessageProducer>
 ) {
   const channel = await createChannel(config);
   await assertDeclarations(channel, config.declarations);
@@ -48,8 +48,8 @@ async function setupSender(
 }
 
 // Forward messages
-const createSender = (config: IRabbitConfig) => () => (
-  stream: Observable<IRabbitMessageProducer>
+const createSender = (config: IAmqpConfig) => () => (
+  stream: Observable<IAmqpMessageProducer>
 ) => {
   setupSender(config, stream).catch((e: Error) => {
     throw e;

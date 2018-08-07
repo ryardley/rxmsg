@@ -8,15 +8,15 @@ import {
 import createChannel from './createChannel';
 
 import {
-  IRabbitConfig,
-  IRabbitMessageConsumed,
-  IRabbitReceiver
+  IAmqpConfig,
+  IAmqpMessageConsumed,
+  IAmqpReceiver
 } from './domain';
 
 async function setupReceiver(
-  config: IRabbitConfig,
-  localConfig: IRabbitReceiver,
-  observer: Observer<IRabbitMessageConsumed>
+  config: IAmqpConfig,
+  localConfig: IAmqpReceiver,
+  observer: Observer<IAmqpMessageConsumed>
 ) {
   const {
     queue = '',
@@ -66,10 +66,10 @@ async function setupReceiver(
 }
 
 // Recieve messages
-const createReceiver = (config: IRabbitConfig) => (
-  receiverConfig: IRabbitReceiver
+const createReceiver = (config: IAmqpConfig) => (
+  receiverConfig: IAmqpReceiver
 ) => () => {
-  return Observable.create((observer: Observer<IRabbitMessageConsumed>) => {
+  return Observable.create((observer: Observer<IAmqpMessageConsumed>) => {
     setupReceiver(config, receiverConfig, observer).catch(e => {
       throw e;
     });

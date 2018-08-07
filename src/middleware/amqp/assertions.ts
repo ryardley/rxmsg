@@ -2,14 +2,14 @@
 import { Channel } from 'amqplib';
 
 import {
-  IRabbitBinding,
-  IRabbitDeclarations,
-  IRabbitExchange,
-  IRabbitQueue,
-  IRabbitQueueFull
+  IAmqpBinding,
+  IAmqpDeclarations,
+  IAmqpExchange,
+  IAmqpQueue,
+  IAmqpQueueFull
 } from './domain';
 
-export function enrichQueue(queueOrString: IRabbitQueue): IRabbitQueueFull {
+export function enrichQueue(queueOrString: IAmqpQueue): IAmqpQueueFull {
   return typeof queueOrString === 'string'
     ? {
         exclusive: true,
@@ -18,7 +18,7 @@ export function enrichQueue(queueOrString: IRabbitQueue): IRabbitQueueFull {
     : queueOrString;
 }
 
-function enrichBinding(binding: IRabbitBinding) {
+function enrichBinding(binding: IAmqpBinding) {
   const {
     arguments: args,
     destination = '',
@@ -35,22 +35,22 @@ function enrichBinding(binding: IRabbitBinding) {
   };
 }
 
-export function containsQueue(array: IRabbitQueue[] = [], queue: IRabbitQueue) {
+export function containsQueue(array: IAmqpQueue[] = [], queue: IAmqpQueue) {
   array.find(item => enrichQueue(item).name === enrichQueue(queue).name);
 }
 
-export async function assertQueue(channel: Channel, queue: IRabbitQueue) {
+export async function assertQueue(channel: Channel, queue: IAmqpQueue) {
   const { name, ...opts } = enrichQueue(queue);
   return channel.assertQueue(name, opts);
 }
 
-export async function assertQueues(channel: Channel, queues: IRabbitQueue[]) {
+export async function assertQueues(channel: Channel, queues: IAmqpQueue[]) {
   return Promise.all(queues.map(queue => assertQueue(channel, queue)));
 }
 
 export async function assertExchanges(
   channel: Channel,
-  exchanges: IRabbitExchange[]
+  exchanges: IAmqpExchange[]
 ) {
   return Promise.all(
     exchanges.map(({ name, type, ...opts }) => {
@@ -70,7 +70,7 @@ export async function assertIfAnonymousQueue(channel: Channel, queue: string) {
 
 export function assertBindings(
   channel: Channel,
-  bindings: IRabbitBinding[],
+  bindings: IAmqpBinding[],
   defaultQueue: string
 ) {
   return Promise.all(
@@ -91,7 +91,7 @@ export function assertBindings(
 
 export async function assertDeclarations(
   channel: Channel,
-  declarations: IRabbitDeclarations
+  declarations: IAmqpDeclarations
 ) {
   const { queues = [], exchanges = [] } = declarations;
   return Promise.all([

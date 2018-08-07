@@ -1,6 +1,6 @@
 import { IMessage } from '../../domain';
 
-export interface IRabbitQueueFull {
+export interface IAmqpQueueFull {
   name: string;
   durable?: boolean;
   exclusive?: boolean;
@@ -8,9 +8,9 @@ export interface IRabbitQueueFull {
   arguments?: any;
 }
 
-export type IRabbitQueue = IRabbitQueueFull | string;
+export type IAmqpQueue = IAmqpQueueFull | string;
 
-export interface IRabbitExchange {
+export interface IAmqpExchange {
   name: string;
   type: 'fanout' | 'topic' | 'direct';
   durable?: boolean;
@@ -20,7 +20,7 @@ export interface IRabbitExchange {
   arguments?: any;
 }
 
-export interface IRabbitReceiver {
+export interface IAmqpReceiver {
   queue?: string; // default to '' <- anon
   consumerTag?: string; // best to ignore this as given automatically
   noAck?: boolean; // if true will dequeue messages as soon as they have been sent
@@ -28,10 +28,10 @@ export interface IRabbitReceiver {
   priority?: number;
   arguments?: object;
   prefetch?: number;
-  bindings?: IRabbitBinding[];
+  bindings?: IAmqpBinding[];
 }
 
-export interface IRabbitConnection {
+export interface IAmqpConnection {
   uri: string;
   socketOptions?: {
     noDelay?: boolean;
@@ -42,28 +42,28 @@ export interface IRabbitConnection {
   };
 }
 
-export interface IRabbitDeclarations {
-  queues?: IRabbitQueue[]; // queues can be represented as strings
-  exchanges?: IRabbitExchange[];
-  bindings?: IRabbitBinding[];
+export interface IAmqpDeclarations {
+  queues?: IAmqpQueue[]; // queues can be represented as strings
+  exchanges?: IAmqpExchange[];
+  bindings?: IAmqpBinding[];
 }
 
-export type IRabbitConfig = IRabbitConnection & {
-  declarations?: IRabbitDeclarations;
+export type IAmqpConfig = IAmqpConnection & {
+  declarations?: IAmqpDeclarations;
 };
 
 // Destination information
 // For reference Kafka client might have things like:
 //   topic, partitionKey, partition
-export type IRabbitRoute =
+export type IAmqpRoute =
   | {
       exchange: string;
       key?: string;
     }
   | string;
 
-export interface IRabbitMessage extends IMessage {
-  route?: IRabbitRoute;
+export interface IAmqpMessage extends IMessage {
+  route?: IAmqpRoute;
   meta?: {
     expiration?: string;
     userId?: string;
@@ -84,13 +84,13 @@ export interface IRabbitMessage extends IMessage {
   };
 }
 
-export interface IRabbitMessageProducer extends IRabbitMessage {
+export interface IAmqpMessageProducer extends IAmqpMessage {
   mandatory?: true;
   bcc?: string | string[];
   immediate?: boolean;
 }
 
-export interface IRabbitMessageConsumed extends IRabbitMessage {
+export interface IAmqpMessageConsumed extends IAmqpMessage {
   ack?: () => void;
   route: {
     exchange: string;
@@ -98,7 +98,7 @@ export interface IRabbitMessageConsumed extends IRabbitMessage {
   };
 }
 
-export interface IRabbitBinding {
+export interface IAmqpBinding {
   arguments?: any;
   destination?: string; // if not provided default to anon queue if no anon que then error
   pattern?: string; // ''

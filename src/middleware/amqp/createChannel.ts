@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { IRabbitConfig } from './domain';
+import { IAmqpConfig } from './domain';
 
 function throwConnectionError(err: Error) {
   throw new Error(`Rabbit middleware could not connect to RabbitMQ. ${err}`);
@@ -8,7 +8,7 @@ function throwConnectionError(err: Error) {
 // TODO: use a WeakMap() to manage connections
 
 async function createConnection(
-  config: IRabbitConfig
+  config: IAmqpConfig
 ): Promise<amqp.Connection | undefined> {
   const { uri, socketOptions } = config;
   let conn;
@@ -29,7 +29,7 @@ async function createConnection(
 // we only need a single TCP connection per node and can use channels
 let singletonConn: amqp.Connection | undefined;
 export async function getConnection(
-  config: IRabbitConfig
+  config: IAmqpConfig
 ): Promise<amqp.Connection | undefined> {
   if (!singletonConn) {
     try {
@@ -41,7 +41,7 @@ export async function getConnection(
   return singletonConn;
 }
 
-export async function closeConnection(config: IRabbitConfig) {
+export async function closeConnection(config: IAmqpConfig) {
   const conn = await getConnection(config);
   if (conn) {
     return await conn.close();
@@ -49,7 +49,7 @@ export async function closeConnection(config: IRabbitConfig) {
 }
 
 // TODO: Listen for process kill and disconnect? Maybe this happens automatically
-export default async function createChannel(config: IRabbitConfig) {
+export default async function createChannel(config: IAmqpConfig) {
   const conn = await getConnection(config);
   if (conn) {
     return await conn.createChannel();

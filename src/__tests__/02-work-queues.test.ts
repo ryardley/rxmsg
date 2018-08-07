@@ -2,7 +2,7 @@
 import { ReplaySubject } from 'rxjs';
 import { createConsumer, createProducer } from '../index';
 import createAmqpConnector from '../middleware/amqp';
-import { IRabbitMessageProducer } from '../middleware/amqp/domain';
+import { IAmqpMessageProducer } from '../middleware/amqp/domain';
 
 it('should simulate work queues', () => {
   const { sender, receiver } = createAmqpConnector({
@@ -18,7 +18,7 @@ it('should simulate work queues', () => {
       'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv'
   });
 
-  const producer: ReplaySubject<IRabbitMessageProducer> = createProducer(
+  const producer: ReplaySubject<IAmqpMessageProducer> = createProducer(
     sender()
   );
 
