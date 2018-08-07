@@ -1,4 +1,4 @@
 import { Observable } from 'rxjs';
-import { IRabbitConfig, IRabbitMessageProducer } from './domain';
-declare const createSender: (config: IRabbitConfig) => () => (stream: Observable<IRabbitMessageProducer>) => Observable<IRabbitMessageProducer>;
+import { IAmqpConfig, IAmqpMessageProducer } from './domain';
+declare const createSender: (config: IAmqpConfig) => () => (stream: Observable<IAmqpMessageProducer>) => Observable<IAmqpMessageProducer>;
 export default createSender;

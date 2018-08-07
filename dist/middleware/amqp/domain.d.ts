@@ -1,14 +1,14 @@
 /// <reference types="node" />
 import { IMessage } from '../../domain';
-export interface IRabbitQueueFull {
+export interface IAmqpQueueFull {
     name: string;
     durable?: boolean;
     exclusive?: boolean;
     autoDelete?: boolean;
     arguments?: any;
 }
-export declare type IRabbitQueue = IRabbitQueueFull | string;
-export interface IRabbitExchange {
+export declare type IAmqpQueue = IAmqpQueueFull | string;
+export interface IAmqpExchange {
     name: string;
     type: 'fanout' | 'topic' | 'direct';
     durable?: boolean;
@@ -17,7 +17,7 @@ export interface IRabbitExchange {
     alternateExchange?: string;
     arguments?: any;
 }
-export interface IRabbitReceiver {
+export interface IAmqpReceiver {
     queue?: string;
     consumerTag?: string;
     noAck?: boolean;
@@ -25,9 +25,9 @@ export interface IRabbitReceiver {
     priority?: number;
     arguments?: object;
     prefetch?: number;
-    bindings?: IRabbitBinding[];
+    bindings?: IAmqpBinding[];
 }
-export interface IRabbitConnection {
+export interface IAmqpConnection {
     uri: string;
     socketOptions?: {
         noDelay?: boolean;
@@ -37,20 +37,20 @@ export interface IRabbitConnection {
         ca?: Buffer[];
     };
 }
-export interface IRabbitDeclarations {
-    queues?: IRabbitQueue[];
-    exchanges?: IRabbitExchange[];
-    bindings?: IRabbitBinding[];
+export interface IAmqpDeclarations {
+    queues?: IAmqpQueue[];
+    exchanges?: IAmqpExchange[];
+    bindings?: IAmqpBinding[];
 }
-export declare type IRabbitConfig = IRabbitConnection & {
-    declarations?: IRabbitDeclarations;
+export declare type IAmqpConfig = IAmqpConnection & {
+    declarations?: IAmqpDeclarations;
 };
-export declare type IRabbitRoute = {
+export declare type IAmqpRoute = {
     exchange: string;
     key?: string;
 } | string;
-export interface IRabbitMessage extends IMessage {
-    route?: IRabbitRoute;
+export interface IAmqpMessage extends IMessage {
+    route?: IAmqpRoute;
     meta?: {
         expiration?: string;
         userId?: string;
@@ -68,19 +68,19 @@ export interface IRabbitMessage extends IMessage {
         appId?: string;
     };
 }
-export interface IRabbitMessageProducer extends IRabbitMessage {
+export interface IAmqpMessageProducer extends IAmqpMessage {
     mandatory?: true;
     bcc?: string | string[];
     immediate?: boolean;
 }
-export interface IRabbitMessageConsumed extends IRabbitMessage {
+export interface IAmqpMessageConsumed extends IAmqpMessage {
     ack?: () => void;
     route: {
         exchange: string;
         key?: string;
     };
 }
-export interface IRabbitBinding {
+export interface IAmqpBinding {
     arguments?: any;
     destination?: string;
     pattern?: string;

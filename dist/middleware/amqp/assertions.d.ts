@@ -1,10 +1,10 @@
 import { Channel } from 'amqplib';
-import { IRabbitBinding, IRabbitDeclarations, IRabbitExchange, IRabbitQueue, IRabbitQueueFull } from './domain';
-export declare function enrichQueue(queueOrString: IRabbitQueue): IRabbitQueueFull;
-export declare function containsQueue(array: IRabbitQueue[], queue: IRabbitQueue): void;
-export declare function assertQueue(channel: Channel, queue: IRabbitQueue): Promise<import("amqplib/properties").Replies.AssertQueue>;
-export declare function assertQueues(channel: Channel, queues: IRabbitQueue[]): Promise<import("amqplib/properties").Replies.AssertQueue[]>;
-export declare function assertExchanges(channel: Channel, exchanges: IRabbitExchange[]): Promise<import("amqplib/properties").Replies.AssertExchange[]>;
+import { IAmqpBinding, IAmqpDeclarations, IAmqpExchange, IAmqpQueue, IAmqpQueueFull } from './domain';
+export declare function enrichQueue(queueOrString: IAmqpQueue): IAmqpQueueFull;
+export declare function containsQueue(array: IAmqpQueue[], queue: IAmqpQueue): void;
+export declare function assertQueue(channel: Channel, queue: IAmqpQueue): Promise<import("amqplib/properties").Replies.AssertQueue>;
+export declare function assertQueues(channel: Channel, queues: IAmqpQueue[]): Promise<import("amqplib/properties").Replies.AssertQueue[]>;
+export declare function assertExchanges(channel: Channel, exchanges: IAmqpExchange[]): Promise<import("amqplib/properties").Replies.AssertExchange[]>;
 export declare function assertIfAnonymousQueue(channel: Channel, queue: string): Promise<string>;
-export declare function assertBindings(channel: Channel, bindings: IRabbitBinding[], defaultQueue: string): Promise<any[]>;
-export declare function assertDeclarations(channel: Channel, declarations: IRabbitDeclarations): Promise<[import("amqplib/properties").Replies.AssertQueue[], import("amqplib/properties").Replies.AssertExchange[]]>;
+export declare function assertBindings(channel: Channel, bindings: IAmqpBinding[], defaultQueue: string): Promise<any[]>;
+export declare function assertDeclarations(channel: Channel, declarations: IAmqpDeclarations): Promise<[import("amqplib/properties").Replies.AssertQueue[], import("amqplib/properties").Replies.AssertExchange[]]>;
