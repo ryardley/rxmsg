@@ -1,7 +1,7 @@
-import { IAmqpConfig } from './domain';
+import { IAmqpConfig } from './types';
 declare const _default: (c?: IAmqpConfig) => {
     close: () => Promise<void>;
-    receiver: (receiverConfig: import("src/middleware/amqp/domain").IAmqpReceiver) => () => any;
-    sender: () => (stream: import("../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/rxjs/internal/Observable").Observable<import("src/middleware/amqp/domain").IAmqpMessageProducer>) => import("../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/rxjs/internal/Observable").Observable<import("src/middleware/amqp/domain").IAmqpMessageProducer>;
+    receiver: (r: import("src/middleware/amqp/types").IAmqpReceiver) => import("src/types").Middleware<import("src/middleware/amqp/types").IAmqpMessageConsumed>;
+    sender: () => (stream: import("../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/rxjs/internal/Observable").Observable<import("src/middleware/amqp/types").IAmqpMessageProducer>) => import("../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/rxjs/internal/Observable").Observable<import("src/middleware/amqp/types").IAmqpMessageProducer>;
 };
 export default _default;

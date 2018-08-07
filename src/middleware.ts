@@ -1,14 +1,18 @@
 import { Observable } from 'rxjs';
-import { IMessage, Middleware } from './types';
+import { Middleware } from './types';
 
-type MiddlewareCombiner = (...a: Middleware[]) => Middleware;
+// type MiddlewareCombiner<T> = (...a: Array<Middleware<T>>) => Middleware<T>;
 
-const identityMiddleware: Middleware = (a: Observable<IMessage>) => a;
+function identityMiddleware<T>(a: Observable<T>): Observable<T> {
+  return a;
+}
 
-export const combineMiddleware: MiddlewareCombiner = (...fns) => {
+export function combineMiddleware<T>(
+  ...fns: Array<Middleware<T>>
+): Middleware<T> {
   if (fns.length === 0) {
     return identityMiddleware;
   }
 
   return fns.reduce((fn1, fn2) => a => fn2(fn1(a)));
-};
+}

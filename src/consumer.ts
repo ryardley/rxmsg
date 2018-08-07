@@ -1,9 +1,11 @@
-import { from } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { combineMiddleware } from './middleware';
 import { Middleware } from './types';
 
-export const createConsumer = (...middleware: Middleware[]) => {
+export function createConsumer<T>(
+  ...middleware: Array<Middleware<T>>
+): Observable<T> {
   const nullObservable = from([]);
-  const middlewareFunction = combineMiddleware(...middleware);
+  const middlewareFunction = combineMiddleware<T>(...middleware);
   return middlewareFunction(nullObservable);
-};
+}

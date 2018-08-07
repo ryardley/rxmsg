@@ -3,12 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const receiveStream = new rxjs_1.Subject();
-// Recieve messages
-const createReceiver = () => () => {
-    return receiveStream.asObservable();
-};
+function createReceiver() {
+    return () => receiveStream.asObservable();
+}
 // Forward messages
-const createSender = config => (sendStream) => {
+const createSender = (config) => (sendStream) => {
     const mappedStream = config && typeof config.delay
         ? sendStream.pipe(operators_1.delay(config.delay))
         : sendStream;
@@ -16,7 +15,7 @@ const createSender = config => (sendStream) => {
     return sendStream;
 };
 exports.default = (config) => ({
-    receiver: createReceiver(config),
+    receiver: createReceiver(),
     sender: createSender(config)
 });
 //# sourceMappingURL=loopback.js.map

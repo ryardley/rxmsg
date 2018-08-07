@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { IMessage, MiddlewareCreator } from '../types';
+import { IMessage } from '../types';
 
 const receiveStream = new Subject<IMessage>();
 
@@ -8,13 +8,12 @@ type ILoopBackConfig = {
   delay?: number;
 } | void;
 
-// Recieve messages
-const createReceiver: MiddlewareCreator<ILoopBackConfig> = () => () => {
-  return receiveStream.asObservable();
-};
+function createReceiver() {
+  return () => receiveStream.asObservable();
+}
 
 // Forward messages
-const createSender: MiddlewareCreator<ILoopBackConfig> = config => (
+const createSender = (config: ILoopBackConfig) => (
   sendStream: Observable<IMessage>
 ) => {
   const mappedStream =
@@ -27,6 +26,6 @@ const createSender: MiddlewareCreator<ILoopBackConfig> = config => (
 };
 
 export default (config?: ILoopBackConfig) => ({
-  receiver: createReceiver(config),
+  receiver: createReceiver(),
   sender: createSender(config)
 });

@@ -1,4 +1,2 @@
-import { Middleware } from './domain';
-declare type MiddlewareCombiner = (...a: Middleware[]) => Middleware;
-export declare const combineMiddleware: MiddlewareCombiner;
-export {};
+import { Middleware } from './types';
+export declare function combineMiddleware<T>(...fns: Array<Middleware<T>>): Middleware<T>;

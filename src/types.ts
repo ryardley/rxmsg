@@ -1,14 +1,11 @@
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 
+// Generic message
 export interface IMessage {
   content: any;
   route?: any;
-  ack?: () => void;
+  meta?: any;
 }
 
-export type MiddlewareCreator<T> = (c: T) => Middleware;
-export type ConfiguredMiddlewareCreator<T, Q> = (c: T) => MiddlewareCreator<Q>;
-export type Producer = Subject<IMessage>;
-export type Consumer = Observable<IMessage>;
-
-export type Middleware = (a: Observable<IMessage>) => Observable<IMessage>;
+// Generic Middleware decorates a stream
+export type Middleware<T> = (a: Observable<T>) => Observable<T>;

@@ -1,5 +1,5 @@
 import { Channel } from 'amqplib';
-import { IAmqpBinding, IAmqpDeclarations, IAmqpExchange, IAmqpQueue, IAmqpQueueFull } from './domain';
+import { IAmqpBinding, IAmqpDeclarations, IAmqpExchange, IAmqpQueue, IAmqpQueueFull } from './types';
 export declare function enrichQueue(queueOrString: IAmqpQueue): IAmqpQueueFull;
 export declare function containsQueue(array: IAmqpQueue[], queue: IAmqpQueue): void;
 export declare function assertQueue(channel: Channel, queue: IAmqpQueue): Promise<import("amqplib/properties").Replies.AssertQueue>;
