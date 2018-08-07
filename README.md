@@ -53,9 +53,6 @@ You can install by referencing a version tag directly off the github repo.
 yarn add blockbid/blockbid-message#2.x
 ```
 
-### Typescript types
-
-[Not yet tested getting types exported yet. There might be config that need updating. Please add that info here.]
 
 ## Framework Usage
 
@@ -95,22 +92,56 @@ const sub = consumer
   });
 ```
 
-## Middleware Structure
+### Typescript types
 
-Basically the structure of middleware is that you accept a stream and return a stream.
+#### Messages
 
-```typescript
-(stream: Observable<IMessage>) => Observable<IMessage>
-```
-
-Where IMessage looks like this (this may change):
+Generic message objects look like this:
 
 ```typescript
+// Generic message
 export interface IMessage {
   content: any;
   route?: any;
-  ack?: () => void;
+  meta?: any;
 }
+```
+
+You might use a message by sending it to the `next()` method of a producer.
+
+```typescript
+producer.next({
+  content: 'Hi there!',
+  route: 'some-queue'
+})
+```
+
+#### Middleware
+
+Middleware are effectively functions designed to decorate RxJS streams and looks like this:
+
+```typescript
+// Generic Middleware decorates a stream
+export type Middleware<T extends IMessage> = (
+  a: Observable<T>
+) => Observable<T>;
+```
+
+You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions
+
+
+```typescript
+import {tap} from 'rxjs/operators';
+
+function logger(stream: Observable<IMessage>) {
+  return stream
+    .pipe(tap(
+      (msg:IMessage) => console.log(`Stream logged: ${msg.content}`
+    ));
+}
+
+// Pass the middleware in order to the consumer or producer
+const consumer = createConsumer(someReceiver, logger);
 ```
 
 ## AMQP Middleware
