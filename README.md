@@ -34,6 +34,7 @@ At a later point we should have plugins to make it work with various messaging p
 
 #### TODO
 
+- [ ] Write docs on AMQP middleware
 - [ ] Mock out tests properly
 - [ ] Test Error handling toughroughly
 - [ ] Fix concurrent connection issues
