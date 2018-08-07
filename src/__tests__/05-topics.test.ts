@@ -33,8 +33,8 @@ it(
       const consumer = createConsumer(
         receiver({
           bindings: patterns.map(pattern => ({
-            source: 'topic_logs',
-            pattern
+            pattern,
+            source: 'topic_logs'
           })),
           noAck: true
         })
