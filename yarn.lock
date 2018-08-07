@@ -517,9 +517,9 @@ bitsyntax@~0.0.4:
   dependencies:
     buffer-more-ints "0.0.2"
 
-blockbid-tools@blockbid/blockbid-tools:
-  version "1.0.3"
-  resolved "git+ssh://git@github.com/blockbid/blockbid-tools.git#e9a4e0241fadc6dde1f6cc9ae9a08fa1c0833915"
+blockbid-tools@blockbid/blockbid-tools#v1.1.0:
+  version "1.1.0"
+  resolved "git+ssh://git@github.com/blockbid/blockbid-tools.git#b3874881bb58bb83cfe059cfb9e609588d580a61"
   dependencies:
     "@types/jest" "^23.3.0"
     jest "^23.4.1"
