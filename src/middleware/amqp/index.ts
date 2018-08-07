@@ -1,7 +1,7 @@
 import { closeConnection } from './createChannel';
 import createReceiver from './createReceiver';
 import createSender from './createSender';
-import { IAmqpConfig } from './domain';
+import { IAmqpConfig } from './types';
 
 export default (c?: IAmqpConfig) => {
   return {

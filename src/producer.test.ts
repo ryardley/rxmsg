@@ -1,8 +1,8 @@
 import { from } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import { Middleware } from './domain';
 import { createProducer } from './producer';
+import { Middleware } from './types';
 
 it('should send messages from the producer to the middleware', () => {
   const mockFn = jest.fn();

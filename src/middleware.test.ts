@@ -1,7 +1,7 @@
 import { from } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Middleware } from './domain';
 import { combineMiddleware } from './middleware';
+import { Middleware } from './types';
 
 describe('combineMiddleware', () => {
   it('should send messages in order', () => {

@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 
 import { createConsumer } from './consumer';
-import { Middleware } from './domain';
+import { Middleware } from './types';
 
 it('should send messages from the middleware to the consumer', () => {
   const mockFn = jest.fn();
