@@ -2,8 +2,8 @@ import { IAmqpEngine, IAmqpEngineMessage } from '../middleware/amqp/types';
 
 const defaultMockEngine: IAmqpEngine = {
   ack: () => null,
-  assertExchange: () => Promise.resolve({ exchange: 'dummyexchange' }),
-  assertQueue: () => Promise.resolve({ queue: 'dummyqueue' }),
+  assertExchange: () => Promise.resolve({ exchange: 'server-exchange' }),
+  assertQueue: () => Promise.resolve({ queue: 'server-queue' }),
   bindExchange: () => Promise.resolve({}),
   bindQueue: () => Promise.resolve({}),
   closeConnection: () => Promise.resolve(),
@@ -42,7 +42,7 @@ const defaultPublishBehaviour = ({
 export function getMockEngine({
   onPublish = defaultPublishBehaviour,
   decorator = a => a
-}: IMockEngineConfig) {
+}: IMockEngineConfig = {}) {
   let onMessage: MessageCalback;
   return decorator({
     ...defaultMockEngine,

@@ -1,9 +1,17 @@
 // tslint:disable:no-console
 import { createConsumer, createProducer } from '..';
-import createAmqpConnector from '../middleware/amqp';
-import { IAmqpMessageOut } from '../middleware/amqp/types';
+import { createInjectableAmqpConnector } from '../middleware/amqp';
+import { IAmqpEngine, IAmqpMessageOut } from '../middleware/amqp/types';
+import { jestSpyObject } from './jestSpyObject';
+import { getMockEngine } from './mockEngine';
 
-it.skip('should simulate work queues', () => {
+it('should simulate work queues', done => {
+  const engine = jestSpyObject<IAmqpEngine>(getMockEngine());
+
+  const createAmqpConnector = createInjectableAmqpConnector(() => () => {
+    return Promise.resolve(engine);
+  });
+
   const { sender, receiver } = createAmqpConnector({
     declarations: {
       queues: [
@@ -13,8 +21,7 @@ it.skip('should simulate work queues', () => {
         }
       ]
     },
-    uri:
-      'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv'
+    uri: ''
   });
 
   const producer = createProducer<IAmqpMessageOut>(sender());
@@ -37,10 +44,34 @@ it.skip('should simulate work queues', () => {
     const secs = msg.content.split('.').length - 1;
 
     output.push(`Received ${msg.content}`);
+    expect(msg.content).toEqual('Hello World!');
+
     setTimeout(() => {
       output.push('Done');
       msg.ack();
-      expect(output).toEqual(['Received Hello World!', 'Done']);
+
+      expect(engine.jestSpyCalls.mock.calls).toEqual([
+        ['assertQueue', 'task_queue', { durable: true }],
+        ['assertQueue', 'task_queue', { durable: true }],
+        ['prefetch', 1],
+        ['consume', 'task_queue', '_FUNCTION_', {}],
+        [
+          'publish',
+          '',
+          'task_queue',
+          Buffer.from(JSON.stringify('Hello World!'))
+        ],
+        [
+          'ack',
+          {
+            content: Buffer.from(JSON.stringify('Hello World!')),
+            fields: { exchange: '', routingKey: 'task_queue' },
+            properties: {}
+          },
+          false
+        ]
+      ]);
+      done();
     }, secs * 1000);
   });
 });

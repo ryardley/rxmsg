@@ -1,21 +1,14 @@
 import { createConsumer, createProducer } from '../index';
 import { createInjectableAmqpConnector } from '../middleware/amqp';
 import { IAmqpEngine } from '../middleware/amqp/types';
+import { jestSpyObject } from './jestSpyObject';
 import { getMockEngine } from './mockEngine';
 
 describe('when the message arrives', () => {
-  const engine = getMockEngine({
-    decorator: (mockEngine: IAmqpEngine) => ({
-      ...mockEngine,
-      assertQueue: jest.fn(mockEngine.assertQueue),
-      consume: jest.fn(mockEngine.consume),
-      publish: jest.fn(mockEngine.publish)
-    })
-  });
-
   it('should run the hello world example ', done => {
+    const channel = jestSpyObject<IAmqpEngine>(getMockEngine());
     const createAmqpConnector = createInjectableAmqpConnector(() => () => {
-      return Promise.resolve(engine);
+      return Promise.resolve(channel);
     });
 
     const { sender, receiver } = createAmqpConnector({
@@ -27,8 +20,7 @@ describe('when the message arrives', () => {
           }
         ]
       },
-      uri:
-        'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv'
+      uri: ''
     });
 
     const producer = createProducer(sender());
@@ -47,22 +39,12 @@ describe('when the message arrives', () => {
 
     consumer.subscribe(msg => {
       // Check consume()
-      expect((engine.consume as jest.Mock).mock.calls[0][0]).toEqual('hello');
-      expect((engine.consume as jest.Mock).mock.calls[0][2]).toEqual({
-        noAck: true
-      });
-
-      // Check assertQueue()
-      expect(engine.assertQueue).toHaveBeenCalledWith('hello', {
-        durable: false
-      });
-
-      // Check publish()
-      expect(engine.publish).toHaveBeenCalledWith(
-        '',
-        'hello',
-        Buffer.from(JSON.stringify('Hello World!'))
-      );
+      expect(channel.jestSpyCalls.mock.calls).toEqual([
+        ['assertQueue', 'hello', { durable: false }],
+        ['assertQueue', 'hello', { durable: false }],
+        ['consume', 'hello', '_FUNCTION_', { noAck: true }],
+        ['publish', '', 'hello', Buffer.from(JSON.stringify('Hello World!'))]
+      ]);
 
       // Check msg.content
       expect(msg.content).toEqual('Hello World!');

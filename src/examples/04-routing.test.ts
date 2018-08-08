@@ -1,9 +1,30 @@
 // tslint:disable:no-console
 import { createConsumer, createProducer } from '../index';
-import createAmqpConnector from '../middleware/amqp';
+import { createInjectableAmqpConnector } from '../middleware/amqp';
+import { IAmqpEngine } from '../middleware/amqp/types';
+import { jestSpyObject } from './jestSpyObject';
+import { getMockEngine } from './mockEngine';
 
-it.skip('should be able to handle routing', done => {
-  const output = [];
+it('should be able to handle routing', done => {
+  const engine = jestSpyObject<IAmqpEngine>(
+    getMockEngine({
+      onPublish: ({ exchange, routingKey, content, opts, onMessage }) => {
+        // Simulate rabbit behaviour
+        if (routingKey === 'error') {
+          onMessage({
+            content,
+            fields: { exchange, routingKey },
+            properties: {}
+          });
+        }
+      }
+    })
+  );
+
+  const createAmqpConnector = createInjectableAmqpConnector(() => () => {
+    return Promise.resolve(engine);
+  });
+
   const { sender, receiver } = createAmqpConnector({
     declarations: {
       exchanges: [
@@ -14,44 +35,42 @@ it.skip('should be able to handle routing', done => {
         }
       ]
     },
-    uri:
-      'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv'
+    uri: ''
   });
 
-  function runProducer(msg = 'Hello World', severity = 'info') {
-    const producer = createProducer(sender());
+  const producer = createProducer(sender());
 
-    producer.next({
-      content: msg,
-      route: { exchange: 'direct_logs', key: severity }
-    });
-  }
+  const consumer = createConsumer(
+    receiver({
+      bindings: ['error'].map(label => ({
+        pattern: label,
+        source: 'direct_logs'
+      })),
+      noAck: true
+    })
+  );
 
-  function runConsumer(labels: string[]) {
-    const consumer = createConsumer(
-      receiver({
-        bindings: labels.map(label => ({
-          pattern: label,
-          source: 'direct_logs'
-        })),
-        noAck: true
-      })
-    );
-
-    consumer.subscribe(msg => {
-      output.push(`${msg.route.key}-${msg.content}`);
-    });
-  }
-
-  runConsumer(['error']);
-
-  setTimeout(() => {
-    runProducer('Hi I am foo', 'error');
-    runProducer('Hi I am a warning', 'warn');
-  }, 2000);
-
-  setTimeout(() => {
-    expect(output).toEqual(['error-Hi I am foo']);
+  consumer.subscribe(msg => {
+    expect(engine.jestSpyCalls.mock.calls).toEqual([
+      ['assertExchange', 'direct_logs', 'direct', { durable: false }],
+      ['assertExchange', 'direct_logs', 'direct', { durable: false }],
+      ['assertQueue', '', { exclusive: true }],
+      ['bindQueue', 'server-queue', 'direct_logs', 'error', undefined],
+      ['consume', 'server-queue', '_FUNCTION_', { noAck: true }],
+      ['publish', 'direct_logs', 'warn', Buffer.from('"Hi I am a warning"')],
+      ['publish', 'direct_logs', 'error', Buffer.from('"Hi I am an error"')]
+    ]);
+    expect(msg.content).toEqual('Hi I am an error');
     done();
-  }, 4000);
+  });
+
+  producer.next({
+    content: 'Hi I am a warning',
+    route: { exchange: 'direct_logs', key: 'warn' }
+  });
+
+  producer.next({
+    content: 'Hi I am an error',
+    route: { exchange: 'direct_logs', key: 'error' }
+  });
 });
