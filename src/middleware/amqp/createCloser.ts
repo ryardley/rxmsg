@@ -1,5 +1,7 @@
-import { closeConnection } from './createChannel';
-import { IAmqp, IAmqpConfig } from './types';
+// import { closeConnection } from './createChannel';
+import { IAmqpEngineFactory } from './types';
 
-export default (amqp: IAmqp) => (config: IAmqpConfig) => () =>
-  closeConnection(amqp, config);
+export default (engineFactory: IAmqpEngineFactory) => async () => {
+  const engine = await engineFactory();
+  return await engine.closeConnection();
+};

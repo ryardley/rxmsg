@@ -1,15 +1,17 @@
 // tslint:disable:no-console
 
-import { Channel } from 'amqplib';
 import {
   IAmqpBinding,
   IAmqpDeclarations,
-  IAmqpExchange,
-  IAmqpQueue,
-  IAmqpQueueFull
+  IAmqpEngine,
+  IAmqpExchangeDescription,
+  IAmqpQueueDescription,
+  IAmqpQueueShortDescription
 } from './types';
 
-export function enrichQueue(queueOrString: IAmqpQueue): IAmqpQueueFull {
+export function enrichQueue(
+  queueOrString: IAmqpQueueShortDescription
+): IAmqpQueueDescription {
   return typeof queueOrString === 'string'
     ? {
         exclusive: true,
@@ -35,22 +37,31 @@ function enrichBinding(binding: IAmqpBinding) {
   };
 }
 
-export function containsQueue(array: IAmqpQueue[] = [], queue: IAmqpQueue) {
+export function containsQueue(
+  array: IAmqpQueueShortDescription[] = [],
+  queue: IAmqpQueueShortDescription
+) {
   array.find(item => enrichQueue(item).name === enrichQueue(queue).name);
 }
 
-export async function assertQueue(channel: Channel, queue: IAmqpQueue) {
+export async function assertQueue(
+  channel: IAmqpEngine,
+  queue: IAmqpQueueShortDescription
+) {
   const { name, ...opts } = enrichQueue(queue);
   return channel.assertQueue(name, opts);
 }
 
-export async function assertQueues(channel: Channel, queues: IAmqpQueue[]) {
+export async function assertQueues(
+  channel: IAmqpEngine,
+  queues: IAmqpQueueShortDescription[]
+) {
   return Promise.all(queues.map(queue => assertQueue(channel, queue)));
 }
 
 export async function assertExchanges(
-  channel: Channel,
-  exchanges: IAmqpExchange[]
+  channel: IAmqpEngine,
+  exchanges: IAmqpExchangeDescription[]
 ) {
   return Promise.all(
     exchanges.map(({ name, type, ...opts }) => {
@@ -59,7 +70,10 @@ export async function assertExchanges(
   );
 }
 
-export async function assertIfAnonymousQueue(channel: Channel, queue: string) {
+export async function assertIfAnonymousQueue(
+  channel: IAmqpEngine,
+  queue: string
+) {
   if (queue !== '') {
     return queue; // assume this already exists
   }
@@ -69,7 +83,7 @@ export async function assertIfAnonymousQueue(channel: Channel, queue: string) {
 }
 
 export function assertBindings(
-  channel: Channel,
+  channel: IAmqpEngine,
   bindings: IAmqpBinding[],
   defaultQueue: string
 ) {
@@ -79,8 +93,8 @@ export function assertBindings(
       .map(({ arguments: args, destination, pattern, source, type }) => {
         const dest = destination || defaultQueue;
         const func = {
-          exchange: channel.bindExchange.bind(channel),
-          queue: channel.bindQueue.bind(channel)
+          exchange: channel.bindExchange,
+          queue: channel.bindQueue
         }[type];
         return func(dest, source, pattern, args);
       })
@@ -90,7 +104,7 @@ export function assertBindings(
 }
 
 export async function assertDeclarations(
-  channel: Channel,
+  channel: IAmqpEngine,
   declarations: IAmqpDeclarations
 ) {
   const { queues = [], exchanges = [] } = declarations;

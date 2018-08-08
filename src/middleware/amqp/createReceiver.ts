@@ -5,14 +5,20 @@ import {
   assertDeclarations,
   assertIfAnonymousQueue
 } from './assertions';
-import createChannel from './createChannel';
 
-import { IAmqp, IAmqpConfig, IAmqpMessageIn, IAmqpReceiver } from './types';
+import {
+  IAmqpDeclarations,
+  IAmqpEngineFactory,
+  IAmqpMessageIn,
+  IAmqpReceiverDescription
+} from './types';
+
+import { Middleware } from '../../types';
 
 async function setupReceiver(
-  amqp: IAmqp,
-  config: IAmqpConfig,
-  localConfig: IAmqpReceiver,
+  createChannel: IAmqpEngineFactory,
+  declarations: IAmqpDeclarations,
+  localConfig: IAmqpReceiverDescription,
   observer: Observer<IAmqpMessageIn>
 ) {
   const {
@@ -21,12 +27,9 @@ async function setupReceiver(
     bindings = [],
     ...receiverConfig
   } = localConfig;
+  const channel = await createChannel();
 
-  const channel = await createChannel(amqp, config);
-  if (!channel) {
-    return;
-  }
-  await assertDeclarations(channel, config.declarations);
+  await assertDeclarations(channel, declarations);
   const consumptionQueue = await assertIfAnonymousQueue(channel, queue);
   await assertBindings(channel, bindings, consumptionQueue);
 
@@ -62,19 +65,20 @@ async function setupReceiver(
   );
 }
 
-// type RecieverCreator<T extends IMessage> = (
-//   c: IAmqpConfig
-// ) => (r: IAmqpReceiver) => Middleware<T>;
+type CreateReceiver = (
+  engineCreator: IAmqpEngineFactory,
+  config: IAmqpDeclarations
+) => (r: IAmqpReceiverDescription) => Middleware<IAmqpMessageIn>;
 
 // Recieve messages
-const createReceiver = (amqp: IAmqp) => (config: IAmqpConfig) => (
-  receiverConfig: IAmqpReceiver
-) => () => {
-  return Observable.create((observer: Observer<IAmqpMessageIn>) => {
-    setupReceiver(amqp, config, receiverConfig, observer).catch(e => {
+const createReceiver: CreateReceiver = (
+  engineCreator,
+  config
+) => receiverConfig => () =>
+  Observable.create((observer: Observer<IAmqpMessageIn>) => {
+    setupReceiver(engineCreator, config, receiverConfig, observer).catch(e => {
       throw e;
     });
   });
-};
 
 export default createReceiver;

@@ -1,8 +1,7 @@
-import { Connection, Options } from 'amqplib';
 import { IMessage } from '../../types';
 // IO Types (Types provided as args at runtime by clients)
 
-export interface IAmqpQueueFull {
+export interface IAmqpQueueDescription {
   name: string;
   durable?: boolean;
   exclusive?: boolean;
@@ -10,9 +9,9 @@ export interface IAmqpQueueFull {
   arguments?: any;
 }
 
-export type IAmqpQueue = IAmqpQueueFull | string;
+export type IAmqpQueueShortDescription = IAmqpQueueDescription | string;
 
-export interface IAmqpExchange {
+export interface IAmqpExchangeDescription {
   name: string;
   type: 'fanout' | 'topic' | 'direct';
   durable?: boolean;
@@ -22,7 +21,7 @@ export interface IAmqpExchange {
   arguments?: any;
 }
 
-export interface IAmqpReceiver {
+export interface IAmqpReceiverDescription {
   queue?: string; // default to '' <- anon
   consumerTag?: string; // best to ignore this as given automatically
   noAck?: boolean; // if true will dequeue messages as soon as they have been sent
@@ -33,7 +32,7 @@ export interface IAmqpReceiver {
   bindings?: IAmqpBinding[];
 }
 
-export interface IAmqpConnection {
+export interface IAmqpConnectionDescription {
   uri: string;
   socketOptions?: {
     noDelay?: boolean;
@@ -45,19 +44,19 @@ export interface IAmqpConnection {
 }
 
 export interface IAmqpDeclarations {
-  queues?: IAmqpQueue[]; // queues can be represented as strings
-  exchanges?: IAmqpExchange[];
+  queues?: IAmqpQueueShortDescription[]; // queues can be represented as strings
+  exchanges?: IAmqpExchangeDescription[];
   bindings?: IAmqpBinding[];
 }
 
-export type IAmqpConfig = IAmqpConnection & {
+export type IAmqpSystemDescription = IAmqpConnectionDescription & {
   declarations?: IAmqpDeclarations;
 };
 
 // Destination information
 // For reference Kafka client might have things like:
 //   topic, partitionKey, partition
-export type IAmqpRoute =
+export type IAmqpRouteDescription =
   | {
       exchange: string;
       key?: string;
@@ -65,7 +64,7 @@ export type IAmqpRoute =
   | string;
 
 export interface IAmqpMessage extends IMessage {
-  route: IAmqpRoute;
+  route: IAmqpRouteDescription;
   expiration?: string;
   userId?: string;
   persistent?: boolean;
@@ -106,9 +105,49 @@ export interface IAmqpBinding {
   type?: 'exchange' | 'queue'; // default to queue
 }
 
-export interface IAmqp {
-  connect: (
-    url: string | Options.Connect,
-    socketOptions?: any
-  ) => Promise<Connection>;
+// IAmqpEngine - to act as a wrapper for amqplib
+interface IAmqpEngineMessage {
+  content: Buffer;
+  fields: any;
+  properties: any;
+}
+
+export type IAmqpEngineFactory = () => Promise<IAmqpEngine>;
+export type IAmqpEngineConfigurator = (
+  config: IAmqpConnectionDescription
+) => IAmqpEngineFactory;
+
+export interface IAmqpEngine {
+  closeConnection?: () => Promise<void>;
+  assertExchange?(
+    exchange: string,
+    type: string,
+    options?: any
+  ): Promise<{ exchange: string }>;
+  assertQueue?(queue: string, options?: any): Promise<{ queue: string }>;
+  bindQueue?(
+    queue: string,
+    source: string,
+    pattern: string,
+    args?: any
+  ): Promise<any>;
+  bindExchange?(
+    destination: string,
+    source: string,
+    pattern: string,
+    args?: any
+  ): Promise<any>;
+  prefetch?(count: number, global?: boolean): Promise<{}>;
+  consume?(
+    queue: string,
+    onMessage: (msg: IAmqpEngineMessage | null) => any,
+    options?: any
+  ): Promise<any>;
+  ack?(message: IAmqpEngineMessage, allUpTo?: boolean): void;
+  publish?(
+    exchange: string,
+    routingKey: string,
+    content: Buffer,
+    options?: any
+  ): boolean;
 }

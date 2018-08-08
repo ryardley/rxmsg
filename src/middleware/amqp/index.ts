@@ -1,19 +1,21 @@
-import amqplib from 'amqplib';
-import bindCloserCreatorToAmqpLib from './createCloser';
-import bindReceiverCreatorToAmqpLib from './createReceiver';
-import bindSenderCreatorToAmqpLib from './createSender';
-import { IAmqp, IAmqpConfig } from './types';
+import curry from 'lodash';
 
-export const createInjectableAmqpConnector = (amqp: IAmqp) => (
-  config?: IAmqpConfig
-) => {
-  const createReceiver = bindReceiverCreatorToAmqpLib(amqp);
-  const createSender = bindSenderCreatorToAmqpLib(amqp);
-  const createCloser = bindCloserCreatorToAmqpLib(amqp);
+import { configureAmqpEngine } from './amqpEngine';
+import createCloser from './createCloser';
+import createReceiver from './createReceiver';
+import createSender from './createSender';
 
-  const close = createCloser(config);
-  const receiver = createReceiver(config);
-  const sender = createSender(config);
+import { IAmqpEngineConfigurator, IAmqpSystemDescription } from './types';
+
+export const createInjectableAmqpConnector = (
+  configureEngine: IAmqpEngineConfigurator
+) => (config: IAmqpSystemDescription) => {
+  const amqpFactory = configureEngine(config);
+  const { declarations } = config;
+
+  const close = createCloser(amqpFactory);
+  const receiver = createReceiver(amqpFactory, declarations);
+  const sender = createSender(amqpFactory, declarations);
 
   return {
     close,
@@ -22,4 +24,4 @@ export const createInjectableAmqpConnector = (amqp: IAmqp) => (
   };
 };
 
-export default createInjectableAmqpConnector(amqplib);
+export default createInjectableAmqpConnector(configureAmqpEngine);

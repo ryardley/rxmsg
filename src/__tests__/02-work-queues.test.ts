@@ -1,6 +1,7 @@
 // tslint:disable:no-console
 import { createConsumer, createProducer } from '..';
 import createAmqpConnector from '../middleware/amqp';
+import { IAmqpMessageOut } from '../middleware/amqp/types';
 
 it('should simulate work queues', () => {
   const { sender, receiver } = createAmqpConnector({
@@ -16,7 +17,7 @@ it('should simulate work queues', () => {
       'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv'
   });
 
-  const producer = createProducer(sender());
+  const producer = createProducer<IAmqpMessageOut>(sender());
 
   producer.next({
     content: 'Hello World!',

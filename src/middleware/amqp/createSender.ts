@@ -1,11 +1,18 @@
 // tslint:disable:no-console
 import { Observable } from 'rxjs';
 
+import { Middleware } from '../../types';
 import { assertDeclarations } from './assertions';
-import createChannel from './createChannel';
-import { IAmqp, IAmqpConfig, IAmqpMessageOut, IAmqpRoute } from './types';
+import {
+  IAmqpDeclarations,
+  IAmqpEngineFactory,
+  IAmqpMessageOut,
+  IAmqpRouteDescription
+} from './types';
 
-function getRouteValues(route: IAmqpRoute): { exchange: string; key: string } {
+function getRouteValues(
+  route: IAmqpRouteDescription
+): { exchange: string; key: string } {
   return typeof route === 'string'
     ? {
         exchange: '',
@@ -18,12 +25,13 @@ function getRouteValues(route: IAmqpRoute): { exchange: string; key: string } {
 }
 
 async function setupSender(
-  amqp: IAmqp,
-  config: IAmqpConfig,
+  createChannel: IAmqpEngineFactory,
+  declarations: IAmqpDeclarations,
   stream: Observable<IAmqpMessageOut>
 ) {
-  const channel = await createChannel(amqp, config);
-  await assertDeclarations(channel, config.declarations);
+  const channel = await createChannel();
+
+  await assertDeclarations(channel, declarations);
 
   setTimeout(() => {
     stream.subscribe(({ route, ...msg }) => {
@@ -45,14 +53,18 @@ async function setupSender(
   }, 500);
 }
 
+type CreateSender = (
+  engineCreator: IAmqpEngineFactory,
+  config: IAmqpDeclarations
+) => () => Middleware<IAmqpMessageOut>;
+
 // Forward messages
-const createSender = (amqp: IAmqp) => (config: IAmqpConfig) => () => (
-  stream: Observable<IAmqpMessageOut>
-) => {
-  setupSender(amqp, config, stream).catch((e: Error) => {
+const createSender: CreateSender = (engineCreator, config) => () => stream => {
+  setupSender(engineCreator, config, stream).catch((e: Error) => {
     throw e;
   });
 
   return stream;
 };
+
 export default createSender;
