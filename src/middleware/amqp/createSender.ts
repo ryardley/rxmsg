@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 import { assertDeclarations } from './assertions';
 import createChannel from './createChannel';
-import { IAmqpConfig, IAmqpMessageOut, IAmqpRoute } from './types';
+import { IAmqp, IAmqpConfig, IAmqpMessageOut, IAmqpRoute } from './types';
 
 function getRouteValues(route: IAmqpRoute): { exchange: string; key: string } {
   return typeof route === 'string'
@@ -18,10 +18,11 @@ function getRouteValues(route: IAmqpRoute): { exchange: string; key: string } {
 }
 
 async function setupSender(
+  amqp: IAmqp,
   config: IAmqpConfig,
   stream: Observable<IAmqpMessageOut>
 ) {
-  const channel = await createChannel(config);
+  const channel = await createChannel(amqp, config);
   await assertDeclarations(channel, config.declarations);
 
   setTimeout(() => {
@@ -45,10 +46,10 @@ async function setupSender(
 }
 
 // Forward messages
-const createSender = (config: IAmqpConfig) => () => (
+const createSender = (amqp: IAmqp) => (config: IAmqpConfig) => () => (
   stream: Observable<IAmqpMessageOut>
 ) => {
-  setupSender(config, stream).catch((e: Error) => {
+  setupSender(amqp, config, stream).catch((e: Error) => {
     throw e;
   });
 

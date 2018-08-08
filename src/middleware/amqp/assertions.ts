@@ -1,6 +1,6 @@
 // tslint:disable:no-console
-import { Channel } from 'amqplib';
 
+import { Channel } from 'amqplib';
 import {
   IAmqpBinding,
   IAmqpDeclarations,

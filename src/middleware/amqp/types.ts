@@ -1,5 +1,5 @@
+import { Connection, Options } from 'amqplib';
 import { IMessage } from '../../types';
-
 // IO Types (Types provided as args at runtime by clients)
 
 export interface IAmqpQueueFull {
@@ -104,4 +104,13 @@ export interface IAmqpBinding {
   pattern?: string; // ''
   source: string;
   type?: 'exchange' | 'queue'; // default to queue
+}
+
+type ConnectFunction = (
+  url: string | Options.Connect,
+  socketOptions?: any
+) => Promise<Connection>;
+
+export interface IAmqp {
+  connect: ConnectFunction;
 }

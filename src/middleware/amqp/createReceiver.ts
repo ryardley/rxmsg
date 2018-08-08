@@ -7,10 +7,10 @@ import {
 } from './assertions';
 import createChannel from './createChannel';
 
-import { IMessage, Middleware } from '../../types';
-import { IAmqpConfig, IAmqpMessageIn, IAmqpReceiver } from './types';
+import { IAmqp, IAmqpConfig, IAmqpMessageIn, IAmqpReceiver } from './types';
 
 async function setupReceiver(
+  amqp: IAmqp,
   config: IAmqpConfig,
   localConfig: IAmqpReceiver,
   observer: Observer<IAmqpMessageIn>
@@ -22,7 +22,7 @@ async function setupReceiver(
     ...receiverConfig
   } = localConfig;
 
-  const channel = await createChannel(config);
+  const channel = await createChannel(amqp, config);
   if (!channel) {
     return;
   }
@@ -62,16 +62,16 @@ async function setupReceiver(
   );
 }
 
-type RecieverCreator<T extends IMessage> = (
-  c: IAmqpConfig
-) => (r: IAmqpReceiver) => Middleware<T>;
+// type RecieverCreator<T extends IMessage> = (
+//   c: IAmqpConfig
+// ) => (r: IAmqpReceiver) => Middleware<T>;
 
 // Recieve messages
-const createReceiver: RecieverCreator<IAmqpMessageIn> = (
-  config: IAmqpConfig
-) => (receiverConfig: IAmqpReceiver) => () => {
+const createReceiver = (amqp: IAmqp) => (config: IAmqpConfig) => (
+  receiverConfig: IAmqpReceiver
+) => () => {
   return Observable.create((observer: Observer<IAmqpMessageIn>) => {
-    setupReceiver(config, receiverConfig, observer).catch(e => {
+    setupReceiver(amqp, config, receiverConfig, observer).catch(e => {
       throw e;
     });
   });
