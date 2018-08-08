@@ -1,10 +1,19 @@
-import { Channel } from 'amqplib';
-import { IAmqpBinding, IAmqpDeclarations, IAmqpExchange, IAmqpQueue, IAmqpQueueFull } from './types';
-export declare function enrichQueue(queueOrString: IAmqpQueue): IAmqpQueueFull;
-export declare function containsQueue(array: IAmqpQueue[], queue: IAmqpQueue): void;
-export declare function assertQueue(channel: Channel, queue: IAmqpQueue): Promise<import("amqplib/properties").Replies.AssertQueue>;
-export declare function assertQueues(channel: Channel, queues: IAmqpQueue[]): Promise<import("amqplib/properties").Replies.AssertQueue[]>;
-export declare function assertExchanges(channel: Channel, exchanges: IAmqpExchange[]): Promise<import("amqplib/properties").Replies.AssertExchange[]>;
-export declare function assertIfAnonymousQueue(channel: Channel, queue: string): Promise<string>;
-export declare function assertBindings(channel: Channel, bindings: IAmqpBinding[], defaultQueue: string): Promise<any[]>;
-export declare function assertDeclarations(channel: Channel, declarations: IAmqpDeclarations): Promise<[import("amqplib/properties").Replies.AssertQueue[], import("amqplib/properties").Replies.AssertExchange[]]>;
+import { IAmqpBinding, IAmqpDeclarations, IAmqpEngine, IAmqpExchangeDescription, IAmqpQueueDescription, IAmqpQueueShortDescription } from './types';
+export declare function enrichQueue(queueOrString: IAmqpQueueShortDescription): IAmqpQueueDescription;
+export declare function containsQueue(array: IAmqpQueueShortDescription[], queue: IAmqpQueueShortDescription): void;
+export declare function assertQueue(channel: IAmqpEngine, queue: IAmqpQueueShortDescription): Promise<{
+    queue: string;
+}>;
+export declare function assertQueues(channel: IAmqpEngine, queues: IAmqpQueueShortDescription[]): Promise<{
+    queue: string;
+}[]>;
+export declare function assertExchanges(channel: IAmqpEngine, exchanges: IAmqpExchangeDescription[]): Promise<{
+    exchange: string;
+}[]>;
+export declare function assertIfAnonymousQueue(channel: IAmqpEngine, queue: string): Promise<string>;
+export declare function assertBindings(channel: IAmqpEngine, bindings: IAmqpBinding[], defaultQueue: string): Promise<any[]>;
+export declare function assertDeclarations(channel: IAmqpEngine, declarations: IAmqpDeclarations): Promise<[{
+    queue: string;
+}[], {
+    exchange: string;
+}[]]>;

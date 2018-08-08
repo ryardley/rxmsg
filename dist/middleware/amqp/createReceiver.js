@@ -16,22 +16,15 @@ var __rest = (this && this.__rest) || function (s, e) {
             t[p[i]] = s[p[i]];
     return t;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:no-console
 const rxjs_1 = require("rxjs");
 const assertions_1 = require("./assertions");
-const createChannel_1 = __importDefault(require("./createChannel"));
-function setupReceiver(config, localConfig, observer) {
+function setupReceiver(createChannel, declarations, localConfig, observer) {
     return __awaiter(this, void 0, void 0, function* () {
         const { queue = '', prefetch, bindings = [] } = localConfig, receiverConfig = __rest(localConfig, ["queue", "prefetch", "bindings"]);
-        const channel = yield createChannel_1.default(config);
-        if (!channel) {
-            return;
-        }
-        yield assertions_1.assertDeclarations(channel, config.declarations);
+        const channel = yield createChannel();
+        yield assertions_1.assertDeclarations(channel, declarations);
         const consumptionQueue = yield assertions_1.assertIfAnonymousQueue(channel, queue);
         yield assertions_1.assertBindings(channel, bindings, consumptionQueue);
         // Prefetch is set
@@ -61,12 +54,10 @@ function setupReceiver(config, localConfig, observer) {
     });
 }
 // Recieve messages
-const createReceiver = (config) => (receiverConfig) => () => {
-    return rxjs_1.Observable.create((observer) => {
-        setupReceiver(config, receiverConfig, observer).catch(e => {
-            throw e;
-        });
+const createReceiver = (engineCreator, config) => receiverConfig => () => rxjs_1.Observable.create((observer) => {
+    setupReceiver(engineCreator, config, receiverConfig, observer).catch(e => {
+        throw e;
     });
-};
+});
 exports.default = createReceiver;
 //# sourceMappingURL=createReceiver.js.map

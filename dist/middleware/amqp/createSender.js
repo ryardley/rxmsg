@@ -16,12 +16,8 @@ var __rest = (this && this.__rest) || function (s, e) {
             t[p[i]] = s[p[i]];
     return t;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const assertions_1 = require("./assertions");
-const createChannel_1 = __importDefault(require("./createChannel"));
 function getRouteValues(route) {
     return typeof route === 'string'
         ? {
@@ -33,10 +29,10 @@ function getRouteValues(route) {
             key: route.key || ''
         };
 }
-function setupSender(config, stream) {
+function setupSender(createChannel, declarations, stream) {
     return __awaiter(this, void 0, void 0, function* () {
-        const channel = yield createChannel_1.default(config);
-        yield assertions_1.assertDeclarations(channel, config.declarations);
+        const channel = yield createChannel();
+        yield assertions_1.assertDeclarations(channel, declarations);
         setTimeout(() => {
             stream.subscribe((_a) => {
                 var { route } = _a, msg = __rest(_a, ["route"]);
@@ -56,8 +52,8 @@ function setupSender(config, stream) {
     });
 }
 // Forward messages
-const createSender = (config) => () => (stream) => {
-    setupSender(config, stream).catch((e) => {
+const createSender = (engineCreator, config) => () => stream => {
+    setupSender(engineCreator, config, stream).catch((e) => {
         throw e;
     });
     return stream;

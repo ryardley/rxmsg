@@ -1,0 +1,1 @@
+{"version":3,"file":"createCloser.js","sourceRoot":"","sources":["../../../src/middleware/amqp/createCloser.ts"],"names":[],"mappings":";;;;;;;;;;AAGA,kBAAe,CAAC,aAAiC,EAAE,EAAE,CAAC,GAAS,EAAE;IAC/D,MAAM,MAAM,GAAG,MAAM,aAAa,EAAE,CAAC;IACrC,OAAO,MAAM,MAAM,CAAC,eAAe,EAAE,CAAC;AACxC,CAAC,CAAA,CAAC"}

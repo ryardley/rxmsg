@@ -1,7 +1,12 @@
-import { IAmqpConfig } from './types';
-declare const _default: (c?: IAmqpConfig) => {
+import { IAmqpEngineConfigurator, IAmqpSystemDescription } from './types';
+export declare const createInjectableAmqpConnector: (configureEngine: IAmqpEngineConfigurator) => (config: IAmqpSystemDescription) => {
     close: () => Promise<void>;
-    receiver: (r: import("src/middleware/amqp/types").IAmqpReceiver) => import("src/types").Middleware<import("src/middleware/amqp/types").IAmqpMessageIn>;
-    sender: () => (stream: import("../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/rxjs/internal/Observable").Observable<import("src/middleware/amqp/types").IAmqpMessageOut>) => import("../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/rxjs/internal/Observable").Observable<import("src/middleware/amqp/types").IAmqpMessageOut>;
+    receiver: (r: import("src/middleware/amqp/types").IAmqpReceiverDescription) => import("src/types").Middleware<import("src/middleware/amqp/types").IAmqpMessageIn>;
+    sender: () => import("src/types").Middleware<import("src/middleware/amqp/types").IAmqpMessageOut>;
+};
+declare const _default: (config: IAmqpSystemDescription) => {
+    close: () => Promise<void>;
+    receiver: (r: import("src/middleware/amqp/types").IAmqpReceiverDescription) => import("src/types").Middleware<import("src/middleware/amqp/types").IAmqpMessageIn>;
+    sender: () => import("src/types").Middleware<import("src/middleware/amqp/types").IAmqpMessageOut>;
 };
 export default _default;
