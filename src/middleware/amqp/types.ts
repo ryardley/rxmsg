@@ -106,11 +106,9 @@ export interface IAmqpBinding {
   type?: 'exchange' | 'queue'; // default to queue
 }
 
-type ConnectFunction = (
-  url: string | Options.Connect,
-  socketOptions?: any
-) => Promise<Connection>;
-
 export interface IAmqp {
-  connect: ConnectFunction;
+  connect: (
+    url: string | Options.Connect,
+    socketOptions?: any
+  ) => Promise<Connection>;
 }

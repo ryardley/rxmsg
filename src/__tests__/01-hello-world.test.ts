@@ -1,7 +1,9 @@
+import * as amqplib from 'amqplib';
 import { createConsumer, createProducer } from '../index';
-import createAmqpConnector from '../middleware/amqp';
+import { createInjectableAmqpConnector } from '../middleware/amqp';
 
 it('should run the hello world example', done => {
+  const createAmqpConnector = createInjectableAmqpConnector(amqplib);
   const { sender, receiver } = createAmqpConnector({
     declarations: {
       queues: [
