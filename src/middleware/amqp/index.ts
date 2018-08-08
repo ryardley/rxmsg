@@ -1,5 +1,3 @@
-import curry from 'lodash';
-
 import { configureAmqpEngine } from './amqpEngine';
 import createCloser from './createCloser';
 import createReceiver from './createReceiver';
