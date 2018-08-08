@@ -1,10 +1,9 @@
 import { Observable } from 'rxjs';
-import { IMessage } from '../types';
-declare type ILoopBackConfig = {
+interface ILoopBackConfig {
     delay?: number;
-} | void;
+}
 declare const _default: (config?: ILoopBackConfig) => {
-    receiver: () => Observable<IMessage>;
-    sender: (sendStream: Observable<IMessage>) => Observable<IMessage>;
+    receiver: () => Observable<any>;
+    sender: (sendStream: Observable<any>) => Observable<any>;
 };
 export default _default;

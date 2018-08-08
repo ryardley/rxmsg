@@ -8,13 +8,14 @@ function createReceiver() {
 }
 // Forward messages
 const createSender = (config) => (sendStream) => {
-    const mappedStream = config && typeof config.delay
-        ? sendStream.pipe(operators_1.delay(config.delay))
+    const delayAmount = config.delay || 0;
+    const mappedStream = delayAmount
+        ? sendStream.pipe(operators_1.delay(delayAmount))
         : sendStream;
     mappedStream.subscribe(receiveStream);
     return sendStream;
 };
-exports.default = (config) => ({
+exports.default = (config = {}) => ({
     receiver: createReceiver(),
     sender: createSender(config)
 });
