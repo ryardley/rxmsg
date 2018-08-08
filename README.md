@@ -25,7 +25,7 @@ At a later point we should have plugins to make it work with various messaging p
 - Flexible and composable over fixed heirarchy.
 - Pure over impure.
 - Minmalistic sensible defaults over boilerplate.
-- Idiomatic API's over reinventing the wheel. 
+- Idiomatic API's over reinventing the wheel.
 
 #### Environments
 
@@ -52,7 +52,6 @@ You can install by referencing a version tag directly off the github repo.
 ```bash
 yarn add blockbid/blockbid-message#2.x
 ```
-
 
 ## Framework Usage
 
@@ -103,7 +102,6 @@ Generic message objects look like this:
 export interface IMessage {
   content: any;
   route?: any;
-  meta?: any;
 }
 ```
 
@@ -113,7 +111,7 @@ You might use a message by sending it to the `next()` method of a producer.
 producer.next({
   content: 'Hi there!',
   route: 'some-queue'
-})
+});
 ```
 
 #### Middleware
@@ -128,7 +126,6 @@ export type Middleware<T extends IMessage> = (
 ```
 
 You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions
-
 
 ```typescript
 import {tap} from 'rxjs/operators';
