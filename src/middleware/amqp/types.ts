@@ -106,7 +106,7 @@ export interface IAmqpBinding {
 }
 
 // IAmqpEngine - to act as a wrapper for amqplib
-interface IAmqpEngineMessage {
+export interface IAmqpEngineMessage {
   content: Buffer;
   fields: any;
   properties: any;

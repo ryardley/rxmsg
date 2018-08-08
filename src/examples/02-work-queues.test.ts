@@ -3,7 +3,7 @@ import { createConsumer, createProducer } from '..';
 import createAmqpConnector from '../middleware/amqp';
 import { IAmqpMessageOut } from '../middleware/amqp/types';
 
-it('should simulate work queues', () => {
+it.skip('should simulate work queues', () => {
   const { sender, receiver } = createAmqpConnector({
     declarations: {
       queues: [

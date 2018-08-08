@@ -2,7 +2,7 @@
 import { createConsumer, createProducer } from '../index';
 import createAmqpConnector from '../middleware/amqp';
 
-it(
+it.skip(
   'should handle topics',
   done => {
     const output = [];
