@@ -1,11 +1,27 @@
 import { createConsumer, createProducer } from '../index';
 import { createInjectableAmqpConnector } from '../middleware/amqp';
-import { configureAmqpEngine } from '../middleware/amqp/amqpEngine';
+import mockEngine from '../middleware/amqp/mockEngine';
+
+function getMockEngine() {
+  let onMessage: (a: { content: Buffer; fields: any }) => void;
+  return {
+    ...mockEngine,
+    consume: (queue, cb, opts) => {
+      onMessage = cb; // save callback
+      return Promise.resolve();
+    },
+    publish: (exchange, routingKey, content, opts) => {
+      onMessage({ content, fields: { exchange, routingKey } });
+      return true;
+    }
+  };
+}
 
 it('should run the hello world example', done => {
-  const createAmqpConnector = createInjectableAmqpConnector(
-    configureAmqpEngine
-  );
+  const engine = getMockEngine();
+  const createAmqpConnector = createInjectableAmqpConnector(() => () => {
+    return Promise.resolve(engine);
+  });
 
   const { sender, receiver } = createAmqpConnector({
     declarations: {
