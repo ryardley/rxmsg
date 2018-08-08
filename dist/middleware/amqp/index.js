@@ -9,7 +9,7 @@ const createReceiver_1 = __importDefault(require("./createReceiver"));
 const createSender_1 = __importDefault(require("./createSender"));
 exports.createInjectableAmqpConnector = (configureEngine) => (config) => {
     const amqpFactory = configureEngine(config);
-    const { declarations } = config;
+    const { declarations = {} } = config;
     const close = createCloser_1.default(amqpFactory);
     const receiver = createReceiver_1.default(amqpFactory, declarations);
     const sender = createSender_1.default(amqpFactory, declarations);

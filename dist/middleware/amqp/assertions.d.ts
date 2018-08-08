@@ -1,6 +1,6 @@
 import { IAmqpBinding, IAmqpDeclarations, IAmqpEngine, IAmqpExchangeDescription, IAmqpQueueDescription, IAmqpQueueShortDescription } from './types';
 export declare function enrichQueue(queueOrString: IAmqpQueueShortDescription): IAmqpQueueDescription;
-export declare function containsQueue(array: IAmqpQueueShortDescription[], queue: IAmqpQueueShortDescription): void;
+export declare function containsQueue(array: IAmqpQueueShortDescription[] | undefined, queue: IAmqpQueueShortDescription): void;
 export declare function assertQueue(channel: IAmqpEngine, queue: IAmqpQueueShortDescription): Promise<{
     queue: string;
 }>;

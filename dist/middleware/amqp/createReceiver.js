@@ -33,6 +33,10 @@ function setupReceiver(createChannel, declarations, localConfig, observer) {
         }
         // consume the channel
         channel.consume(consumptionQueue, msg => {
+            // Technically it is possible that amqplib consumes with a null msg
+            if (!msg) {
+                return;
+            }
             // handle acknowledgement
             const { noAck } = receiverConfig;
             const ack = noAck

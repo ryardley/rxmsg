@@ -118,33 +118,33 @@ export type IAmqpEngineConfigurator = (
 ) => IAmqpEngineFactory;
 
 export interface IAmqpEngine {
-  closeConnection?: () => Promise<void>;
-  assertExchange?(
+  closeConnection: () => Promise<void>;
+  assertExchange(
     exchange: string,
     type: string,
     options?: any
   ): Promise<{ exchange: string }>;
-  assertQueue?(queue: string, options?: any): Promise<{ queue: string }>;
-  bindQueue?(
+  assertQueue(queue: string, options?: any): Promise<{ queue: string }>;
+  bindQueue(
     queue: string,
     source: string,
     pattern: string,
     args?: any
   ): Promise<any>;
-  bindExchange?(
+  bindExchange(
     destination: string,
     source: string,
     pattern: string,
     args?: any
   ): Promise<any>;
-  prefetch?(count: number, global?: boolean): Promise<{}>;
-  consume?(
+  prefetch(count: number, global?: boolean): Promise<{}>;
+  consume(
     queue: string,
     onMessage: (msg: IAmqpEngineMessage | null) => any,
     options?: any
   ): Promise<any>;
-  ack?(message: IAmqpEngineMessage, allUpTo?: boolean): void;
-  publish?(
+  ack(message: IAmqpEngineMessage, allUpTo?: boolean): void;
+  publish(
     exchange: string,
     routingKey: string,
     content: Buffer,

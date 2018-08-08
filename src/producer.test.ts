@@ -8,7 +8,7 @@ it('should send messages from the producer to the middleware', () => {
   const mockFn = jest.fn();
   const nullStream = from([]);
 
-  const middleware: Middleware = o => {
+  const middleware: Middleware<any> = o => {
     o.pipe(tap(mockFn)).subscribe();
     return nullStream;
   };
@@ -24,7 +24,7 @@ it('should send messages from the producer to the middleware', () => {
 });
 
 it('should store messages until it is subscribed', done => {
-  const middleware: Middleware = o => {
+  const middleware: Middleware<any> = o => {
     const mockFn = jest.fn();
     setTimeout(() => {
       o.subscribe(mockFn);

@@ -9,7 +9,7 @@ export const createInjectableAmqpConnector = (
   configureEngine: IAmqpEngineConfigurator
 ) => (config: IAmqpSystemDescription) => {
   const amqpFactory = configureEngine(config);
-  const { declarations } = config;
+  const { declarations = {} } = config;
 
   const close = createCloser(amqpFactory);
   const receiver = createReceiver(amqpFactory, declarations);
