@@ -1,5 +1,5 @@
-import { createConsumer, createProducer } from './index';
-import loopbackMiddleware from './middleware/loopback';
+import { createConsumer, createProducer } from '../index';
+import loopbackMiddleware from './loopback';
 
 describe('Using the loopback middleware synchronously', () => {
   const { receiver, sender } = loopbackMiddleware();
