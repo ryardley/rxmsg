@@ -37,13 +37,11 @@ At a later point we should have plugins to make it work with various messaging p
 - [x] Mock out tests properly
 - [x] Export proper typescript types
 - [x] Revisit `blockbid-tools` and ensure it supports versioning
-- [ ] Guard for configuration shape
 - [ ] Implement connection resillience
 - [ ] Fix concurrent connection issues
+- [ ] Guard for configuration shape
 - [ ] Write docs on AMQP middleware
-- [ ] Test Error handling toughroughly
-- [ ] Determine a solid retries story
-- [ ] Determine a solid circuit breaker story
+- [ ] Send errors upstream
 
 ## Installation
 
