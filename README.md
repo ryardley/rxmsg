@@ -34,12 +34,12 @@ At a later point we should have plugins to make it work with various messaging p
 
 #### TODO
 
+- [x] Mock out tests properly
+- [x] Export proper typescript types
 - [ ] Guard for configuration shape
-- [ ] Export proper typescript types
 - [ ] Implement connection resillience
 - [ ] Fix concurrent connection issues
 - [ ] Write docs on AMQP middleware
-- [ ] Mock out tests properly
 - [ ] Test Error handling toughroughly
 - [ ] Revisit `blockbid-tools` and ensure it supports versioning
 - [ ] Determine a solid retries story
