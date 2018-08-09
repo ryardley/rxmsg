@@ -20,6 +20,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:no-console
 const rxjs_1 = require("rxjs");
 const assertions_1 = require("./assertions");
+function deserialiseMessage(possiblySerialisedMessage) {
+    try {
+        return JSON.parse(possiblySerialisedMessage);
+    }
+    catch (e) {
+        return possiblySerialisedMessage;
+    }
+}
 function setupReceiver(createChannel, declarations, localConfig, observer) {
     return __awaiter(this, void 0, void 0, function* () {
         const { queue = '', prefetch, bindings = [] } = localConfig, receiverConfig = __rest(localConfig, ["queue", "prefetch", "bindings"]);
@@ -43,7 +51,7 @@ function setupReceiver(createChannel, declarations, localConfig, observer) {
                 ? () => { } // tslint:disable-line:no-empty
                 : (allUpTo = false) => channel.ack(msg, allUpTo);
             // prepare content
-            const content = JSON.parse(msg.content.toString());
+            const content = deserialiseMessage(msg.content.toString());
             const { fields } = msg;
             // send
             observer.next({

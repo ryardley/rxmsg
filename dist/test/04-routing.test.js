@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:no-console
-const __1 = require("..");
-const jestSpyObject_1 = require("../../test/jestSpyObject");
-const amqp_1 = require("../middleware/amqp");
-const mockEngine_1 = require("../middleware/amqp/mockEngine");
+const src_1 = require("../src");
+const amqp_1 = require("../src/middleware/amqp");
+const mockEngine_1 = require("../src/middleware/amqp/mockEngine");
+const jestSpyObject_1 = require("./jestSpyObject");
 it('should be able to handle routing', done => {
     const engine = jestSpyObject_1.jestSpyObject(mockEngine_1.getMockEngine({
         onPublish: ({ exchange, routingKey, content, onMessage }) => {
@@ -33,8 +33,8 @@ it('should be able to handle routing', done => {
         },
         uri: ''
     });
-    const producer = __1.createProducer(sender());
-    const consumer = __1.createConsumer(receiver({
+    const producer = src_1.createProducer(sender());
+    const consumer = src_1.createConsumer(receiver({
         bindings: ['error'].map(label => ({
             pattern: label,
             source: 'direct_logs'

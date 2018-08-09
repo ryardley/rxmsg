@@ -10,6 +10,10 @@ import {
   IAmqpRouteDescription
 } from './types';
 
+function serializeMessage(message: string) {
+  return JSON.stringify(message);
+}
+
 function getRouteValues(
   route: IAmqpRouteDescription
 ): { exchange: string; key: string } {
@@ -36,7 +40,7 @@ async function setupSender(
   setTimeout(() => {
     stream.subscribe(({ route, ...msg }) => {
       const { exchange, key } = getRouteValues(route);
-      const content = JSON.stringify(msg.content);
+      const content = serializeMessage(msg.content);
 
       if (!channel.publish(exchange, key, Buffer.from(content))) {
         // Do we throw an error here? What should we do here when the

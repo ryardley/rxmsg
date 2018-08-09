@@ -15,6 +15,14 @@ import {
 
 import { Middleware } from '../../types';
 
+function deserialiseMessage(possiblySerialisedMessage: string) {
+  try {
+    return JSON.parse(possiblySerialisedMessage);
+  } catch (e) {
+    return possiblySerialisedMessage;
+  }
+}
+
 async function setupReceiver(
   createChannel: IAmqpEngineFactory,
   declarations: IAmqpDeclarations,
@@ -54,7 +62,7 @@ async function setupReceiver(
         : (allUpTo: boolean = false) => channel.ack(msg, allUpTo);
 
       // prepare content
-      const content = JSON.parse(msg.content.toString());
+      const content = deserialiseMessage(msg.content.toString());
       const { fields } = msg;
       // send
       observer.next({

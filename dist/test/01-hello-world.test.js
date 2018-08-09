@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const __1 = require("..");
-const jestSpyObject_1 = require("../../test/jestSpyObject");
-const amqp_1 = require("../middleware/amqp");
-const mockEngine_1 = require("../middleware/amqp/mockEngine");
+const src_1 = require("../src");
+const amqp_1 = require("../src/middleware/amqp");
+const mockEngine_1 = require("../src/middleware/amqp/mockEngine");
+const jestSpyObject_1 = require("./jestSpyObject");
 describe('when the message arrives', () => {
     it('should run the hello world example ', done => {
         const channel = jestSpyObject_1.jestSpyObject(mockEngine_1.getMockEngine());
@@ -21,12 +21,12 @@ describe('when the message arrives', () => {
             },
             uri: ''
         });
-        const producer = __1.createProducer(sender());
+        const producer = src_1.createProducer(sender());
         producer.next({
             content: 'Hello World!',
             route: 'hello'
         });
-        const consumer = __1.createConsumer(receiver({
+        const consumer = src_1.createConsumer(receiver({
             noAck: true,
             queue: 'hello'
         }));

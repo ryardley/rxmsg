@@ -151,3 +151,9 @@ export interface IAmqpEngine {
     options?: any
   ): boolean;
 }
+
+interface IWithOnReady {
+  onReady: (callback: (() => void)) => void;
+}
+
+export type IAmqpEngineTest = IAmqpEngine & IWithOnReady;

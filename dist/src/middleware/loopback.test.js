@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("./index");
-const loopback_1 = __importDefault(require("./middleware/loopback"));
+const index_1 = require("../index");
+const loopback_1 = __importDefault(require("./loopback"));
 describe('Using the loopback middleware synchronously', () => {
     const { receiver, sender } = loopback_1.default();
     it('should send and receive messages synchronously via a loopback middleware', () => {

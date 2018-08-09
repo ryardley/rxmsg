@@ -19,10 +19,12 @@ const defaultPublishBehaviour = ({ exchange, routingKey, content, onMessage }) =
 };
 function getMockEngine({ onPublish = defaultPublishBehaviour, decorator = a => a } = {}) {
     let onMessage;
+    let readyCallback = () => { }; // tslint:disable-line:no-empty
     return decorator(Object.assign({}, defaultMockEngine, { consume: (_, cb) => {
             onMessage = cb; // save callback
+            readyCallback();
             return Promise.resolve();
-        }, publish: (exchange, routingKey, content, opts) => {
+        }, onReady: callback => (readyCallback = callback), publish: (exchange, routingKey, content, opts) => {
             onPublish({ exchange, routingKey, content, opts, onMessage });
             return true;
         } }));

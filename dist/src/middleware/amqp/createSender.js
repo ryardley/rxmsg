@@ -18,6 +18,9 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const assertions_1 = require("./assertions");
+function serializeMessage(message) {
+    return JSON.stringify(message);
+}
 function getRouteValues(route) {
     return typeof route === 'string'
         ? {
@@ -37,7 +40,7 @@ function setupSender(createChannel, declarations, stream) {
             stream.subscribe((_a) => {
                 var { route } = _a, msg = __rest(_a, ["route"]);
                 const { exchange, key } = getRouteValues(route);
-                const content = JSON.stringify(msg.content);
+                const content = serializeMessage(msg.content);
                 if (!channel.publish(exchange, key, Buffer.from(content))) {
                     // Do we throw an error here? What should we do here when the
                     // publish queue needs draining?

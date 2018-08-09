@@ -1,4 +1,4 @@
-import { IAmqpEngine, IAmqpEngineMessage } from './types';
+import { IAmqpEngine, IAmqpEngineMessage, IAmqpEngineTest } from './types';
 
 const defaultMockEngine: IAmqpEngine = {
   ack: () => null,
@@ -14,7 +14,7 @@ const defaultMockEngine: IAmqpEngine = {
 
 interface IMockEngineConfig {
   onPublish?: (a: IPublishBehaviourArgs) => void;
-  decorator?: (a: IAmqpEngine) => IAmqpEngine;
+  decorator?: (a: IAmqpEngineTest) => IAmqpEngineTest;
 }
 
 type MessageCalback = (m: IAmqpEngineMessage) => void;
@@ -44,12 +44,15 @@ export function getMockEngine({
   decorator = a => a
 }: IMockEngineConfig = {}) {
   let onMessage: MessageCalback;
+  let readyCallback: () => void = () => {}; // tslint:disable-line:no-empty
   return decorator({
     ...defaultMockEngine,
     consume: (_, cb) => {
       onMessage = cb; // save callback
+      readyCallback();
       return Promise.resolve();
     },
+    onReady: callback => (readyCallback = callback),
     publish: (exchange, routingKey, content, opts) => {
       onPublish({ exchange, routingKey, content, opts, onMessage });
       return true;

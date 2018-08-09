@@ -107,3 +107,8 @@ export interface IAmqpEngine {
     ack(message: IAmqpEngineMessage, allUpTo?: boolean): void;
     publish(exchange: string, routingKey: string, content: Buffer, options?: any): boolean;
 }
+interface IWithOnReady {
+    onReady: (callback: (() => void)) => void;
+}
+export declare type IAmqpEngineTest = IAmqpEngine & IWithOnReady;
+export {};

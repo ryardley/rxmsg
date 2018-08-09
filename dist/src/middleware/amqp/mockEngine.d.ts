@@ -1,8 +1,8 @@
 /// <reference types="node" />
-import { IAmqpEngine, IAmqpEngineMessage } from './types';
+import { IAmqpEngineMessage, IAmqpEngineTest } from './types';
 interface IMockEngineConfig {
     onPublish?: (a: IPublishBehaviourArgs) => void;
-    decorator?: (a: IAmqpEngine) => IAmqpEngine;
+    decorator?: (a: IAmqpEngineTest) => IAmqpEngineTest;
 }
 declare type MessageCalback = (m: IAmqpEngineMessage) => void;
 interface IPublishBehaviourArgs {
@@ -12,5 +12,5 @@ interface IPublishBehaviourArgs {
     opts: any;
     onMessage: MessageCalback;
 }
-export declare function getMockEngine({ onPublish, decorator }?: IMockEngineConfig): IAmqpEngine;
+export declare function getMockEngine({ onPublish, decorator }?: IMockEngineConfig): IAmqpEngineTest;
 export {};
