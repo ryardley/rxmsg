@@ -6,8 +6,10 @@
   "devDependencies": {
     "@types/amqplib": "^0.5.8",
     "@types/lodash": "^4.14.115",
+    "@types/minimatch": "^3.0.3",
     "@types/rx": "^4.1.1",
     "blockbid-tools": "blockbid/blockbid-tools#v1.1.0",
+    "minimatch": "^3.0.4",
     "proxyquire": "^2.0.1",
     "ts-node": "^7.0.0"
   },

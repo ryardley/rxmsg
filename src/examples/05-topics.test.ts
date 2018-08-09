@@ -1,65 +1,105 @@
 // tslint:disable:no-console
+import minimatch from 'minimatch';
 import { createConsumer, createProducer } from '../index';
-import createAmqpConnector from '../middleware/amqp';
+import { createInjectableAmqpConnector } from '../middleware/amqp';
+import { IAmqpEngine } from '../middleware/amqp/types';
+import { jestSpyObject } from './jestSpyObject';
+import { getMockEngine } from './mockEngine';
 
-it.skip(
-  'should handle topics',
-  done => {
-    const output = [];
-    const { sender, receiver } = createAmqpConnector({
-      declarations: {
-        exchanges: [
-          {
-            durable: false,
-            name: 'topic_logs',
-            type: 'topic'
-          }
-        ]
-      },
-      uri:
-        'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv'
-    });
+it('should handle topics', done => {
+  const patterns = ['*.exe', '*.jpg', 'cat.*'];
 
-    function emitLog(msg = 'Hello World', key = 'anonymous.info') {
-      const producer = createProducer(sender());
+  const engine = jestSpyObject<IAmqpEngine>(
+    getMockEngine({
+      onPublish: ({ exchange, routingKey, content, onMessage }) => {
+        // Simulate rabbit behaviour match routing patterns
+        const matches = patterns.reduce(
+          (bl, pat) => bl || minimatch(routingKey, pat),
+          false
+        );
 
-      producer.next({
-        content: msg,
-        route: { exchange: 'topic_logs', key }
-      });
-    }
+        if (matches) {
+          onMessage({
+            content,
+            fields: { exchange, routingKey },
+            properties: {}
+          });
+        }
+      }
+    })
+  );
 
-    function recieveLog(patterns: string[]) {
-      const consumer = createConsumer(
-        receiver({
-          bindings: patterns.map(pattern => ({
-            pattern,
-            source: 'topic_logs'
-          })),
-          noAck: true
-        })
-      );
+  const createAmqpConnector = createInjectableAmqpConnector(() => () => {
+    return Promise.resolve(engine);
+  });
 
-      consumer.subscribe(msg => {
-        output.push(`${msg.route.key}: '${msg.content}'`);
-      });
-    }
+  const { sender, receiver } = createAmqpConnector({
+    declarations: {
+      exchanges: [
+        {
+          durable: false,
+          name: 'topic_logs',
+          type: 'topic'
+        }
+      ]
+    },
+    uri: ''
+  });
 
-    recieveLog(['*.exe', '*.jpg', 'cat.*']);
+  const producer = createProducer(sender());
 
-    setTimeout(() => {
-      emitLog('I am a JPG image', 'cat.jpg');
-      emitLog('I am a Dog exe', 'dog.exe');
-      emitLog('I am a Fish image', 'fish.png');
-    }, 2000);
+  const consumer = createConsumer(
+    receiver({
+      bindings: patterns.map(pattern => ({
+        pattern,
+        source: 'topic_logs'
+      })),
+      noAck: true
+    })
+  );
 
-    setTimeout(() => {
+  const output = [];
+  consumer.subscribe(msg => {
+    output.push(`${msg.route.key}: '${msg.content}'`);
+
+    if (output.length >= 2) {
+      expect(engine.jestSpyCalls.mock.calls).toEqual([
+        ['assertExchange', 'topic_logs', 'topic', { durable: false }],
+        ['assertExchange', 'topic_logs', 'topic', { durable: false }],
+        ['assertQueue', '', { exclusive: true }],
+        ['bindQueue', 'server-queue', 'topic_logs', '*.exe', undefined],
+        ['bindQueue', 'server-queue', 'topic_logs', '*.jpg', undefined],
+        ['bindQueue', 'server-queue', 'topic_logs', 'cat.*', undefined],
+        ['consume', 'server-queue', '_FUNCTION_', { noAck: true }],
+        ['publish', 'topic_logs', 'cat.jpg', Buffer.from('"I am a JPG image"')],
+        [
+          'publish',
+          'topic_logs',
+          'fish.png',
+          Buffer.from('"I am a Fish image"')
+        ],
+        ['publish', 'topic_logs', 'dog.exe', Buffer.from('"I am a Dog exe"')]
+      ]);
       expect(output).toEqual([
         "cat.jpg: 'I am a JPG image'",
         "dog.exe: 'I am a Dog exe'"
       ]);
       done();
-    }, 8000);
-  },
-  10000
-);
+    }
+  });
+
+  producer.next({
+    content: 'I am a JPG image',
+    route: { exchange: 'topic_logs', key: 'cat.jpg' }
+  });
+
+  producer.next({
+    content: 'I am a Fish image',
+    route: { exchange: 'topic_logs', key: 'fish.png' }
+  });
+
+  producer.next({
+    content: 'I am a Dog exe',
+    route: { exchange: 'topic_logs', key: 'dog.exe' }
+  });
+});

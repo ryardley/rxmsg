@@ -85,7 +85,7 @@ export interface IAmqpBinding {
     source: string;
     type?: 'exchange' | 'queue';
 }
-interface IAmqpEngineMessage {
+export interface IAmqpEngineMessage {
     content: Buffer;
     fields: any;
     properties: any;
@@ -107,4 +107,3 @@ export interface IAmqpEngine {
     ack(message: IAmqpEngineMessage, allUpTo?: boolean): void;
     publish(exchange: string, routingKey: string, content: Buffer, options?: any): boolean;
 }
-export {};

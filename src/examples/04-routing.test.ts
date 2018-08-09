@@ -8,7 +8,7 @@ import { getMockEngine } from './mockEngine';
 it('should be able to handle routing', done => {
   const engine = jestSpyObject<IAmqpEngine>(
     getMockEngine({
-      onPublish: ({ exchange, routingKey, content, opts, onMessage }) => {
+      onPublish: ({ exchange, routingKey, content, onMessage }) => {
         // Simulate rabbit behaviour
         if (routingKey === 'error') {
           onMessage({
