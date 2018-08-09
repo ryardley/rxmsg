@@ -190,13 +190,13 @@ sub.unsubscribe();
 
 ### Example Usage AMQP Middleware
 
-For usage and examples please look at the basic (crappy) tests thrown together [here](src/__tests__)
+For usage and examples please look at the basic tests thrown together [here](test)
 
-1.  [Hello World](src/__tests__/01-hello-world.test.ts)
-1.  [Work Queues](src/__tests__/02-work-queues.test.ts)
-1.  [PubSub](src/__tests__/03-publish-subscribe.test.ts)
-1.  [Routing](src/__tests__/04-routing.test.ts)
-1.  [Topics](src/__tests__/05-topics.test.ts)
+1.  [Hello World](test/01-hello-world.test.ts)
+1.  [Work Queues](test/02-work-queues.test.ts)
+1.  [PubSub](test/03-publish-subscribe.test.ts)
+1.  [Routing](test/04-routing.test.ts)
+1.  [Topics](test/05-topics.test.ts)
 
 ## RxJS References
 

@@ -1,9 +1,9 @@
 // tslint:disable:no-console
-import { createConsumer, createProducer } from '..';
-import { jestSpyObject } from '../../test/jestSpyObject';
-import { createInjectableAmqpConnector } from '../middleware/amqp';
-import { getMockEngine } from '../middleware/amqp/mockEngine';
-import { IAmqpEngine } from '../middleware/amqp/types';
+import { createConsumer, createProducer } from '../src';
+import { createInjectableAmqpConnector } from '../src/middleware/amqp';
+import { getMockEngine } from '../src/middleware/amqp/mockEngine';
+import { IAmqpEngine } from '../src/middleware/amqp/types';
+import { jestSpyObject } from './jestSpyObject';
 
 it('should be able to run a fanout exchange', done => {
   const engine = jestSpyObject<IAmqpEngine>(getMockEngine());
