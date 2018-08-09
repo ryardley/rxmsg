@@ -5,13 +5,13 @@ import { Middleware } from './types';
 
 describe('combineMiddleware', () => {
   it('should send messages in order', () => {
-    const log = [];
+    const log: any[] = [];
 
-    const middleware1: Middleware = o =>
+    const middleware1: Middleware<any> = o =>
       o.pipe(tap(msg => log.push(`middleware1: ${msg.content}`)));
-    const middleware2: Middleware = o =>
+    const middleware2: Middleware<any> = o =>
       o.pipe(tap(msg => log.push(`middleware2: ${msg.content}`)));
-    const middleware3: Middleware = o =>
+    const middleware3: Middleware<any> = o =>
       o.pipe(tap(msg => log.push(`middleware3: ${msg.content}`)));
 
     const middlewareFunc = combineMiddleware(
@@ -49,10 +49,10 @@ describe('combineMiddleware', () => {
 
   describe('no middleware function', () => {
     it('should send the observer through', () => {
-      const log = [];
-      combineMiddleware()(from([{ content: 1 }, { content: 2 }])).subscribe(
-        msg => log.push(`subscribe: ${msg.content}`)
-      );
+      const log: any[] = [];
+      combineMiddleware()(
+        from([{ content: 1, route: {} }, { content: 2, route: {} }])
+      ).subscribe(msg => log.push(`subscribe: ${msg.content}`));
       expect(log).toEqual(['subscribe: 1', 'subscribe: 2']);
     });
   });

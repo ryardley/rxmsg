@@ -1,1 +1,0 @@
-{"version":3,"file":"producer.js","sourceRoot":"","sources":["../src/producer.ts"],"names":[],"mappings":";;AAAA,+BAA+C;AAC/C,6CAAiD;AAGjD,wBACE,GAAG,UAAgC;IAEnC,MAAM,OAAO,GAAG,IAAI,oBAAa,EAAK,CAAC;IACvC,MAAM,kBAAkB,GAAG,8BAAiB,CAAC,GAAG,UAAU,CAAC,CAAC;IAC5D,kBAAkB,CAAC,OAAO,CAAC,YAAY,EAAE,CAAC,CAAC;IAC3C,OAAO,OAAO,CAAC;AACjB,CAAC;AAPD,wCAOC"}

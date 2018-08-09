@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "bbt test",
-    "build": "bbt build",
+    "build": "rm -rf ./dist && bbt build",
     "lint": "bbt lint",
     "format": "bbt format"
   },

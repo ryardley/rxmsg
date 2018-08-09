@@ -5,7 +5,7 @@ describe('Using the loopback middleware synchronously', () => {
   const { receiver, sender } = loopbackMiddleware();
 
   it('should send and receive messages synchronously via a loopback middleware', () => {
-    const log = [];
+    const log: any[] = [];
     const producer = createProducer(sender);
     const consumer = createConsumer(receiver);
 
@@ -33,7 +33,7 @@ describe('Using the loopback middleware asynchronously', () => {
   });
 
   it('should send and receive messages asynchronously via a loopback middleware', done => {
-    const log = [];
+    const log: any[] = [];
     const producer = createProducer(sender);
     const consumer = createConsumer(receiver);
 

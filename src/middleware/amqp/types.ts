@@ -90,7 +90,7 @@ export interface IAmqpMessageOut extends IAmqpMessage {
 }
 
 export interface IAmqpMessageIn extends IAmqpMessage {
-  ack?: () => void;
+  ack: () => void;
   route: {
     exchange: string;
     key?: string;
