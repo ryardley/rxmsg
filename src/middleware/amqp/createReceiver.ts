@@ -8,7 +8,10 @@ import {
 
 import {
   IAmqpDeclarations,
+  IAmqpEngine,
   IAmqpEngineFactory,
+  IAmqpEngineMessage,
+  IAmqpEngineSetup,
   IAmqpMessageIn,
   IAmqpReceiverDescription
 } from './types';
@@ -23,6 +26,16 @@ function deserialiseMessage(possiblySerialisedMessage: string) {
   }
 }
 
+function createAck(
+  noAck: boolean,
+  channel: IAmqpEngine,
+  msg: IAmqpEngineMessage
+) {
+  return noAck
+    ? () => {} // tslint:disable-line:no-empty
+    : (allUpTo: boolean = false) => channel.ack(msg, allUpTo);
+}
+
 async function setupReceiver(
   createChannel: IAmqpEngineFactory,
   declarations: IAmqpDeclarations,
@@ -35,7 +48,9 @@ async function setupReceiver(
     bindings = [],
     ...receiverConfig
   } = localConfig;
-  createChannel(async channel => {
+
+  const setupChannel: IAmqpEngineSetup = async channel => {
+    // setup structure
     await assertDeclarations(channel, declarations);
     const consumptionQueue = await assertIfAnonymousQueue(channel, queue);
     await assertBindings(channel, bindings, consumptionQueue);
@@ -55,29 +70,28 @@ async function setupReceiver(
         }
 
         // handle acknowledgement
-        const { noAck } = receiverConfig;
-        const ack = noAck
-          ? () => {} // tslint:disable-line:no-empty
-          : (allUpTo: boolean = false) => channel.ack(msg, allUpTo);
+        const { noAck = false } = receiverConfig;
 
         // prepare content
-        const content = deserialiseMessage(msg.content.toString());
-        const { fields } = msg;
+        const {
+          fields: { exchange, routingKey: key },
+          content
+        } = msg;
+
         // send
         observer.next({
-          ack,
-          content,
-          route: {
-            exchange: fields.exchange,
-            key: fields.routingKey
-          }
+          ack: createAck(noAck, channel, msg),
+          content: deserialiseMessage(content.toString()),
+          route: { exchange, key }
         });
       },
       receiverConfig
     );
 
     return channel;
-  });
+  };
+
+  createChannel(setupChannel);
 }
 
 type CreateReceiver = (

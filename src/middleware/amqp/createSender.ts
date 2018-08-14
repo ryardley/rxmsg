@@ -1,11 +1,12 @@
 // tslint:disable:no-console
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { Middleware } from '../../types';
 import { assertDeclarations } from './assertions';
 import {
   IAmqpDeclarations,
   IAmqpEngineFactory,
+  IAmqpEngineSetup,
   IAmqpMessageOut,
   IAmqpRouteDescription
 } from './types';
@@ -33,14 +34,15 @@ async function setupSender(
   declarations: IAmqpDeclarations,
   stream: Observable<IAmqpMessageOut>
 ) {
-  createChannel(async channel => {
+  let subscription: Subscription;
+  const setupChannel: IAmqpEngineSetup = async channel => {
     await assertDeclarations(channel, declarations);
 
+    // subscribe on next tick so channel is ready
     setTimeout(() => {
-      stream.subscribe(({ route, ...msg }) => {
+      subscription = stream.subscribe(({ route, ...msg }) => {
         const { exchange, key } = getRouteValues(route);
         const content = serializeMessage(msg.content);
-
         if (!channel.publish(exchange, key, Buffer.from(content))) {
           // Do we throw an error here? What should we do here when the
           // publish queue needs draining?
@@ -53,9 +55,12 @@ async function setupSender(
           );
         }
       });
-    }, 500);
+    }, 0);
     return channel;
-  });
+  };
+
+  const tearDownChannel = () => Promise.resolve(subscription.unsubscribe());
+  createChannel(setupChannel, tearDownChannel);
 }
 
 type CreateSender = (
