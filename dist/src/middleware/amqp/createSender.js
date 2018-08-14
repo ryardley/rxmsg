@@ -34,10 +34,12 @@ function getRouteValues(route) {
 }
 function setupSender(createChannel, declarations, stream) {
     return __awaiter(this, void 0, void 0, function* () {
-        createChannel((channel) => __awaiter(this, void 0, void 0, function* () {
+        let subscription;
+        const setupChannel = (channel) => __awaiter(this, void 0, void 0, function* () {
             yield assertions_1.assertDeclarations(channel, declarations);
+            // subscribe on next tick so channel is ready
             setTimeout(() => {
-                stream.subscribe((_a) => {
+                subscription = stream.subscribe((_a) => {
                     var { route } = _a, msg = __rest(_a, ["route"]);
                     const { exchange, key } = getRouteValues(route);
                     const content = serializeMessage(msg.content);
@@ -51,9 +53,11 @@ function setupSender(createChannel, declarations, stream) {
                         })}`);
                     }
                 });
-            }, 500);
+            }, 0);
             return channel;
-        }));
+        });
+        const tearDownChannel = () => Promise.resolve(subscription.unsubscribe());
+        createChannel(setupChannel, tearDownChannel);
     });
 }
 // Forward messages

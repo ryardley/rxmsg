@@ -28,10 +28,16 @@ function deserialiseMessage(possiblySerialisedMessage) {
         return possiblySerialisedMessage;
     }
 }
+function createAck(noAck, channel, msg) {
+    return noAck
+        ? () => { } // tslint:disable-line:no-empty
+        : (allUpTo = false) => channel.ack(msg, allUpTo);
+}
 function setupReceiver(createChannel, declarations, localConfig, observer) {
     return __awaiter(this, void 0, void 0, function* () {
         const { queue = '', prefetch, bindings = [] } = localConfig, receiverConfig = __rest(localConfig, ["queue", "prefetch", "bindings"]);
-        createChannel((channel) => __awaiter(this, void 0, void 0, function* () {
+        const setupChannel = (channel) => __awaiter(this, void 0, void 0, function* () {
+            // setup structure
             yield assertions_1.assertDeclarations(channel, declarations);
             const consumptionQueue = yield assertions_1.assertIfAnonymousQueue(channel, queue);
             yield assertions_1.assertBindings(channel, bindings, consumptionQueue);
@@ -46,25 +52,19 @@ function setupReceiver(createChannel, declarations, localConfig, observer) {
                     return;
                 }
                 // handle acknowledgement
-                const { noAck } = receiverConfig;
-                const ack = noAck
-                    ? () => { } // tslint:disable-line:no-empty
-                    : (allUpTo = false) => channel.ack(msg, allUpTo);
+                const { noAck = false } = receiverConfig;
                 // prepare content
-                const content = deserialiseMessage(msg.content.toString());
-                const { fields } = msg;
+                const { fields: { exchange, routingKey: key }, content } = msg;
                 // send
                 observer.next({
-                    ack,
-                    content,
-                    route: {
-                        exchange: fields.exchange,
-                        key: fields.routingKey
-                    }
+                    ack: createAck(noAck, channel, msg),
+                    content: deserialiseMessage(content.toString()),
+                    route: { exchange, key }
                 });
             }, receiverConfig);
             return channel;
-        }));
+        });
+        createChannel(setupChannel);
     });
 }
 // Recieve messages
