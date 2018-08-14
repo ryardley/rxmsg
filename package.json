@@ -1,7 +1,7 @@
 {
   "name": "blockbid-message",
   "version": "3.3.0",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "license": "MIT",
   "devDependencies": {
     "@types/amqplib": "^0.5.8",
