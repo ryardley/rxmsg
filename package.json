@@ -17,7 +17,8 @@
     "test": "bbt test",
     "build": "rm -rf ./dist && bbt build",
     "lint": "bbt lint",
-    "format": "bbt format"
+    "format": "bbt format",
+    "release": "bbt test && bbt publish"
   },
   "dependencies": {
     "amqplib": "^0.5.2",
