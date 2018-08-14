@@ -1,6 +1,6 @@
 {
   "name": "blockbid-message",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "main": "dist/src/index.js",
   "license": "MIT",
   "devDependencies": {
