@@ -48,7 +48,7 @@ At a later point we should have plugins to make it work with various messaging p
 You can install by referencing a version tag directly off the github repo.
 
 ```bash
-yarn add blockbid/blockbid-message#2.x
+yarn add blockbid/blockbid-message#4.x
 ```
 
 ## Framework Usage
