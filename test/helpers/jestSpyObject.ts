@@ -1,4 +1,4 @@
-interface IJ {
+export interface IJ {
   jestSpyCalls: jest.Mock;
 }
 

@@ -12,7 +12,7 @@ const defaultMockEngine: IAmqpEngine = {
   publish: () => true
 };
 
-interface IMockEngineConfig {
+export interface IMockEngineConfig {
   onPublish?: (a: IPublishBehaviourArgs) => void;
   decorator?: (a: IAmqpEngineTest) => IAmqpEngineTest;
 }

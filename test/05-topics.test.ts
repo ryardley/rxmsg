@@ -1,36 +1,27 @@
 // tslint:disable:no-console
 import minimatch from 'minimatch';
 import { createConsumer, createProducer } from '../src';
-import { createInjectableAmqpConnector } from '../src/middleware/amqp';
-import { getMockEngine } from '../src/middleware/amqp/mockEngine';
-import { IAmqpEngine } from '../src/middleware/amqp/types';
-import { jestSpyObject } from './jestSpyObject';
+import getMockConnector from './helpers/getMockConnector';
 
 it('should handle topics', done => {
   const patterns = ['*.exe', '*.jpg', 'cat.*'];
 
-  const engine = jestSpyObject<IAmqpEngine>(
-    getMockEngine({
-      onPublish: ({ exchange, routingKey, content, onMessage }) => {
-        // Simulate rabbit behaviour match routing patterns
-        const matches = patterns.reduce(
-          (bl, pat) => bl || minimatch(routingKey, pat),
-          false
-        );
+  const { createAmqpConnector, channel: engine } = getMockConnector({
+    onPublish: ({ exchange, routingKey, content, onMessage }) => {
+      // Simulate rabbit behaviour match routing patterns
+      const matches = patterns.reduce(
+        (bl, pat) => bl || minimatch(routingKey, pat),
+        false
+      );
 
-        if (matches) {
-          onMessage({
-            content,
-            fields: { exchange, routingKey },
-            properties: {}
-          });
-        }
+      if (matches) {
+        onMessage({
+          content,
+          fields: { exchange, routingKey },
+          properties: {}
+        });
       }
-    })
-  );
-
-  const createAmqpConnector = createInjectableAmqpConnector(() => () => {
-    return Promise.resolve(engine);
+    }
   });
 
   const { sender, receiver } = createAmqpConnector({

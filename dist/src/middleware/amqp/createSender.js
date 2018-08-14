@@ -34,24 +34,26 @@ function getRouteValues(route) {
 }
 function setupSender(createChannel, declarations, stream) {
     return __awaiter(this, void 0, void 0, function* () {
-        const channel = yield createChannel();
-        yield assertions_1.assertDeclarations(channel, declarations);
-        setTimeout(() => {
-            stream.subscribe((_a) => {
-                var { route } = _a, msg = __rest(_a, ["route"]);
-                const { exchange, key } = getRouteValues(route);
-                const content = serializeMessage(msg.content);
-                if (!channel.publish(exchange, key, Buffer.from(content))) {
-                    // Do we throw an error here? What should we do here when the
-                    // publish queue needs draining?
-                    console.log(`Error publishing: ${JSON.stringify({
-                        content,
-                        exchange,
-                        key
-                    })}`);
-                }
-            });
-        }, 500);
+        createChannel((channel) => __awaiter(this, void 0, void 0, function* () {
+            yield assertions_1.assertDeclarations(channel, declarations);
+            setTimeout(() => {
+                stream.subscribe((_a) => {
+                    var { route } = _a, msg = __rest(_a, ["route"]);
+                    const { exchange, key } = getRouteValues(route);
+                    const content = serializeMessage(msg.content);
+                    if (!channel.publish(exchange, key, Buffer.from(content))) {
+                        // Do we throw an error here? What should we do here when the
+                        // publish queue needs draining?
+                        console.log(`Error publishing: ${JSON.stringify({
+                            content,
+                            exchange,
+                            key
+                        })}`);
+                    }
+                });
+            }, 500);
+            return channel;
+        }));
     });
 }
 // Forward messages

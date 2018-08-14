@@ -33,28 +33,29 @@ async function setupSender(
   declarations: IAmqpDeclarations,
   stream: Observable<IAmqpMessageOut>
 ) {
-  const channel = await createChannel();
+  createChannel(async channel => {
+    await assertDeclarations(channel, declarations);
 
-  await assertDeclarations(channel, declarations);
+    setTimeout(() => {
+      stream.subscribe(({ route, ...msg }) => {
+        const { exchange, key } = getRouteValues(route);
+        const content = serializeMessage(msg.content);
 
-  setTimeout(() => {
-    stream.subscribe(({ route, ...msg }) => {
-      const { exchange, key } = getRouteValues(route);
-      const content = serializeMessage(msg.content);
-
-      if (!channel.publish(exchange, key, Buffer.from(content))) {
-        // Do we throw an error here? What should we do here when the
-        // publish queue needs draining?
-        console.log(
-          `Error publishing: ${JSON.stringify({
-            content,
-            exchange,
-            key
-          })}`
-        );
-      }
-    });
-  }, 500);
+        if (!channel.publish(exchange, key, Buffer.from(content))) {
+          // Do we throw an error here? What should we do here when the
+          // publish queue needs draining?
+          console.log(
+            `Error publishing: ${JSON.stringify({
+              content,
+              exchange,
+              key
+            })}`
+          );
+        }
+      });
+    }, 500);
+    return channel;
+  });
 }
 
 type CreateSender = (

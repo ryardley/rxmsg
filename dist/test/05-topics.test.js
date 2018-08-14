@@ -6,12 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:no-console
 const minimatch_1 = __importDefault(require("minimatch"));
 const src_1 = require("../src");
-const amqp_1 = require("../src/middleware/amqp");
-const mockEngine_1 = require("../src/middleware/amqp/mockEngine");
-const jestSpyObject_1 = require("./jestSpyObject");
+const getMockConnector_1 = __importDefault(require("./helpers/getMockConnector"));
 it('should handle topics', done => {
     const patterns = ['*.exe', '*.jpg', 'cat.*'];
-    const engine = jestSpyObject_1.jestSpyObject(mockEngine_1.getMockEngine({
+    const { createAmqpConnector, channel: engine } = getMockConnector_1.default({
         onPublish: ({ exchange, routingKey, content, onMessage }) => {
             // Simulate rabbit behaviour match routing patterns
             const matches = patterns.reduce((bl, pat) => bl || minimatch_1.default(routingKey, pat), false);
@@ -23,9 +21,6 @@ it('should handle topics', done => {
                 });
             }
         }
-    }));
-    const createAmqpConnector = amqp_1.createInjectableAmqpConnector(() => () => {
-        return Promise.resolve(engine);
     });
     const { sender, receiver } = createAmqpConnector({
         declarations: {

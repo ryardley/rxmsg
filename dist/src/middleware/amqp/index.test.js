@@ -1,17 +1,16 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const rxjs_1 = require("rxjs");
-const jestSpyObject_1 = require("../../../test/jestSpyObject");
-const index_1 = require("./index");
-const mockEngine_1 = require("./mockEngine");
+const getMockConnector_1 = __importDefault(require("../../../test/helpers/getMockConnector"));
 describe('when I recieve messages from AMQP', () => {
     let channel;
     let middewareReceiver;
     beforeEach(() => {
-        channel = jestSpyObject_1.jestSpyObject(mockEngine_1.getMockEngine());
-        const createAmqpConnector = index_1.createInjectableAmqpConnector(() => () => {
-            return Promise.resolve(channel);
-        });
+        const { createAmqpConnector, channel: engine } = getMockConnector_1.default();
+        channel = engine;
         const { receiver } = createAmqpConnector({
             declarations: {
                 queues: [

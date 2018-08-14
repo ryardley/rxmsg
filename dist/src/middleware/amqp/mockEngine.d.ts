@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { IAmqpEngineMessage, IAmqpEngineTest } from './types';
-interface IMockEngineConfig {
+export interface IMockEngineConfig {
     onPublish?: (a: IPublishBehaviourArgs) => void;
     decorator?: (a: IAmqpEngineTest) => IAmqpEngineTest;
 }

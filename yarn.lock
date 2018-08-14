@@ -16,7 +16,14 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@types/amqplib@^0.5.8":
+"@types/amqp-connection-manager@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/amqp-connection-manager/-/amqp-connection-manager-2.0.1.tgz#a367c1302df132eae1e9742ec4e62594607b9733"
+  dependencies:
+    "@types/amqplib" "*"
+    "@types/events" "*"
+
+"@types/amqplib@*", "@types/amqplib@^0.5.8":
   version "0.5.8"
   resolved "https://registry.yarnpkg.com/@types/amqplib/-/amqplib-0.5.8.tgz#c7a4bd668d8761b2c64ae3e35c0e7c65df44d032"
   dependencies:
@@ -178,6 +185,12 @@ align-text@^0.1.1, align-text@^0.1.3:
 amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
+
+amqp-connection-manager@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/amqp-connection-manager/-/amqp-connection-manager-2.1.0.tgz#f0e9e68fe2677f4491e46fc56d460641f54031d2"
+  dependencies:
+    promise-breaker "^4.1.2"
 
 amqplib@^0.5.2:
   version "0.5.2"
@@ -2703,6 +2716,10 @@ private@^0.1.8:
 process-nextick-args@~2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.0.tgz#a37d732f4271b4ab1ad070d35508e8290788ffaa"
+
+promise-breaker@^4.1.2:
+  version "4.1.11"
+  resolved "https://registry.yarnpkg.com/promise-breaker/-/promise-breaker-4.1.11.tgz#c9cbd28a3c5627451ad2e3eabcc3e4617bf97491"
 
 prompts@^0.1.9:
   version "0.1.13"

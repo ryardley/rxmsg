@@ -1,18 +1,17 @@
 import { from } from 'rxjs';
-import { jestSpyObject } from '../../../test/jestSpyObject';
 import { Middleware } from '../../types';
-import { createInjectableAmqpConnector } from './index';
-import { getMockEngine } from './mockEngine';
+
+import getMockedConnector from '../../../test/helpers/getMockConnector';
+
 import { IAmqpEngineTest, IAmqpMessageIn } from './types';
 describe('when I recieve messages from AMQP', () => {
   let channel: IAmqpEngineTest;
   let middewareReceiver: Middleware<IAmqpMessageIn>;
 
   beforeEach(() => {
-    channel = jestSpyObject<IAmqpEngineTest>(getMockEngine());
-    const createAmqpConnector = createInjectableAmqpConnector(() => () => {
-      return Promise.resolve(channel);
-    });
+    const { createAmqpConnector, channel: engine } = getMockedConnector();
+
+    channel = engine;
 
     const { receiver } = createAmqpConnector({
       declarations: {

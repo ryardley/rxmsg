@@ -90,7 +90,8 @@ export interface IAmqpEngineMessage {
     fields: any;
     properties: any;
 }
-export declare type IAmqpEngineFactory = () => Promise<IAmqpEngine>;
+export declare type IAmqpEngineSetup = (channel: IAmqpEngine) => Promise<IAmqpEngine>;
+export declare type IAmqpEngineFactory = (s?: IAmqpEngineSetup) => Promise<IAmqpEngine>;
 export declare type IAmqpEngineConfigurator = (config: IAmqpConnectionDescription) => IAmqpEngineFactory;
 export interface IAmqpEngine {
     closeConnection: () => Promise<void>;
@@ -107,8 +108,7 @@ export interface IAmqpEngine {
     ack(message: IAmqpEngineMessage, allUpTo?: boolean): void;
     publish(exchange: string, routingKey: string, content: Buffer, options?: any): boolean;
 }
-interface IWithOnReady {
+export interface IWithOnReady {
     onReady: (callback: (() => void)) => void;
 }
 export declare type IAmqpEngineTest = IAmqpEngine & IWithOnReady;
-export {};

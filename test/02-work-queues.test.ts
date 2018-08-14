@@ -1,16 +1,10 @@
 // tslint:disable:no-console
 import { createConsumer, createProducer } from '../src';
-import { createInjectableAmqpConnector } from '../src/middleware/amqp';
-import { getMockEngine } from '../src/middleware/amqp/mockEngine';
-import { IAmqpEngine, IAmqpMessageOut } from '../src/middleware/amqp/types';
-import { jestSpyObject } from './jestSpyObject';
+import { IAmqpMessageOut } from '../src/middleware/amqp/types';
+import getMockConnector from './helpers/getMockConnector';
 
 it('should simulate work queues', done => {
-  const engine = jestSpyObject<IAmqpEngine>(getMockEngine());
-
-  const createAmqpConnector = createInjectableAmqpConnector(() => () => {
-    return Promise.resolve(engine);
-  });
+  const { createAmqpConnector, channel: engine } = getMockConnector();
 
   const { sender, receiver } = createAmqpConnector({
     declarations: {

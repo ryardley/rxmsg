@@ -111,8 +111,8 @@ export interface IAmqpEngineMessage {
   fields: any;
   properties: any;
 }
-
-export type IAmqpEngineFactory = () => Promise<IAmqpEngine>;
+export type IAmqpEngineSetup = (channel: IAmqpEngine) => Promise<IAmqpEngine>;
+export type IAmqpEngineFactory = (s?: IAmqpEngineSetup) => Promise<IAmqpEngine>;
 export type IAmqpEngineConfigurator = (
   config: IAmqpConnectionDescription
 ) => IAmqpEngineFactory;
@@ -152,7 +152,7 @@ export interface IAmqpEngine {
   ): boolean;
 }
 
-interface IWithOnReady {
+export interface IWithOnReady {
   onReady: (callback: (() => void)) => void;
 }
 

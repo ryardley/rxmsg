@@ -4,6 +4,7 @@
   "main": "dist/src/index.js",
   "license": "MIT",
   "devDependencies": {
+    "@types/amqp-connection-manager": "^2.0.1",
     "@types/amqplib": "^0.5.8",
     "@types/lodash": "^4.14.115",
     "@types/minimatch": "^3.0.3",
@@ -21,6 +22,7 @@
     "release": "bbt test && bbt publish"
   },
   "dependencies": {
+    "amqp-connection-manager": "^2.1.0",
     "amqplib": "^0.5.2",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.2"

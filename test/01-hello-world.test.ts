@@ -1,16 +1,9 @@
 import { createConsumer, createProducer } from '../src';
-import { createInjectableAmqpConnector } from '../src/middleware/amqp';
-import { getMockEngine } from '../src/middleware/amqp/mockEngine';
-import { IAmqpEngine } from '../src/middleware/amqp/types';
-import { jestSpyObject } from './jestSpyObject';
+import getMockConnector from './helpers/getMockConnector';
 
 describe('when the message arrives', () => {
   it('should run the hello world example ', done => {
-    const channel = jestSpyObject<IAmqpEngine>(getMockEngine());
-    const createAmqpConnector = createInjectableAmqpConnector(() => () => {
-      return Promise.resolve(channel);
-    });
-
+    const { createAmqpConnector, channel } = getMockConnector();
     const { sender, receiver } = createAmqpConnector({
       declarations: {
         queues: [

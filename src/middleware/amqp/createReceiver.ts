@@ -35,47 +35,49 @@ async function setupReceiver(
     bindings = [],
     ...receiverConfig
   } = localConfig;
-  const channel = await createChannel();
+  createChannel(async channel => {
+    await assertDeclarations(channel, declarations);
+    const consumptionQueue = await assertIfAnonymousQueue(channel, queue);
+    await assertBindings(channel, bindings, consumptionQueue);
 
-  await assertDeclarations(channel, declarations);
-  const consumptionQueue = await assertIfAnonymousQueue(channel, queue);
-  await assertBindings(channel, bindings, consumptionQueue);
+    // Prefetch is set
+    if (typeof prefetch === 'number') {
+      channel.prefetch(prefetch);
+    }
 
-  // Prefetch is set
-  if (typeof prefetch === 'number') {
-    channel.prefetch(prefetch);
-  }
-
-  // consume the channel
-  channel.consume(
-    consumptionQueue,
-    msg => {
-      // Technically it is possible that amqplib consumes with a null msg
-      if (!msg) {
-        return;
-      }
-
-      // handle acknowledgement
-      const { noAck } = receiverConfig;
-      const ack = noAck
-        ? () => {} // tslint:disable-line:no-empty
-        : (allUpTo: boolean = false) => channel.ack(msg, allUpTo);
-
-      // prepare content
-      const content = deserialiseMessage(msg.content.toString());
-      const { fields } = msg;
-      // send
-      observer.next({
-        ack,
-        content,
-        route: {
-          exchange: fields.exchange,
-          key: fields.routingKey
+    // consume the channel
+    channel.consume(
+      consumptionQueue,
+      msg => {
+        // Technically it is possible that amqplib consumes with a null msg
+        if (!msg) {
+          return;
         }
-      });
-    },
-    receiverConfig
-  );
+
+        // handle acknowledgement
+        const { noAck } = receiverConfig;
+        const ack = noAck
+          ? () => {} // tslint:disable-line:no-empty
+          : (allUpTo: boolean = false) => channel.ack(msg, allUpTo);
+
+        // prepare content
+        const content = deserialiseMessage(msg.content.toString());
+        const { fields } = msg;
+        // send
+        observer.next({
+          ack,
+          content,
+          route: {
+            exchange: fields.exchange,
+            key: fields.routingKey
+          }
+        });
+      },
+      receiverConfig
+    );
+
+    return channel;
+  });
 }
 
 type CreateReceiver = (

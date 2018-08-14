@@ -1,28 +1,20 @@
 // tslint:disable:no-console
 import { createConsumer, createProducer } from '../src';
-import { createInjectableAmqpConnector } from '../src/middleware/amqp';
-import { getMockEngine } from '../src/middleware/amqp/mockEngine';
-import { IAmqpEngine } from '../src/middleware/amqp/types';
-import { jestSpyObject } from './jestSpyObject';
+
+import getMockConnector from './helpers/getMockConnector';
 
 it('should be able to handle routing', done => {
-  const engine = jestSpyObject<IAmqpEngine>(
-    getMockEngine({
-      onPublish: ({ exchange, routingKey, content, onMessage }) => {
-        // Simulate rabbit behaviour
-        if (routingKey === 'error') {
-          onMessage({
-            content,
-            fields: { exchange, routingKey },
-            properties: {}
-          });
-        }
+  const { createAmqpConnector, channel: engine } = getMockConnector({
+    onPublish: ({ exchange, routingKey, content, onMessage }) => {
+      // Simulate rabbit behaviour
+      if (routingKey === 'error') {
+        onMessage({
+          content,
+          fields: { exchange, routingKey },
+          properties: {}
+        });
       }
-    })
-  );
-
-  const createAmqpConnector = createInjectableAmqpConnector(() => () => {
-    return Promise.resolve(engine);
+    }
   });
 
   const { sender, receiver } = createAmqpConnector({

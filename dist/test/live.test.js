@@ -4,11 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const src_1 = require("../src");
-const getMockConnector_1 = __importDefault(require("./helpers/getMockConnector"));
+const amqp_1 = __importDefault(require("../src/middleware/amqp"));
 describe('when the message arrives', () => {
-    it('should run the hello world example ', done => {
-        const { createAmqpConnector, channel } = getMockConnector_1.default();
-        const { sender, receiver } = createAmqpConnector({
+    it('should run the hello world example with a live rabbit MQ', done => {
+        const { sender, receiver } = amqp_1.default({
             declarations: {
                 queues: [
                     {
@@ -17,7 +16,7 @@ describe('when the message arrives', () => {
                     }
                 ]
             },
-            uri: ''
+            uri: 'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv'
         });
         const producer = src_1.createProducer(sender());
         producer.next({
@@ -29,17 +28,10 @@ describe('when the message arrives', () => {
             queue: 'hello'
         }));
         consumer.subscribe(msg => {
-            // Check consume()
-            expect(channel.jestSpyCalls.mock.calls).toEqual([
-                ['assertQueue', 'hello', { durable: false }],
-                ['assertQueue', 'hello', { durable: false }],
-                ['consume', 'hello', '_FUNCTION_', { noAck: true }],
-                ['publish', '', 'hello', Buffer.from(JSON.stringify('Hello World!'))]
-            ]);
             // Check msg.content
             expect(msg.content).toEqual('Hello World!');
             done();
         });
-    });
+    }, 7000);
 });
-//# sourceMappingURL=01-hello-world.test.js.map
+//# sourceMappingURL=live.test.js.map

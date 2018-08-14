@@ -31,38 +31,40 @@ function deserialiseMessage(possiblySerialisedMessage) {
 function setupReceiver(createChannel, declarations, localConfig, observer) {
     return __awaiter(this, void 0, void 0, function* () {
         const { queue = '', prefetch, bindings = [] } = localConfig, receiverConfig = __rest(localConfig, ["queue", "prefetch", "bindings"]);
-        const channel = yield createChannel();
-        yield assertions_1.assertDeclarations(channel, declarations);
-        const consumptionQueue = yield assertions_1.assertIfAnonymousQueue(channel, queue);
-        yield assertions_1.assertBindings(channel, bindings, consumptionQueue);
-        // Prefetch is set
-        if (typeof prefetch === 'number') {
-            channel.prefetch(prefetch);
-        }
-        // consume the channel
-        channel.consume(consumptionQueue, msg => {
-            // Technically it is possible that amqplib consumes with a null msg
-            if (!msg) {
-                return;
+        createChannel((channel) => __awaiter(this, void 0, void 0, function* () {
+            yield assertions_1.assertDeclarations(channel, declarations);
+            const consumptionQueue = yield assertions_1.assertIfAnonymousQueue(channel, queue);
+            yield assertions_1.assertBindings(channel, bindings, consumptionQueue);
+            // Prefetch is set
+            if (typeof prefetch === 'number') {
+                channel.prefetch(prefetch);
             }
-            // handle acknowledgement
-            const { noAck } = receiverConfig;
-            const ack = noAck
-                ? () => { } // tslint:disable-line:no-empty
-                : (allUpTo = false) => channel.ack(msg, allUpTo);
-            // prepare content
-            const content = deserialiseMessage(msg.content.toString());
-            const { fields } = msg;
-            // send
-            observer.next({
-                ack,
-                content,
-                route: {
-                    exchange: fields.exchange,
-                    key: fields.routingKey
+            // consume the channel
+            channel.consume(consumptionQueue, msg => {
+                // Technically it is possible that amqplib consumes with a null msg
+                if (!msg) {
+                    return;
                 }
-            });
-        }, receiverConfig);
+                // handle acknowledgement
+                const { noAck } = receiverConfig;
+                const ack = noAck
+                    ? () => { } // tslint:disable-line:no-empty
+                    : (allUpTo = false) => channel.ack(msg, allUpTo);
+                // prepare content
+                const content = deserialiseMessage(msg.content.toString());
+                const { fields } = msg;
+                // send
+                observer.next({
+                    ack,
+                    content,
+                    route: {
+                        exchange: fields.exchange,
+                        key: fields.routingKey
+                    }
+                });
+            }, receiverConfig);
+            return channel;
+        }));
     });
 }
 // Recieve messages

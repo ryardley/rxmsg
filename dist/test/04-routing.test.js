@@ -1,12 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable:no-console
 const src_1 = require("../src");
-const amqp_1 = require("../src/middleware/amqp");
-const mockEngine_1 = require("../src/middleware/amqp/mockEngine");
-const jestSpyObject_1 = require("./jestSpyObject");
+const getMockConnector_1 = __importDefault(require("./helpers/getMockConnector"));
 it('should be able to handle routing', done => {
-    const engine = jestSpyObject_1.jestSpyObject(mockEngine_1.getMockEngine({
+    const { createAmqpConnector, channel: engine } = getMockConnector_1.default({
         onPublish: ({ exchange, routingKey, content, onMessage }) => {
             // Simulate rabbit behaviour
             if (routingKey === 'error') {
@@ -17,9 +18,6 @@ it('should be able to handle routing', done => {
                 });
             }
         }
-    }));
-    const createAmqpConnector = amqp_1.createInjectableAmqpConnector(() => () => {
-        return Promise.resolve(engine);
     });
     const { sender, receiver } = createAmqpConnector({
         declarations: {
