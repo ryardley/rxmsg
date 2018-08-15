@@ -90,9 +90,11 @@ export interface IAmqpEngineMessage {
     fields: any;
     properties: any;
 }
-export declare type IAmqpEngineSetup = (channel: IAmqpEngine) => Promise<IAmqpEngine>;
-export declare type IAmqpEngineTearDown = () => Promise<void>;
-export declare type IAmqpEngineFactory = (setup?: IAmqpEngineSetup, teardown?: IAmqpEngineTearDown) => Promise<IAmqpEngine>;
+export declare type IAmqpEngineSetupFunction = (channel: IAmqpEngine) => Promise<IAmqpEngine>;
+export declare type IAmqpEngineTearDown = (params: {
+    err: Error;
+}) => Promise<void>;
+export declare type IAmqpEngineFactory = (setup?: IAmqpEngineSetupFunction, teardown?: IAmqpEngineTearDown) => Promise<IAmqpEngine>;
 export declare type IAmqpEngineConfigurator = (config: IAmqpConnectionDescription) => IAmqpEngineFactory;
 export interface IAmqpEngine {
     closeConnection: () => Promise<void>;

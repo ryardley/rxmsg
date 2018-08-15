@@ -16,10 +16,14 @@ var __rest = (this && this.__rest) || function (s, e) {
             t[p[i]] = s[p[i]];
     return t;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-// tslint:disable:no-console
 const rxjs_1 = require("rxjs");
+const logger_1 = __importDefault(require("../../logger"));
 const assertions_1 = require("./assertions");
+const log = new logger_1.default({ label: 'createReceiver' });
 function deserialiseMessage(possiblySerialisedMessage) {
     try {
         return JSON.parse(possiblySerialisedMessage);
@@ -46,9 +50,11 @@ function setupReceiver(createChannel, declarations, localConfig, observer) {
                 channel.prefetch(prefetch);
             }
             // consume the channel
-            channel.consume(consumptionQueue, msg => {
-                // Technically it is possible that amqplib consumes with a null msg
+            channel
+                .consume(consumptionQueue, msg => {
                 if (!msg) {
+                    log.error('Received null message. Setting up channel again...');
+                    setupChannel(channel);
                     return;
                 }
                 // handle acknowledgement
@@ -61,17 +67,31 @@ function setupReceiver(createChannel, declarations, localConfig, observer) {
                     content: deserialiseMessage(content.toString()),
                     route: { exchange, key }
                 });
-            }, receiverConfig);
+            }, receiverConfig)
+                .catch(err => {
+                log.error(err);
+            });
             return channel;
         });
-        createChannel(setupChannel);
+        const tearDownChannel = () => {
+            // TODO: Do we need to get channelTag and close channel?
+            return Promise.resolve();
+        };
+        createChannel(setupChannel, tearDownChannel).catch(err => {
+            log.error('Could not create channel.', err);
+        });
     });
 }
 // Recieve messages
-const createReceiver = (engineCreator, config) => receiverConfig => () => rxjs_1.Observable.create((observer) => {
-    setupReceiver(engineCreator, config, receiverConfig, observer).catch(e => {
-        throw e;
-    });
-});
+const createReceiver = (engineCreator, config) => receiverConfig => {
+    // We're all configured return the middleware
+    return function messageInMiddleware( /* dummyStream */) {
+        return rxjs_1.Observable.create((observer) => {
+            setupReceiver(engineCreator, config, receiverConfig, observer).catch(err => {
+                log.error(`Error setting up message receiver: ${err}`);
+            });
+        });
+    };
+};
 exports.default = createReceiver;
 //# sourceMappingURL=createReceiver.js.map

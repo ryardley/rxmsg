@@ -20,7 +20,7 @@ const { sender } = amqp_1.default({
 const producer = src_1.createProducer(sender());
 setInterval(() => {
     const hex = Math.floor(Math.random() * 16777215).toString(16);
-    console.log(`Sending: (${hex}) "Hello World!"`);
+    // console.log(`Sending: (${hex}) "Hello World!"`);
     producer.next({
         content: `(${hex}) Hello World!`,
         route: 'hello'

@@ -16,8 +16,13 @@ var __rest = (this && this.__rest) || function (s, e) {
             t[p[i]] = s[p[i]];
     return t;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = __importDefault(require("../../logger"));
 const assertions_1 = require("./assertions");
+const log = new logger_1.default({ label: 'createSender' });
 function serializeMessage(message) {
     return JSON.stringify(message);
 }
@@ -38,34 +43,42 @@ function setupSender(createChannel, declarations, stream) {
         const setupChannel = (channel) => __awaiter(this, void 0, void 0, function* () {
             yield assertions_1.assertDeclarations(channel, declarations);
             // subscribe on next tick so channel is ready
-            setTimeout(() => {
+            setTimeout(() => __awaiter(this, void 0, void 0, function* () {
+                // ensure we are not already on a subscription
+                yield tearDownChannel();
                 subscription = stream.subscribe((_a) => {
                     var { route } = _a, msg = __rest(_a, ["route"]);
                     const { exchange, key } = getRouteValues(route);
+                    // TODO: Perhaps give this a special verbose logging key
+                    log.info(`Publishing message: ${JSON.stringify(msg)}`);
                     const content = serializeMessage(msg.content);
                     if (!channel.publish(exchange, key, Buffer.from(content))) {
-                        // Do we throw an error here? What should we do here when the
-                        // publish queue needs draining?
-                        console.log(`Error publishing: ${JSON.stringify({
-                            content,
-                            exchange,
-                            key
-                        })}`);
+                        log.error('channel write buffer is full!');
                     }
                 });
-            }, 0);
+            }), 0);
             return channel;
         });
-        const tearDownChannel = () => Promise.resolve(subscription.unsubscribe());
-        createChannel(setupChannel, tearDownChannel);
+        const tearDownChannel = () => {
+            if (subscription) {
+                subscription.unsubscribe();
+            }
+            return Promise.resolve();
+        };
+        return createChannel(setupChannel, tearDownChannel).catch(err => {
+            log.error('Could not create channel.', err);
+        });
     });
 }
 // Forward messages
-const createSender = (engineCreator, config) => () => stream => {
-    setupSender(engineCreator, config, stream).catch((e) => {
-        throw e;
-    });
-    return stream;
+const createSender = (engineCreator, config) => ( /* senderConfig*/) => {
+    // We're all configured return the middleware
+    return function messageOutMiddleware(stream) {
+        setupSender(engineCreator, config, stream).catch(err => {
+            log.error(err);
+        });
+        return stream;
+    };
 };
 exports.default = createSender;
 //# sourceMappingURL=createSender.js.map

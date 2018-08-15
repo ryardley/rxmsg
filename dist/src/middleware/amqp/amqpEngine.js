@@ -14,10 +14,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-/* tslint:disable:no-console */
 // import * as amqp from 'amqplib';
 const amqp = __importStar(require("amqp-connection-manager"));
+const logger_1 = __importDefault(require("../../logger"));
+const log = new logger_1.default({ label: 'amqpEngine' });
 function ensureArray(possibleArray) {
     return Array.isArray(possibleArray) ? possibleArray : [possibleArray];
 }
@@ -36,32 +40,28 @@ function createEngine(channel, connection) {
         publish: channel.publish.bind(channel)
     };
 }
-function setupEngine(connection, setupFunc) {
-    return new Promise(resolve => {
-        connection.createChannel({
-            setup(channel) {
-                console.log('   -> RUNNING SETUP');
-                setupFunc(createEngine(channel, connection)).then(resolve);
-            }
-        });
-    });
-}
 // This is done so we can easily mock engines
 exports.configureAmqpEngine = config => {
     // Return a channel creator
-    return function channelCreator(setupFunc = Promise.resolve, tearDown = Promise.resolve) {
-        const { uri, socketOptions: connectionOptions } = config;
-        const connection = amqp.connect(ensureArray(uri), { connectionOptions });
-        connection.on('connect', () => {
-            console.log('   -> RUNNING CONNECT');
-            console.log('Connected!');
+    const engineFactory = (setupFunc = Promise.resolve, tearDown = Promise.resolve) => {
+        return new Promise((resolve /*,reject*/) => {
+            const { uri, socketOptions: connectionOptions } = config;
+            const connection = amqp.connect(ensureArray(uri), { connectionOptions });
+            // TODO: Why not run setup here? I guess we would need to create out own channel...
+            connection.on('connect', () => {
+                log.info('Connected!');
+            });
+            connection.on('disconnect', (params) => __awaiter(this, void 0, void 0, function* () {
+                yield tearDown(params);
+                log.error('Disconnected.');
+            }));
+            connection.createChannel({
+                setup(channel) {
+                    setupFunc(createEngine(channel, connection)).then(resolve);
+                }
+            });
         });
-        connection.on('disconnect', (params) => __awaiter(this, void 0, void 0, function* () {
-            yield tearDown();
-            console.log('   -> RUNNING DISCONNECT');
-            console.log('Disconnected.', params.err.stack);
-        }));
-        return setupEngine(connection, setupFunc);
     };
+    return engineFactory;
 };
 //# sourceMappingURL=amqpEngine.js.map
