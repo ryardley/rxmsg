@@ -1,15 +1,16 @@
-// tslint:disable:no-console
 import { Observable, Subscription } from 'rxjs';
-
+import Logger from '../../logger';
 import { Middleware } from '../../types';
 import { assertDeclarations } from './assertions';
 import {
   IAmqpDeclarations,
   IAmqpEngineFactory,
-  IAmqpEngineSetup,
+  IAmqpEngineSetupFunction,
   IAmqpMessageOut,
   IAmqpRouteDescription
 } from './types';
+
+const log = new Logger({ label: 'createSender' });
 
 function serializeMessage(message: string) {
   return JSON.stringify(message);
@@ -35,32 +36,41 @@ async function setupSender(
   stream: Observable<IAmqpMessageOut>
 ) {
   let subscription: Subscription;
-  const setupChannel: IAmqpEngineSetup = async channel => {
+
+  const setupChannel: IAmqpEngineSetupFunction = async channel => {
     await assertDeclarations(channel, declarations);
 
     // subscribe on next tick so channel is ready
-    setTimeout(() => {
+    setTimeout(async () => {
+      // ensure we are not already on a subscription
+      await tearDownChannel();
+
       subscription = stream.subscribe(({ route, ...msg }) => {
         const { exchange, key } = getRouteValues(route);
+
+        // TODO: Perhaps give this a special verbose logging key
+        log.info(`Publishing message: ${JSON.stringify(msg)}`);
+
         const content = serializeMessage(msg.content);
+
         if (!channel.publish(exchange, key, Buffer.from(content))) {
-          // Do we throw an error here? What should we do here when the
-          // publish queue needs draining?
-          console.log(
-            `Error publishing: ${JSON.stringify({
-              content,
-              exchange,
-              key
-            })}`
-          );
+          log.error('channel write buffer is full!');
         }
       });
     }, 0);
     return channel;
   };
 
-  const tearDownChannel = () => Promise.resolve(subscription.unsubscribe());
-  createChannel(setupChannel, tearDownChannel);
+  const tearDownChannel = () => {
+    if (subscription) {
+      subscription.unsubscribe();
+    }
+    return Promise.resolve();
+  };
+
+  return createChannel(setupChannel, tearDownChannel).catch(err => {
+    log.error('Could not create channel.', err);
+  });
 }
 
 type CreateSender = (
@@ -69,12 +79,18 @@ type CreateSender = (
 ) => () => Middleware<IAmqpMessageOut>;
 
 // Forward messages
-const createSender: CreateSender = (engineCreator, config) => () => stream => {
-  setupSender(engineCreator, config, stream).catch((e: Error) => {
-    throw e;
-  });
+const createSender: CreateSender = (
+  engineCreator,
+  config
+) => (/* senderConfig*/) => {
+  // We're all configured return the middleware
+  return function messageOutMiddleware(stream) {
+    setupSender(engineCreator, config, stream).catch(err => {
+      log.error(err);
+    });
 
-  return stream;
+    return stream;
+  };
 };
 
 export default createSender;

@@ -111,12 +111,18 @@ export interface IAmqpEngineMessage {
   fields: any;
   properties: any;
 }
-export type IAmqpEngineSetup = (channel: IAmqpEngine) => Promise<IAmqpEngine>;
-export type IAmqpEngineTearDown = () => Promise<void>;
+
+export type IAmqpEngineSetupFunction = (
+  channel: IAmqpEngine
+) => Promise<IAmqpEngine>;
+
+export type IAmqpEngineTearDown = (params: { err: Error }) => Promise<void>;
+
 export type IAmqpEngineFactory = (
-  setup?: IAmqpEngineSetup,
+  setup?: IAmqpEngineSetupFunction,
   teardown?: IAmqpEngineTearDown
 ) => Promise<IAmqpEngine>;
+
 export type IAmqpEngineConfigurator = (
   config: IAmqpConnectionDescription
 ) => IAmqpEngineFactory;

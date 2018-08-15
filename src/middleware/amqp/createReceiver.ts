@@ -1,22 +1,22 @@
-// tslint:disable:no-console
 import { Observable, Observer } from 'rxjs';
+import Logger from '../../logger';
+import { Middleware } from '../../types';
 import {
   assertBindings,
   assertDeclarations,
   assertIfAnonymousQueue
 } from './assertions';
-
 import {
   IAmqpDeclarations,
   IAmqpEngine,
   IAmqpEngineFactory,
   IAmqpEngineMessage,
-  IAmqpEngineSetup,
+  IAmqpEngineSetupFunction,
   IAmqpMessageIn,
   IAmqpReceiverDescription
 } from './types';
 
-import { Middleware } from '../../types';
+const log = new Logger({ label: 'createReceiver' });
 
 function deserialiseMessage(possiblySerialisedMessage: string) {
   try {
@@ -49,7 +49,7 @@ async function setupReceiver(
     ...receiverConfig
   } = localConfig;
 
-  const setupChannel: IAmqpEngineSetup = async channel => {
+  const setupChannel: IAmqpEngineSetupFunction = async channel => {
     // setup structure
     await assertDeclarations(channel, declarations);
     const consumptionQueue = await assertIfAnonymousQueue(channel, queue);
@@ -61,37 +61,49 @@ async function setupReceiver(
     }
 
     // consume the channel
-    channel.consume(
-      consumptionQueue,
-      msg => {
-        // Technically it is possible that amqplib consumes with a null msg
-        if (!msg) {
-          return;
-        }
+    channel
+      .consume(
+        consumptionQueue,
+        msg => {
+          if (!msg) {
+            log.error('Received null message. Setting up channel again...');
+            setupChannel(channel);
+            return;
+          }
 
-        // handle acknowledgement
-        const { noAck = false } = receiverConfig;
+          // handle acknowledgement
+          const { noAck = false } = receiverConfig;
 
-        // prepare content
-        const {
-          fields: { exchange, routingKey: key },
-          content
-        } = msg;
+          // prepare content
+          const {
+            fields: { exchange, routingKey: key },
+            content
+          } = msg;
 
-        // send
-        observer.next({
-          ack: createAck(noAck, channel, msg),
-          content: deserialiseMessage(content.toString()),
-          route: { exchange, key }
-        });
-      },
-      receiverConfig
-    );
+          // send
+          observer.next({
+            ack: createAck(noAck, channel, msg),
+            content: deserialiseMessage(content.toString()),
+            route: { exchange, key }
+          });
+        },
+        receiverConfig
+      )
+      .catch(err => {
+        log.error(err);
+      });
 
     return channel;
   };
 
-  createChannel(setupChannel);
+  const tearDownChannel = () => {
+    // TODO: Do we need to get channelTag and close channel?
+    return Promise.resolve();
+  };
+
+  createChannel(setupChannel, tearDownChannel).catch(err => {
+    log.error('Could not create channel.', err);
+  });
 }
 
 type CreateReceiver = (
@@ -103,11 +115,17 @@ type CreateReceiver = (
 const createReceiver: CreateReceiver = (
   engineCreator,
   config
-) => receiverConfig => () =>
-  Observable.create((observer: Observer<IAmqpMessageIn>) => {
-    setupReceiver(engineCreator, config, receiverConfig, observer).catch(e => {
-      throw e;
+) => receiverConfig => {
+  // We're all configured return the middleware
+  return function messageInMiddleware(/* dummyStream */) {
+    return Observable.create((observer: Observer<IAmqpMessageIn>) => {
+      setupReceiver(engineCreator, config, receiverConfig, observer).catch(
+        err => {
+          log.error(`Error setting up message receiver: ${err}`);
+        }
+      );
     });
-  });
+  };
+};
 
 export default createReceiver;

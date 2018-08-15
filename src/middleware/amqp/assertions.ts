@@ -1,5 +1,3 @@
-// tslint:disable:no-console
-
 import {
   IAmqpBinding,
   IAmqpDeclarations,
@@ -8,6 +6,16 @@ import {
   IAmqpQueueDescription,
   IAmqpQueueShortDescription
 } from './types';
+
+export interface IAmqpQueueDescription {
+  name: string;
+  durable?: boolean;
+  exclusive?: boolean;
+  autoDelete?: boolean;
+  arguments?: any;
+}
+
+export type IAmqpQueueShortDescription = IAmqpQueueDescription | string;
 
 export function enrichQueue(
   queueOrString: IAmqpQueueShortDescription

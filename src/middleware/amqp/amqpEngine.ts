@@ -1,12 +1,14 @@
-/* tslint:disable:no-console */
 // import * as amqp from 'amqplib';
 import * as amqp from 'amqp-connection-manager';
 import * as amqplib from 'amqplib';
 import {
   IAmqpEngine,
   IAmqpEngineConfigurator,
-  IAmqpEngineSetup
+  IAmqpEngineFactory
 } from './types';
+
+import Logger from '../../logger';
+const log = new Logger({ label: 'amqpEngine' });
 
 function ensureArray(possibleArray: string[] | string): string[] {
   return Array.isArray(possibleArray) ? possibleArray : [possibleArray];
@@ -31,45 +33,38 @@ function createEngine(
   };
 }
 
-function setupEngine(
-  connection: amqp.AmqpConnectionManager,
-  setupFunc: IAmqpEngineSetup
-) {
-  return new Promise<IAmqpEngine>(resolve => {
-    connection.createChannel({
-      setup(channel: amqplib.ConfirmChannel) {
-        console.log('   -> RUNNING SETUP');
-        setupFunc(createEngine(channel, connection)).then(resolve);
-      }
-    });
-  });
-}
-
 // This is done so we can easily mock engines
 export const configureAmqpEngine: IAmqpEngineConfigurator = config => {
   // Return a channel creator
-  return function channelCreator(
+  const engineFactory: IAmqpEngineFactory = (
     setupFunc = Promise.resolve,
     tearDown = Promise.resolve
-  ) {
-    const { uri, socketOptions: connectionOptions } = config;
+  ) => {
+    return new Promise<IAmqpEngine>((resolve /*,reject*/) => {
+      const { uri, socketOptions: connectionOptions } = config;
 
-    const connection = amqp.connect(
-      ensureArray(uri),
-      { connectionOptions }
-    );
+      const connection = amqp.connect(
+        ensureArray(uri),
+        { connectionOptions }
+      );
 
-    connection.on('connect', () => {
-      console.log('   -> RUNNING CONNECT');
-      console.log('Connected!');
+      // TODO: Why not run setup here? I guess we would need to create out own channel...
+      connection.on('connect', () => {
+        log.info('Connected!');
+      });
+
+      connection.on('disconnect', async params => {
+        await tearDown(params);
+        log.error('Disconnected.');
+      });
+
+      connection.createChannel({
+        setup(channel: amqplib.ConfirmChannel) {
+          setupFunc(createEngine(channel, connection)).then(resolve);
+        }
+      });
     });
-
-    connection.on('disconnect', async params => {
-      await tearDown();
-      console.log('   -> RUNNING DISCONNECT');
-      console.log('Disconnected.', params.err.stack);
-    });
-
-    return setupEngine(connection, setupFunc);
   };
+
+  return engineFactory;
 };
