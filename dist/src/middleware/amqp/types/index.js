@@ -1,6 +1,4 @@
 "use strict";
-// TODO: Replace Joi runtime typeschecking with
-//       https://github.com/pelotom/runtypes to avoid duplication
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }

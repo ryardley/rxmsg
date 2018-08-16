@@ -1,15 +1,10 @@
-import Joi from 'joi';
-export declare type BindingDescription = {
-    arguments?: any;
-    destination?: string;
-    pattern?: string;
-    source: string;
-    type?: 'exchange' | 'queue';
-};
-export declare const BindingDescriptionSchema: {
-    arguments: Joi.ObjectSchema;
-    destination: Joi.StringSchema;
-    pattern: Joi.StringSchema;
-    source: Joi.StringSchema;
-    type: Joi.StringSchema;
-};
+import { Literal, Partial, Record, Static, String } from 'runtypes';
+export declare const BindingDescriptionSchema: import("../../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/runtypes/lib/types/intersect").Intersect2<Record<{
+    source: String;
+}>, Partial<{
+    arguments: import("../../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/runtypes/lib/types/dictionary").StringDictionary<Partial<{}>>;
+    destination: String;
+    pattern: String;
+    type: import("../../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/runtypes/lib/types/union").Union2<Literal<"exchange">, Literal<"queue">>;
+}>>;
+export declare type BindingDescription = Static<typeof BindingDescriptionSchema>;

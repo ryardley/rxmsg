@@ -1,35 +1,21 @@
-import Joi from 'joi';
-import { BindingDescription, BindingDescriptionSchema } from './Binding';
-import {
-  ConnectionDescription,
-  ConnectionDescriptionSchema
-} from './Connection';
-import { ExchangeDescription, ExchangeDescriptionSchema } from './Exchange';
-import { QueueDescriptionSchema, QueueShortDescription } from './Queue';
+import { Array, Partial, Static } from 'runtypes';
 
-export type AmqpDeclarations = {
-  queues?: QueueShortDescription[]; // queues can be represented as strings
-  exchanges?: ExchangeDescription[];
-  bindings?: BindingDescription[];
-};
+import { BindingDescriptionSchema } from './Binding';
+import { ConnectionDescriptionSchema } from './Connection';
+import { ExchangeDescriptionSchema } from './Exchange';
+import { QueueDescriptionSchema } from './Queue';
 
-export const AmqpDeclarationsSchema = {
-  bindings: Joi.array()
-    .items(BindingDescriptionSchema)
-    .optional(),
-  exchanges: Joi.array()
-    .items(ExchangeDescriptionSchema)
-    .optional(),
-  queues: Joi.array()
-    .items(QueueDescriptionSchema)
-    .optional()
-};
+export const AmqpDeclarationsSchema = Partial({
+  bindings: Array(BindingDescriptionSchema),
+  exchanges: Array(ExchangeDescriptionSchema),
+  queues: Array(QueueDescriptionSchema) // queues can be represented as strings
+});
 
-export type AmqpSystemDescription = ConnectionDescription & {
-  declarations?: AmqpDeclarations;
-};
+export const AmqpSystemDescriptionSchema = ConnectionDescriptionSchema.And(
+  Partial({
+    declarations: AmqpDeclarationsSchema
+  })
+);
 
-export const AmqpSystemDescriptionSchema = {
-  ...ConnectionDescriptionSchema,
-  declarations: Joi.object(AmqpDeclarationsSchema).optional()
-};
+export type AmqpDeclarations = Static<typeof AmqpDeclarationsSchema>;
+export type AmqpSystemDescription = Static<typeof AmqpSystemDescriptionSchema>;

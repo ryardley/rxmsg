@@ -1,14 +1,12 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const joi_1 = __importDefault(require("joi"));
-exports.QueueDescriptionSchema = {
-    arguments: joi_1.default.object().optional(),
-    autoDelete: joi_1.default.boolean().optional(),
-    durable: joi_1.default.boolean().optional(),
-    exclusive: joi_1.default.boolean().optional(),
-    name: joi_1.default.string()
-};
+const runtypes_1 = require("runtypes");
+exports.QueueDescriptionSchema = runtypes_1.Record({
+    name: runtypes_1.String
+}).And(runtypes_1.Partial({
+    arguments: runtypes_1.Dictionary(runtypes_1.Partial({})),
+    autoDelete: runtypes_1.Boolean,
+    durable: runtypes_1.Boolean,
+    exclusive: runtypes_1.Boolean
+}));
 //# sourceMappingURL=Queue.js.map

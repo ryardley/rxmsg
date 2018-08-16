@@ -1,17 +1,17 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const joi_1 = __importDefault(require("joi"));
-exports.ConnectionDescriptionSchema = {
-    socketOptions: joi_1.default.object({
-        ca: joi_1.default.any().optional(),
-        cert: joi_1.default.any().optional(),
-        key: joi_1.default.any().optional(),
-        noDelay: joi_1.default.boolean().optional(),
-        passphrase: joi_1.default.string().optional()
-    }).optional(),
-    uri: joi_1.default.string()
-};
+const runtypes_1 = require("runtypes");
+exports.ConnectionDescriptionSchema = runtypes_1.Record({
+    uri: runtypes_1.String
+}).And(runtypes_1.Partial({
+    // TODO: Cannot easily check against buffers with runtypes should look like this:
+    // socketOptions?: {
+    //   noDelay?: boolean;
+    //   cert?: Buffer;
+    //   key?: Buffer;
+    //   passphrase?: string;
+    //   ca?: Buffer[];
+    // };
+    socketOptions: runtypes_1.Dictionary(runtypes_1.Partial({}))
+}));
 //# sourceMappingURL=Connection.js.map

@@ -1,16 +1,7 @@
-/// <reference types="node" />
-import Joi from 'joi';
-export declare type ConnectionDescription = {
-    uri: string;
-    socketOptions?: {
-        noDelay?: boolean;
-        cert?: Buffer;
-        key?: Buffer;
-        passphrase?: string;
-        ca?: Buffer[];
-    };
-};
-export declare const ConnectionDescriptionSchema: {
-    socketOptions: Joi.ObjectSchema;
-    uri: Joi.StringSchema;
-};
+import { Partial, Record, Static, String } from 'runtypes';
+export declare const ConnectionDescriptionSchema: import("../../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/runtypes/lib/types/intersect").Intersect2<Record<{
+    uri: String;
+}>, Partial<{
+    socketOptions: import("../../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/runtypes/lib/types/dictionary").StringDictionary<Partial<{}>>;
+}>>;
+export declare type ConnectionDescription = Static<typeof ConnectionDescriptionSchema>;

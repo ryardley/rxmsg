@@ -1,23 +1,19 @@
-import Joi from 'joi';
+import { Dictionary, Partial, Record, Static, String } from 'runtypes';
 
-export type ConnectionDescription = {
-  uri: string;
-  socketOptions?: {
-    noDelay?: boolean;
-    cert?: Buffer;
-    key?: Buffer;
-    passphrase?: string;
-    ca?: Buffer[];
-  };
-};
+export const ConnectionDescriptionSchema = Record({
+  uri: String
+}).And(
+  Partial({
+    // TODO: Cannot easily check against buffers with runtypes should look like this:
+    // socketOptions?: {
+    //   noDelay?: boolean;
+    //   cert?: Buffer;
+    //   key?: Buffer;
+    //   passphrase?: string;
+    //   ca?: Buffer[];
+    // };
+    socketOptions: Dictionary(Partial({}))
+  })
+);
 
-export const ConnectionDescriptionSchema = {
-  socketOptions: Joi.object({
-    ca: Joi.any().optional(),
-    cert: Joi.any().optional(),
-    key: Joi.any().optional(),
-    noDelay: Joi.boolean().optional(),
-    passphrase: Joi.string().optional()
-  }).optional(),
-  uri: Joi.string()
-};
+export type ConnectionDescription = Static<typeof ConnectionDescriptionSchema>;

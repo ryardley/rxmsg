@@ -1,18 +1,16 @@
 {
   "name": "blockbid-message",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "main": "dist/src/index.js",
   "license": "MIT",
   "devDependencies": {
     "@types/amqp-connection-manager": "^2.0.1",
     "@types/amqplib": "^0.5.8",
-    "@types/joi": "^13.4.2",
     "@types/lodash": "^4.14.115",
     "@types/minimatch": "^3.0.3",
     "@types/rx": "^4.1.1",
     "blockbid-tools": "blockbid/blockbid-tools#v1.1.0",
     "minimatch": "^3.0.4",
-    "proxyquire": "^2.0.1",
     "ts-node": "^7.0.0"
   },
   "scripts": {
@@ -25,9 +23,8 @@
   "dependencies": {
     "amqp-connection-manager": "^2.1.0",
     "amqplib": "^0.5.2",
-    "joi": "^13.6.0",
     "lodash": "^4.17.10",
-    "rxjs": "^6.2.2",
-    "yup": "^0.26.2"
+    "runtypes": "^2.1.6",
+    "rxjs": "^6.2.2"
   }
 }

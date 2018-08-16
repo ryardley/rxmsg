@@ -26,7 +26,9 @@ export const createInjectableAmqpConnector = (
     ...connDescription
   }: AmqpSystemDescription = validateInput(input);
 
-  const connectedFactory = createConnectedFactory(connDescription);
+  const connectedFactory = createConnectedFactory(
+    connDescription as ConnectionDescription
+  );
 
   return {
     close: createCloser(connectedFactory),

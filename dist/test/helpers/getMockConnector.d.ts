@@ -5,7 +5,20 @@ export default function getMockedConnector(config?: MockEngineConfig): {
     } & import("test/helpers/jestSpyObject").IJ;
     createAmqpConnector: (input: any) => {
         close: () => Promise<void>;
-        receiver: (r: import("src/middleware/amqp/types/Receiver").ReceiverDescription) => import("src/types").Middleware<import("src/middleware/amqp/types/Message").AmqpMessageIn>;
+        receiver: (r: {
+            arguments?: {
+                [_: string]: any;
+            } | undefined;
+            bindings?: ({
+                source: string;
+            } & any)[] | undefined;
+            consumerTag?: string | undefined;
+            exclusive?: boolean | undefined;
+            noAck?: boolean | undefined;
+            prefetch?: number | undefined;
+            priority?: number | undefined;
+            queue?: string | undefined;
+        }) => import("src/types").Middleware<import("src/middleware/amqp/types/Message").AmqpMessageIn>;
         sender: () => import("src/types").Middleware<import("src/middleware/amqp/types/Message").AmqpMessageOut>;
     };
 };

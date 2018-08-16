@@ -1,19 +1,22 @@
-import Joi from 'joi';
+import {
+  Dictionary,
+  Literal,
+  Partial,
+  Record,
+  Static,
+  String,
+  Union
+} from 'runtypes';
 
-export type BindingDescription = {
-  arguments?: any;
-  destination?: string; // if not provided default to anon queue if no anon que then error
-  pattern?: string; // ''
-  source: string;
-  type?: 'exchange' | 'queue'; // default to queue
-};
+export const BindingDescriptionSchema = Record({
+  source: String
+}).And(
+  Partial({
+    arguments: Dictionary(Partial({})),
+    destination: String,
+    pattern: String,
+    type: Union(Literal('exchange'), Literal('queue')) // default to queue
+  })
+);
 
-export const BindingDescriptionSchema = {
-  arguments: Joi.object().optional(),
-  destination: Joi.string().optional(),
-  pattern: Joi.string().optional(),
-  source: Joi.string(),
-  type: Joi.string()
-    .optional()
-    .valid('exchange', 'queue')
-};
+export type BindingDescription = Static<typeof BindingDescriptionSchema>;

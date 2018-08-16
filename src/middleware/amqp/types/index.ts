@@ -1,6 +1,3 @@
-// TODO: Replace Joi runtime typeschecking with
-//       https://github.com/pelotom/runtypes to avoid duplication
-
 export * from './AmqpChannel';
 export * from './Binding';
 export * from './Connection';

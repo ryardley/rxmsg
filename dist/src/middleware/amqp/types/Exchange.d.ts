@@ -1,18 +1,12 @@
-import Joi from 'joi';
-export declare type ExchangeDescription = {
-    name: string;
-    type: 'fanout' | 'topic' | 'direct';
-    durable?: boolean;
-    internal?: boolean;
-    autoDelete?: boolean;
-    alternateExchange?: string;
-    arguments?: any;
-};
-export declare const ExchangeDescriptionSchema: {
-    alternateExchange: Joi.StringSchema;
-    autoDelete: Joi.BooleanSchema;
-    durable: Joi.BooleanSchema;
-    internal: Joi.BooleanSchema;
-    name: Joi.StringSchema;
-    type: Joi.StringSchema;
-};
+import { Boolean, Literal, Partial, Record, Static, String } from 'runtypes';
+export declare const ExchangeDescriptionSchema: import("../../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/runtypes/lib/types/intersect").Intersect2<Record<{
+    name: String;
+    type: import("../../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/runtypes/lib/types/union").Union3<Literal<"fanout">, Literal<"topic">, Literal<"direct">>;
+}>, Partial<{
+    alternateExchange: String;
+    arguments: import("../../../../../../../../../../Users/rudiyardley/client-projects/blockbid/microservices/blockbid-message/node_modules/runtypes/lib/types/dictionary").StringDictionary<Partial<{}>>;
+    autoDelete: Boolean;
+    durable: Boolean;
+    internal: Boolean;
+}>>;
+export declare type ExchangeDescription = Static<typeof ExchangeDescriptionSchema>;

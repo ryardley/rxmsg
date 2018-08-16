@@ -1,12 +1,7 @@
-import Joi from 'joi';
-
-export function createValidator<T>(schemaLike: Joi.SchemaLike) {
+export function createValidator<T>(schemaLike: { check: (a: any) => void }) {
   return (value: any): T => {
-    const { error } = Joi.validate(value, schemaLike);
-    if (error) {
-      throw new Error(error.message);
-    }
+    schemaLike.check(value);
 
-    return value;
+    return value as T;
   };
 }

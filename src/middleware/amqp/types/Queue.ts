@@ -1,19 +1,16 @@
-import Joi from 'joi';
+import { Boolean, Dictionary, Partial, Record, Static, String } from 'runtypes';
 
-export type QueueDescription = {
-  name: string;
-  durable?: boolean;
-  exclusive?: boolean;
-  autoDelete?: boolean;
-  arguments?: any;
-};
+export const QueueDescriptionSchema = Record({
+  name: String
+}).And(
+  Partial({
+    arguments: Dictionary(Partial({})),
+    autoDelete: Boolean,
+    durable: Boolean,
+    exclusive: Boolean
+  })
+);
+
+export type QueueDescription = Static<typeof QueueDescriptionSchema>;
 
 export type QueueShortDescription = QueueDescription | string;
-
-export const QueueDescriptionSchema = {
-  arguments: Joi.object().optional(),
-  autoDelete: Joi.boolean().optional(),
-  durable: Joi.boolean().optional(),
-  exclusive: Joi.boolean().optional(),
-  name: Joi.string()
-};

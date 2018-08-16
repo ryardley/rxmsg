@@ -1,2 +1,8 @@
-import { AmqpEngineFactory, ConnectionDescription } from './types';
-export declare const configureAmqpEngine: (config: ConnectionDescription) => AmqpEngineFactory;
+import { AmqpEngineFactory } from './types';
+export declare const configureAmqpEngine: (config: {
+    uri: string;
+} & {
+    socketOptions?: {
+        [_: string]: any;
+    } | undefined;
+}) => AmqpEngineFactory;
