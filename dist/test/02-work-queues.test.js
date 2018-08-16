@@ -17,7 +17,7 @@ it('should simulate work queues', done => {
                 }
             ]
         },
-        uri: ''
+        uri: 'amqp://somerabbitserver'
     });
     const producer = src_1.createProducer(sender());
     producer.next({

@@ -13,7 +13,7 @@ describe('when the message arrives', () => {
           }
         ]
       },
-      uri: ''
+      uri: 'amqp://somerabbitserver'
     });
 
     const producer = createProducer(sender());

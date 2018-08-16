@@ -1,6 +1,6 @@
 // tslint:disable:no-console
 import { createConsumer, createProducer } from '../src';
-import { IAmqpMessageOut } from '../src/middleware/amqp/types';
+import { AmqpMessageOut } from '../src/middleware/amqp/types';
 import getMockConnector from './helpers/getMockConnector';
 
 it('should simulate work queues', done => {
@@ -15,10 +15,10 @@ it('should simulate work queues', done => {
         }
       ]
     },
-    uri: ''
+    uri: 'amqp://somerabbitserver'
   });
 
-  const producer = createProducer<IAmqpMessageOut>(sender());
+  const producer = createProducer<AmqpMessageOut>(sender());
 
   producer.next({
     content: 'Hello World!',

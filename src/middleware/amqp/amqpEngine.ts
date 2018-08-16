@@ -1,11 +1,7 @@
 // import * as amqp from 'amqplib';
 import * as amqp from 'amqp-connection-manager';
 import * as amqplib from 'amqplib';
-import {
-  IAmqpEngine,
-  IAmqpEngineConfigurator,
-  IAmqpEngineFactory
-} from './types';
+import { AmqpEngine, AmqpEngineFactory, ConnectionDescription } from './types';
 
 import Logger from '../../logger';
 const log = new Logger({ label: 'amqpEngine' });
@@ -17,7 +13,7 @@ function ensureArray(possibleArray: string[] | string): string[] {
 function createEngine(
   channel: amqplib.ConfirmChannel,
   connection: amqp.AmqpConnectionManager
-) {
+): AmqpEngine {
   return {
     ack: channel.ack.bind(channel),
     assertExchange: channel.assertExchange.bind(channel),
@@ -34,13 +30,13 @@ function createEngine(
 }
 
 // This is done so we can easily mock engines
-export const configureAmqpEngine: IAmqpEngineConfigurator = config => {
+export const configureAmqpEngine = (config: ConnectionDescription) => {
   // Return a channel creator
-  const engineFactory: IAmqpEngineFactory = (
+  const engineFactory: AmqpEngineFactory = (
     setupFunc = Promise.resolve,
     tearDown = Promise.resolve
   ) => {
-    return new Promise<IAmqpEngine>((resolve /*,reject*/) => {
+    return new Promise<AmqpEngine>((resolve /*,reject*/) => {
       const { uri, socketOptions: connectionOptions } = config;
 
       const connection = amqp.connect(

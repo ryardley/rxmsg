@@ -18,7 +18,7 @@ it('should be able to run a fanout exchange', done => {
                 }
             ]
         },
-        uri: ''
+        uri: 'amqp://somerabbitserver'
     });
     const consumer = src_1.createConsumer(receiver({
         bindings: [

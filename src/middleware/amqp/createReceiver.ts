@@ -7,16 +7,21 @@ import {
   assertIfAnonymousQueue
 } from './assertions';
 import {
-  IAmqpDeclarations,
-  IAmqpEngine,
-  IAmqpEngineFactory,
-  IAmqpEngineMessage,
-  IAmqpEngineSetupFunction,
-  IAmqpMessageIn,
-  IAmqpReceiverDescription
+  AmqpDeclarations,
+  AmqpEngine,
+  AmqpEngineFactory,
+  AmqpMessageIn,
+  AmqpProtocolMessage,
+  ReceiverDescription,
+  ReceiverDescriptionSchema
 } from './types';
+import { createValidator } from './types/validator';
 
 const log = new Logger({ label: 'createReceiver' });
+
+const validateInput = createValidator<ReceiverDescription>(
+  ReceiverDescriptionSchema
+);
 
 function deserialiseMessage(possiblySerialisedMessage: string) {
   try {
@@ -28,8 +33,8 @@ function deserialiseMessage(possiblySerialisedMessage: string) {
 
 function createAck(
   noAck: boolean,
-  channel: IAmqpEngine,
-  msg: IAmqpEngineMessage
+  channel: AmqpEngine,
+  msg: AmqpProtocolMessage
 ) {
   return noAck
     ? () => {} // tslint:disable-line:no-empty
@@ -37,10 +42,10 @@ function createAck(
 }
 
 async function setupReceiver(
-  createChannel: IAmqpEngineFactory,
-  declarations: IAmqpDeclarations,
-  localConfig: IAmqpReceiverDescription,
-  observer: Observer<IAmqpMessageIn>
+  createChannel: AmqpEngineFactory,
+  declarations: AmqpDeclarations,
+  localConfig: ReceiverDescription,
+  observer: Observer<AmqpMessageIn>
 ) {
   const {
     queue = '',
@@ -49,7 +54,7 @@ async function setupReceiver(
     ...receiverConfig
   } = localConfig;
 
-  const setupChannel: IAmqpEngineSetupFunction = async channel => {
+  const setupChannel = async (channel: AmqpEngine) => {
     // setup structure
     await assertDeclarations(channel, declarations);
     const consumptionQueue = await assertIfAnonymousQueue(channel, queue);
@@ -107,18 +112,20 @@ async function setupReceiver(
 }
 
 type CreateReceiver = (
-  engineCreator: IAmqpEngineFactory,
-  config: IAmqpDeclarations
-) => (r: IAmqpReceiverDescription) => Middleware<IAmqpMessageIn>;
+  engineCreator: AmqpEngineFactory,
+  config: AmqpDeclarations
+) => (r: ReceiverDescription) => Middleware<AmqpMessageIn>;
 
 // Recieve messages
 const createReceiver: CreateReceiver = (
   engineCreator,
   config
 ) => receiverConfig => {
+  validateInput(receiverConfig);
+
   // We're all configured return the middleware
   return function messageInMiddleware(/* dummyStream */) {
-    return Observable.create((observer: Observer<IAmqpMessageIn>) => {
+    return Observable.create((observer: Observer<AmqpMessageIn>) => {
       setupReceiver(engineCreator, config, receiverConfig, observer).catch(
         err => {
           log.error(`Error setting up message receiver: ${err}`);

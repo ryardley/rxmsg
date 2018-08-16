@@ -27,7 +27,7 @@ it('should be able to handle routing', done => {
         }
       ]
     },
-    uri: ''
+    uri: 'amqp://somerabbitserver'
   });
 
   const producer = createProducer(sender());

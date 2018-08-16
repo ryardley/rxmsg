@@ -41,7 +41,7 @@ function createEngine(channel, connection) {
     };
 }
 // This is done so we can easily mock engines
-exports.configureAmqpEngine = config => {
+exports.configureAmqpEngine = (config) => {
     // Return a channel creator
     const engineFactory = (setupFunc = Promise.resolve, tearDown = Promise.resolve) => {
         return new Promise((resolve /*,reject*/) => {

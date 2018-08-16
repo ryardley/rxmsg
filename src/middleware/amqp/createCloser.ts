@@ -1,7 +1,7 @@
 // import { closeConnection } from './createChannel';
-import { IAmqpEngineFactory } from './types';
+import { AmqpEngineFactory } from './types';
 
-export default (engineFactory: IAmqpEngineFactory) => async () => {
+export default (engineFactory: AmqpEngineFactory) => async () => {
   const engine = await engineFactory();
   return await engine.closeConnection();
 };

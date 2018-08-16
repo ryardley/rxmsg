@@ -34,7 +34,7 @@ it('should handle topics', done => {
         }
       ]
     },
-    uri: ''
+    uri: 'amqp://somerabbitserver'
   });
 
   const producer = createProducer(sender());

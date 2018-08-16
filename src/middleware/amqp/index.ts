@@ -2,23 +2,36 @@ import { configureAmqpEngine } from './amqpEngine';
 import createCloser from './createCloser';
 import createReceiver from './createReceiver';
 import createSender from './createSender';
+import {
+  AmqpEngineFactory,
+  AmqpSystemDescription,
+  AmqpSystemDescriptionSchema,
+  ConnectionDescription
+} from './types';
+import { createValidator } from './types/validator';
 
-import { IAmqpEngineConfigurator, IAmqpSystemDescription } from './types';
+export type EngineFactoryCreator = (
+  c: ConnectionDescription
+) => AmqpEngineFactory;
+
+const validateInput = createValidator<AmqpSystemDescription>(
+  AmqpSystemDescriptionSchema
+);
 
 export const createInjectableAmqpConnector = (
-  configureEngine: IAmqpEngineConfigurator
-) => (config: IAmqpSystemDescription) => {
-  const amqpFactory = configureEngine(config);
-  const { declarations = {} } = config;
+  createConnectedFactory: EngineFactoryCreator
+) => (input: any) => {
+  const {
+    declarations = {},
+    ...connDescription
+  }: AmqpSystemDescription = validateInput(input);
 
-  const close = createCloser(amqpFactory);
-  const receiver = createReceiver(amqpFactory, declarations);
-  const sender = createSender(amqpFactory, declarations);
+  const connectedFactory = createConnectedFactory(connDescription);
 
   return {
-    close,
-    receiver,
-    sender
+    close: createCloser(connectedFactory),
+    receiver: createReceiver(connectedFactory, declarations),
+    sender: createSender(connectedFactory, declarations)
   };
 };
 

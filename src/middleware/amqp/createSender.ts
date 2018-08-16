@@ -3,11 +3,11 @@ import Logger from '../../logger';
 import { Middleware } from '../../types';
 import { assertDeclarations } from './assertions';
 import {
-  IAmqpDeclarations,
-  IAmqpEngineFactory,
-  IAmqpEngineSetupFunction,
-  IAmqpMessageOut,
-  IAmqpRouteDescription
+  AmqpDeclarations,
+  AmqpEngine,
+  AmqpEngineFactory,
+  AmqpMessageOut,
+  RouteDescription
 } from './types';
 
 const log = new Logger({ label: 'createSender' });
@@ -17,7 +17,7 @@ function serializeMessage(message: string) {
 }
 
 function getRouteValues(
-  route: IAmqpRouteDescription
+  route: RouteDescription
 ): { exchange: string; key: string } {
   return typeof route === 'string'
     ? {
@@ -31,13 +31,13 @@ function getRouteValues(
 }
 
 async function setupSender(
-  createChannel: IAmqpEngineFactory,
-  declarations: IAmqpDeclarations,
-  stream: Observable<IAmqpMessageOut>
+  createChannel: AmqpEngineFactory,
+  declarations: AmqpDeclarations,
+  stream: Observable<AmqpMessageOut>
 ) {
   let subscription: Subscription;
 
-  const setupChannel: IAmqpEngineSetupFunction = async channel => {
+  const setupChannel = async (channel: AmqpEngine) => {
     await assertDeclarations(channel, declarations);
 
     // subscribe on next tick so channel is ready
@@ -74,9 +74,9 @@ async function setupSender(
 }
 
 type CreateSender = (
-  engineCreator: IAmqpEngineFactory,
-  config: IAmqpDeclarations
-) => () => Middleware<IAmqpMessageOut>;
+  engineCreator: AmqpEngineFactory,
+  config: AmqpDeclarations
+) => () => Middleware<AmqpMessageOut>;
 
 // Forward messages
 const createSender: CreateSender = (

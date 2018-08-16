@@ -1,25 +1,15 @@
 import {
-  IAmqpBinding,
-  IAmqpDeclarations,
-  IAmqpEngine,
-  IAmqpExchangeDescription,
-  IAmqpQueueDescription,
-  IAmqpQueueShortDescription
+  AmqpDeclarations,
+  AmqpEngine,
+  BindingDescription,
+  ExchangeDescription,
+  QueueDescription,
+  QueueShortDescription
 } from './types';
 
-export interface IAmqpQueueDescription {
-  name: string;
-  durable?: boolean;
-  exclusive?: boolean;
-  autoDelete?: boolean;
-  arguments?: any;
-}
-
-export type IAmqpQueueShortDescription = IAmqpQueueDescription | string;
-
 export function enrichQueue(
-  queueOrString: IAmqpQueueShortDescription
-): IAmqpQueueDescription {
+  queueOrString: QueueShortDescription
+): QueueDescription {
   return typeof queueOrString === 'string'
     ? {
         exclusive: true,
@@ -28,7 +18,7 @@ export function enrichQueue(
     : queueOrString;
 }
 
-function enrichBinding(binding: IAmqpBinding) {
+function enrichBinding(binding: BindingDescription) {
   const {
     arguments: args,
     destination = '',
@@ -46,30 +36,30 @@ function enrichBinding(binding: IAmqpBinding) {
 }
 
 export function containsQueue(
-  array: IAmqpQueueShortDescription[] = [],
-  queue: IAmqpQueueShortDescription
+  array: QueueShortDescription[] = [],
+  queue: QueueShortDescription
 ) {
   array.find(item => enrichQueue(item).name === enrichQueue(queue).name);
 }
 
 export async function assertQueue(
-  channel: IAmqpEngine,
-  queue: IAmqpQueueShortDescription
+  channel: AmqpEngine,
+  queue: QueueShortDescription
 ) {
   const { name, ...opts } = enrichQueue(queue);
   return channel.assertQueue(name, opts);
 }
 
 export async function assertQueues(
-  channel: IAmqpEngine,
-  queues: IAmqpQueueShortDescription[]
+  channel: AmqpEngine,
+  queues: QueueShortDescription[]
 ) {
   return Promise.all(queues.map(queue => assertQueue(channel, queue)));
 }
 
 export async function assertExchanges(
-  channel: IAmqpEngine,
-  exchanges: IAmqpExchangeDescription[]
+  channel: AmqpEngine,
+  exchanges: ExchangeDescription[]
 ) {
   return Promise.all(
     exchanges.map(({ name, type, ...opts }) => {
@@ -79,7 +69,7 @@ export async function assertExchanges(
 }
 
 export async function assertIfAnonymousQueue(
-  channel: IAmqpEngine,
+  channel: AmqpEngine,
   queue: string
 ) {
   if (queue !== '') {
@@ -91,8 +81,8 @@ export async function assertIfAnonymousQueue(
 }
 
 export function assertBindings(
-  channel: IAmqpEngine,
-  bindings: IAmqpBinding[],
+  channel: AmqpEngine,
+  bindings: BindingDescription[],
   defaultQueue: string
 ) {
   return Promise.all(
@@ -112,8 +102,8 @@ export function assertBindings(
 }
 
 export async function assertDeclarations(
-  channel: IAmqpEngine,
-  declarations: IAmqpDeclarations
+  channel: AmqpEngine,
+  declarations: AmqpDeclarations
 ) {
   const { queues = [], exchanges = [] } = declarations;
   return Promise.all([

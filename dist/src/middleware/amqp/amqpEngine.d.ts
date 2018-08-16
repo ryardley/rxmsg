@@ -1,2 +1,2 @@
-import { IAmqpEngineConfigurator } from './types';
-export declare const configureAmqpEngine: IAmqpEngineConfigurator;
+import { AmqpEngineFactory, ConnectionDescription } from './types';
+export declare const configureAmqpEngine: (config: ConnectionDescription) => AmqpEngineFactory;

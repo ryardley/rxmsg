@@ -23,7 +23,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const rxjs_1 = require("rxjs");
 const logger_1 = __importDefault(require("../../logger"));
 const assertions_1 = require("./assertions");
+const types_1 = require("./types");
+const validator_1 = require("./types/validator");
 const log = new logger_1.default({ label: 'createReceiver' });
+const validateInput = validator_1.createValidator(types_1.ReceiverDescriptionSchema);
 function deserialiseMessage(possiblySerialisedMessage) {
     try {
         return JSON.parse(possiblySerialisedMessage);
@@ -84,6 +87,7 @@ function setupReceiver(createChannel, declarations, localConfig, observer) {
 }
 // Recieve messages
 const createReceiver = (engineCreator, config) => receiverConfig => {
+    validateInput(receiverConfig);
     // We're all configured return the middleware
     return function messageInMiddleware( /* dummyStream */) {
         return rxjs_1.Observable.create((observer) => {

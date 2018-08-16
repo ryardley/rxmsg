@@ -17,7 +17,7 @@ describe('when the message arrives', () => {
                     }
                 ]
             },
-            uri: ''
+            uri: 'amqp://somerabbitserver'
         });
         const producer = src_1.createProducer(sender());
         producer.next({

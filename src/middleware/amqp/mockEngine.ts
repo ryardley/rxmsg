@@ -1,6 +1,6 @@
-import { IAmqpEngine, IAmqpEngineMessage, IAmqpEngineTest } from './types';
+import { AmqpEngine, AmqpProtocolMessage, AmqpTestEngine } from './types';
 
-const defaultMockEngine: IAmqpEngine = {
+const defaultMockEngine: AmqpEngine = {
   ack: () => null,
   assertExchange: () => Promise.resolve({ exchange: 'server-exchange' }),
   assertQueue: () => Promise.resolve({ queue: 'server-queue' }),
@@ -12,27 +12,27 @@ const defaultMockEngine: IAmqpEngine = {
   publish: () => true
 };
 
-export interface IMockEngineConfig {
-  onPublish?: (a: IPublishBehaviourArgs) => void;
-  decorator?: (a: IAmqpEngineTest) => IAmqpEngineTest;
-}
+export type MockEngineConfig = {
+  onPublish?: (a: PublishBehaviourArgs) => void;
+  decorator?: (a: AmqpTestEngine) => AmqpTestEngine;
+};
 
-type MessageCalback = (m: IAmqpEngineMessage) => void;
+type MessageCalback = (m: AmqpProtocolMessage) => void;
 
-interface IPublishBehaviourArgs {
+type PublishBehaviourArgs = {
   exchange: string;
   routingKey: string;
   content: Buffer;
   opts: any;
   onMessage: MessageCalback;
-}
+};
 
 const defaultPublishBehaviour = ({
   exchange,
   routingKey,
   content,
   onMessage
-}: IPublishBehaviourArgs) => {
+}: PublishBehaviourArgs) => {
   setTimeout(() => {
     // ensure a delay this will never be synchronous
     onMessage({ content, fields: { exchange, routingKey }, properties: {} });
@@ -42,7 +42,7 @@ const defaultPublishBehaviour = ({
 export function getMockEngine({
   onPublish = defaultPublishBehaviour,
   decorator = a => a
-}: IMockEngineConfig = {}) {
+}: MockEngineConfig = {}) {
   let onMessage: MessageCalback;
   let readyCallback: () => void = () => {}; // tslint:disable-line:no-empty
   return decorator({
