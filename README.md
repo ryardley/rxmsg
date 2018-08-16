@@ -1,9 +1,5 @@
 # RxJS wrapper for messaging systems
 
-_Please note this is under development I don't expect the API to change much so it is tentatively ready for careful **NON PRODUCTION USE** however there will be bugs and errors until the errors are explicitly handled in tests_
-
-### Please help track down bugs and submit PRs!!
-
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers but initially via RabbitMQ.
 
