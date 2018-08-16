@@ -35,9 +35,8 @@ At a later point we should have plugins to make it work with various messaging p
 - [x] Revisit `blockbid-tools` and ensure it supports versioning
 - [x] Implement connection resillience
 - [x] Fix concurrent connection issues
-- [ ] Guard for configuration shape
+- [x] Guard for configuration shape
 - [ ] Write docs on AMQP middleware
-- [ ] Send errors upstream
 
 ## Installation
 
