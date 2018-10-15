@@ -1,26 +1,24 @@
-/* tslint:disable:no-console */
-import { createConsumer } from '../src';
-import createAmqpConnector from '../src/middleware/amqp';
+const { createConsumer } = require("rxjs-message");
+const { createAmqpConnector } = require("rxjs-message/amqp");
 
-const RABBIT_URI =
-  'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv';
+require("dotenv").config();
 
 const { receiver } = createAmqpConnector({
   declarations: {
     queues: [
       {
         durable: false,
-        name: 'hello'
+        name: "hello"
       }
     ]
   },
-  uri: RABBIT_URI
+  uri: process.env.RABBIT_URI
 });
 
 const consumer = createConsumer(
   receiver({
     noAck: true,
-    queue: 'hello'
+    queue: "hello"
   })
 );
 
