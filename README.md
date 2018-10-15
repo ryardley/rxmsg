@@ -1,4 +1,5 @@
-# Universal messaging wrapper for RxJS
+# RxJS Message
+### A powerfully simple universal messaging wrapper for RxJS
 
 This library makes it easy to send messages in a distributed network transparent way via various brokers using RxJS streams.
 
