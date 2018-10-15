@@ -1,20 +1,18 @@
-/* tslint:disable:no-console */
-import { createProducer } from '../src';
-import createAmqpConnector from '../src/middleware/amqp';
+const { createProducer } = require("rxjs-message");
+const { createAmqpConnector } = require("rxjs-message/amqp");
 
-const RABBIT_URI =
-  'amqp://lzbwpbiv:g3FVGyfPasAwGEZ6z81PGf97xjRY-P8s@mustang.rmq.cloudamqp.com/lzbwpbiv';
+require("dotenv").config();
 
 const { sender } = createAmqpConnector({
   declarations: {
     queues: [
       {
         durable: false,
-        name: 'hello'
+        name: "hello"
       }
     ]
   },
-  uri: RABBIT_URI
+  uri: process.env.RABBIT_URI
 });
 
 const producer = createProducer(sender());
@@ -23,6 +21,6 @@ setInterval(() => {
   const hex = Math.floor(Math.random() * 16777215).toString(16);
   producer.next({
     content: `(${hex}) Hello World!`,
-    route: 'hello'
+    route: "hello"
   });
 }, 2000);

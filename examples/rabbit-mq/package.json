@@ -1,0 +1,14 @@
+{
+  "name": "foo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "consumer": "node consumer.js",
+    "producer": "node producer.js"
+  },
+  "dependencies": {
+    "dotenv": "^6.1.0",
+    "rxjs-message": "^0.0.6"
+  }
+}
