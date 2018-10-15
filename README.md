@@ -3,40 +3,6 @@
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers.
 
-### Project Principles:
-
-- Declarative over imperative.
-- Functions over classes.
-- Simplicity over complexity.
-- Immutable over mutable.
-- Flexible and composable over fixed heirarchy.
-- Pure over impure.
-- Minmalistic sensible defaults over boilerplate.
-- Idiomatic API's over reinventing the wheel.
-
-## Broker Support
-Currently we support the following brokers:
-
-- [x] AMQP / RabbitMQ
-- [ ] Kafka
-- [ ] Node Processes
-- [ ] Web Workers
-- [ ] Socket.io
-
-Is there a message broker you would like to see on this list? Want to get a specific integration sooner? 
-
-[Create an issue](/ryardley/rxjs-message/issues) or [talk to me](https://twitter.com/rudiyardley) about sponsoring this project.
-
-## Installation
-
-You can install by referencing a version tag directly off the github repo.
-
-```bash
-yarn add rxjs-message
-```
-
-## Framework Usage
-
 ```typescript
 import { createConsumer, createProducer } from 'rxjs-message';
 import { filter } from 'rxjs/opeerators';
@@ -73,54 +39,12 @@ const sub = consumer
   });
 ```
 
-### Typescript types
+## Installation
 
-#### Messages
+You can install by referencing a version tag directly off the github repo.
 
-Generic message objects look like this:
-
-```typescript
-// Generic message
-export interface IMessage {
-  content: any;
-  route?: any;
-}
-```
-
-You might use a message by sending it to the `next()` method of a producer.
-
-```typescript
-producer.next({
-  content: 'Hi there!',
-  route: 'some-queue'
-});
-```
-
-#### Middleware
-
-Middleware are effectively functions designed to decorate RxJS streams and looks like this:
-
-```typescript
-// Generic Middleware decorates a stream
-export type Middleware<T extends IMessage> = (
-  a: Observable<T>
-) => Observable<T>;
-```
-
-You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions
-
-```typescript
-import {tap} from 'rxjs/operators';
-
-function logger(stream: Observable<IMessage>) {
-  return stream
-    .pipe(tap(
-      (msg:IMessage) => console.log(`Stream logged: ${msg.content}`
-    ));
-}
-
-// Pass the middleware in order to the consumer or producer
-const consumer = createConsumer(someReceiver, logger);
+```bash
+yarn add rxjs-message
 ```
 
 ## AMQP Middleware
@@ -190,10 +114,87 @@ For usage and examples please look at the basic tests thrown together [here](tes
 1.  [Routing](test/04-routing.test.ts)
 1.  [Topics](test/05-topics.test.ts)
 
-## Environments
+
+### Usage with Typescript
+
+#### Messages
+
+Generic message objects look like this:
+
+```typescript
+// Generic message
+export interface IMessage {
+  content: any;
+  route?: any;
+}
+```
+
+You might use a message by sending it to the `next()` method of a producer.
+
+```typescript
+producer.next({
+  content: 'Hi there!',
+  route: 'some-queue'
+});
+```
+
+#### Middleware
+
+Middleware are effectively functions designed to decorate RxJS streams and looks like this:
+
+```typescript
+// Generic Middleware decorates a stream
+export type Middleware<T extends IMessage> = (
+  a: Observable<T>
+) => Observable<T>;
+```
+
+You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions
+
+```typescript
+import {tap} from 'rxjs/operators';
+
+function logger(stream: Observable<IMessage>) {
+  return stream
+    .pipe(tap(
+      (msg:IMessage) => console.log(`Stream logged: ${msg.content}`
+    ));
+}
+
+// Pass the middleware in order to the consumer or producer
+const consumer = createConsumer(someReceiver, logger);
+```
+
+
+## Project Principles:
+
+- Declarative over imperative.
+- Functions over classes.
+- Simplicity over complexity.
+- Immutable over mutable.
+- Flexible and composable over fixed heirarchy.
+- Pure over impure.
+- Minmalistic sensible defaults over boilerplate.
+- Idiomatic API's over reinventing the wheel.
+
+### Environments
 
 - Basic framework should work in all V8 environments. eg.
 - Middleware is environment specific. Eg. `rxjs-message/amqp` requires node. `rxjs-message/socketio-browser` (coming soon) requires a browser environment eg. `window`, `document` etc.
+
+
+## Broker Support
+Currently we support the following brokers:
+
+- [x] AMQP / RabbitMQ
+- [ ] Kafka
+- [ ] Node Processes
+- [ ] Web Workers
+- [ ] Socket.io
+
+Is there a message broker you would like to see on this list? Want to get a specific integration sooner? 
+
+[Create an issue](/ryardley/rxjs-message/issues) or [talk to me](https://twitter.com/rudiyardley) about sponsoring this project.
 
 ## RxJS References
 
