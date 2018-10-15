@@ -15,10 +15,11 @@
     "tsmill": "^3.1.4"
   },
   "scripts": {
-    "test": "tsm test",
-    "build": "tsm clean && tsm build",
+    "test": "./scripts/test",
+    "build": "tsm clean && ./scripts/build",
     "lint": "tsm lint",
-    "format": "tsm format"
+    "format": "tsm format",
+    "release": "./scripts/release"
   },
   "dependencies": {
     "amqp-connection-manager": "^2.1.0",
