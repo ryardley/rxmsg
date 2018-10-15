@@ -1,4 +1,4 @@
-node_modules/
+/node_modules
 *-error.log
-dist
-build
+/dist
+/build

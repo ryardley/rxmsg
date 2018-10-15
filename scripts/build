@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+BIN=./node_modules/.bin
+
+# build the package
+$BIN/tsm build
+
+# copy package.json to the built loaction
+cp package.json ./build/src
