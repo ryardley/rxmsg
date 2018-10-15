@@ -175,7 +175,16 @@ const sub = consumer.subscribe(msg => {
 sub.unsubscribe();
 ```
 
-### Example Usage AMQP Middleware
+### Getting Started Examples
+
+You can checkout the getting started example here:
+
+1. [RabbitMQ](examples/rabbit-mq)
+1. Kafka (coming soon)
+1. Threads (coming soon)
+1. Socket.IO (coming soon)
+
+### RabbitMQ Examples as tests
 
 For usage and examples please look at the basic tests thrown together [here](test)
 
