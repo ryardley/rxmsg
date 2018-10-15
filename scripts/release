@@ -23,5 +23,3 @@ cd ./build/src
 # npm version $1
 # npm publish
 # git push --tags
-
-
