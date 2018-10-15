@@ -32,12 +32,9 @@ if ! [[ $(git rev-parse HEAD) == $(git rev-parse @{u}) ]]; then
   exit 1
 fi
 
-
-
-
 ./scripts/test
 ./scripts/build
 cd ./build/src
-# npm version $1
-# npm publish
-# git push --tags
+npm version $1
+npm publish
+git push --tags
