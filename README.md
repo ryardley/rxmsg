@@ -61,8 +61,8 @@ The endpoint creators each accept a list of middleware as arguments. When the pr
 
 ```typescript
 const producer = createProducer(
-  transformMessageSomehow, // Step 1 - Do some transformation
-  broadCastsMessagesSomewhere // Step 2 - The last middleware must do the broadcasting
+  transformMessageSomehow,     // Step 1 - Do some transformation
+  broadCastsMessagesSomewhere  // Step 2 - The last middleware must do the broadcasting
 );
 ```
 
@@ -70,8 +70,8 @@ const producer = createProducer(
 ```typescript
 const consumer = createConsumer(
   receivesMessagesFromSomewhere, // Step 1 - The first middleware must emit the message.
-  logOrTransformMessage, // Step 2 - Send the message to a logger.
-  doSomeMoreTransformation // Step 3 - Run another transform on the message before subscription.
+  logOrTransformMessage,         // Step 2 - Perhaps send the message to a logger.
+  doSomeMoreTransformation       // Step 3 - Run another transform on the message before subscription.
 );
 ```
 
@@ -85,6 +85,26 @@ const sub = consumer
   .subscribe(msg => {
     console.log(`Received: ${msg.content}`);
   });
+```
+
+### Creating your own Middleware
+
+Middleware are effectively functions designed to decorate RxJS streams and looks like this:
+
+```typescript
+type Middleware = (stream: Observable) => Observable;
+```
+
+You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions. Here is an example logging middleware:
+
+```typescript
+function logger(stream) {
+  return stream.pipe(
+    tap(
+      (msg) => console.log(`Stream logged: ${msg.content}`
+    )
+  );
+}
 ```
 
 ## Installation
@@ -141,33 +161,6 @@ producer.next({
   content: 'Hi there!',
   route: 'some-queue'
 });
-```
-
-#### Middleware
-
-Middleware are effectively functions designed to decorate RxJS streams and looks like this:
-
-```typescript
-// Generic Middleware decorates a stream
-export type Middleware<T extends IMessage> = (
-  a: Observable<T>
-) => Observable<T>;
-```
-
-You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions
-
-```typescript
-import {tap} from 'rxjs/operators';
-
-function logger(stream: Observable<IMessage>) {
-  return stream
-    .pipe(tap(
-      (msg:IMessage) => console.log(`Stream logged: ${msg.content}`
-    ));
-}
-
-// Pass the middleware in order to the consumer or producer
-const consumer = createConsumer(someReceiver, logger);
 ```
 
 
