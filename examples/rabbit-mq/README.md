@@ -1,4 +1,4 @@
-# rxjs-message Rabbit MQ example
+# RxJS-Message Rabbit MQ example
 
 ## Install the example
 
@@ -11,13 +11,13 @@ git clone git@github.com:ryardley/rxjs-message.git
 Move to the folder
 
 ```bash
-cd rxjs-message/examples/rabbit-mq
+cd ./rxjs-message/examples/rabbit-mq
 ```
 
 Install dependencies
 
 ```
-npm install
+yarn
 ```
 
 ## Run this example
@@ -26,30 +26,29 @@ Setup a RabbitMQ server somewhere and get a connection string.
 
 I suggest trying a service such as https://www.cloudamqp.com/
 
-Create an env file with your Rabbit connection string and save it to `.env`:
-
-`.env`
+Create an env file with your Rabbit connection string and save it to a file called `.env`:
 
 ```bash
+# .env
 RABBIT_URI=amqp://xxxxxx:xxxxxxx@mustang.rmq.cloudamqp.com/xxxxxxx
 ```
 
 Run the consumer:
 
 ```
-$ npm run consumer
+$ yarn consumer
 INFO: Connected!
 ```
 
 Then in a new terminal try running the producer
 
 ```bash
-$ npm run producer
+$ yarn producer
 INFO: Connected!
 INFO: Publishing message: {"content":"(455705) Hello World!"}
 INFO: Publishing message: {"content":"(685c08) Hello World!"}
 INFO: Publishing message: {"content":"(3cb1ef) Hello World!"}
-...
+ ...
 ```
 
 You should see the consumer get the messages:
@@ -60,5 +59,5 @@ INFO: Connected!
 Received: "(455705) Hello World!"
 Received: "(685c08) Hello World!"
 Received: "(3cb1ef) Hello World!"
-...
+ ...
 ```
