@@ -89,7 +89,7 @@ const sub = consumer
 
 ### Creating your own Middleware
 
-Middleware are effectively functions designed to decorate RxJS streams and looks like this:
+Middleware is simple and are effectively functions designed to decorate RxJS streams and looks like this:
 
 ```typescript
 type Middleware = (stream: Observable) => Observable;
