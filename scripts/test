@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+BIN=./node_modules/.bin
+
+# build the package
+$BIN/tsm test

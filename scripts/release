@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -e
+usage() {
+  echo ""
+  echo " ======================="
+  echo "  Release Script Usage: "
+  echo " ======================="
+  echo ""
+  echo " ./scripts/release <patch|minor|major>"
+  echo ""
+}
+
+
+if ! [[ "$1" =~ ^(patch|minor|major)$ ]]; then
+  usage
+  exit 1
+fi
+
+if [[ "master" != $(git branch | sed -n -e 's/^\* \(.*\)/\1/p') ]]; then
+  echo "Branch is not master"
+  exit 1
+fi
+
+if ! [[ -z $(git status -s) ]]; then
+  echo "Branch status is not clean."
+  exit 1
+fi
+
+if ! [[ $(git rev-parse HEAD) == $(git rev-parse @{u}) ]]; then
+  echo "Branch is not up to date."
+  exit 1
+fi
+
+./scripts/test
+npm version $1
+./scripts/build
+cd ./build/src
+npm publish
+git push --tags

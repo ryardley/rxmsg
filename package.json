@@ -1,0 +1,31 @@
+{
+  "name": "rxjs-message",
+  "version": "0.0.5",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/amqp-connection-manager": "^2.0.1",
+    "@types/amqplib": "^0.5.8",
+    "@types/lodash": "^4.14.115",
+    "@types/minimatch": "^3.0.3",
+    "@types/rx": "^4.1.1",
+    "minimatch": "^3.0.4",
+    "ts-node": "^7.0.0",
+    "tslint-config-prettier": "^1.15.0",
+    "tsmill": "^3.1.4"
+  },
+  "scripts": {
+    "test": "./scripts/test",
+    "build": "tsm clean && ./scripts/build",
+    "lint": "tsm lint",
+    "format": "tsm format",
+    "release": "./scripts/release"
+  },
+  "dependencies": {
+    "amqp-connection-manager": "^2.1.0",
+    "amqplib": "^0.5.2",
+    "lodash": "^4.17.10",
+    "runtypes": "^2.1.6",
+    "rxjs": "^6.2.2"
+  }
+}
