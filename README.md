@@ -3,19 +3,7 @@
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers.
 
-#### Brokers
-Currently we support the following brokers:
-
-- [x] AMQP / RabbitMQ
-- [ ] Kafka
-- [ ] Node Processes
-- [ ] Web Workers
-- [ ] Socket.io
-
-Is there a message broker or paradigm that is not on this list you would like? Would you like to get a plugin created? 
-Hit me up over twitter: https://twitter.com/rudiyardley and we can talk about sponsoring this project.
-
-#### Principles:
+### Project Principles:
 
 - Declarative over imperative.
 - Functions over classes.
@@ -26,14 +14,18 @@ Hit me up over twitter: https://twitter.com/rudiyardley and we can talk about sp
 - Minmalistic sensible defaults over boilerplate.
 - Idiomatic API's over reinventing the wheel.
 
-#### Environments
+## Broker Support
+Currently we support the following brokers:
 
-- Basic framework should work in all V8 environments. eg.
-- Middleware might be environment specific. Eg. `rxjs-message/amqp` requires node. `rxjs-message/socketio-browser` may require browser objects. (YTBI)
+- [x] AMQP / RabbitMQ
+- [ ] Kafka
+- [ ] Node Processes
+- [ ] Web Workers
+- [ ] Socket.io
 
-#### TODO
+Is there a message broker you would like to see on this list? Want to get a specific integration sooner? 
 
-- [ ] Write docs on AMQP middleware
+[Create an issue](/ryardley/rxjs-message/issues) or [talk to me](https://twitter.com/rudiyardley) about sponsoring this project.
 
 ## Installation
 
@@ -197,6 +189,11 @@ For usage and examples please look at the basic tests thrown together [here](tes
 1.  [PubSub](test/03-publish-subscribe.test.ts)
 1.  [Routing](test/04-routing.test.ts)
 1.  [Topics](test/05-topics.test.ts)
+
+## Environments
+
+- Basic framework should work in all V8 environments. eg.
+- Middleware is environment specific. Eg. `rxjs-message/amqp` requires node. `rxjs-message/socketio-browser` (coming soon) requires a browser environment eg. `window`, `document` etc.
 
 ## RxJS References
 
