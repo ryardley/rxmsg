@@ -1,4 +1,4 @@
-![RxJS Message Diagram](docs/images/diagram.png)
+![RxJS Message Diagram](docs/images/diagram.png?123)
 
 # RxJS Message
 
