@@ -81,10 +81,14 @@ const sub = consumer
 
 ## Installation
 
-You can install by referencing a version tag directly off the github repo.
+You can install over npm.
 
 ```bash
 yarn add rxjs-message
+```
+
+```bash
+npm install rxjs-message --save
 ```
 
 ## AMQP Middleware
