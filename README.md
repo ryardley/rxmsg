@@ -3,7 +3,7 @@
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers.
 
-#### Roadmap
+#### Brokers
 Currently we support the following brokers:
 
 - [x] AMQP / RabbitMQ
