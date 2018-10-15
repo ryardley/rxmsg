@@ -38,7 +38,7 @@ consumer.subscribe(msg => {
 });
 ```
 
-## Configuration
+## AMQP Specific Configuration
 
 ```typescript
 module.exports.amqpConfig = {
