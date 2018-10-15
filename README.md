@@ -4,14 +4,15 @@ This library makes it easy to send messages in a distributed network transparent
 way via various brokers.
 
 #### Roadmap
-
-At a later point we should have plugins to make it work with various messaging paradigms:
+The infrastructure is sound. We just need to create plugins for various messaging systems:
 
 - [x] AMQP / RabbitMQ
 - [ ] Kafka
 - [ ] Node Processes
 - [ ] Web Workers
 - [ ] Socket.io
+
+PRs and issues accepted.
 
 Do you need this functionality? You can sponsor development of this package by messaging me over twitter: https://twitter.com/rudiyardley
 
