@@ -36,12 +36,15 @@ const consumer = createConsumer(
   createAmqpConnector({
     declarations,
     uri: 'amqp://user:password@somerabbitserver.io/user'
-  }).receiver()
+  }).receiver({
+    queue: 'hello'
+  })
 );
 
 // RxJS observable
 consumer.subscribe(msg => {
   console.log(`Received: ${msg.content}`);
+  msg.ack();
 });
 ```
 
