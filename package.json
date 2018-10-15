@@ -1,5 +1,5 @@
 {
-  "name": "blockbid-message",
+  "name": "rxjs-message",
   "version": "6.0.1",
   "main": "dist/src/index.js",
   "license": "MIT",
@@ -9,16 +9,15 @@
     "@types/lodash": "^4.14.115",
     "@types/minimatch": "^3.0.3",
     "@types/rx": "^4.1.1",
-    "blockbid-tools": "blockbid/blockbid-tools#v1.1.0",
     "minimatch": "^3.0.4",
-    "ts-node": "^7.0.0"
+    "ts-node": "^7.0.0",
+    "tsmill": "^3.1.4"
   },
   "scripts": {
-    "test": "bbt test",
-    "build": "rm -rf ./dist && bbt build",
-    "lint": "bbt lint",
-    "format": "bbt format",
-    "release": "bbt test && bbt publish"
+    "test": "tsm test",
+    "build": "tsm clean && tsm build",
+    "lint": "tsm lint",
+    "format": "tsm format"
   },
   "dependencies": {
     "amqp-connection-manager": "^2.1.0",

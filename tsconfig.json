@@ -10,7 +10,7 @@
     "noUnusedLocals": true,
     "strictNullChecks": true,
     "noUnusedParameters": true,
-    "outDir": "dist",
+    "outDir": "build",
     "paths": {
       "*": ["node_modules/*", "src/types/*"]
     },
