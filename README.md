@@ -3,9 +3,9 @@
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers.
 
-RxJS Message uses a middleware pattern to make creating messaging endpoints extremely flexible and versatile. 
+RxJS Message uses a versatile middleware pattern to create messaging endpoints that are extremely flexible. 
 
-## Send a message
+## Sending a message
 
 ```typescript
 import { createProducer } from 'rxjs-message';
@@ -24,7 +24,7 @@ const producer = createProducer(
 producer.next({content: 'Hello World!', route: 'hello');
 ```
 
-## Receive a message
+## Receiving a message
 
 ```typescript
 import { createConsumer } from 'rxjs-message';
@@ -45,37 +45,33 @@ consumer.subscribe(msg => {
 });
 ```
 
-## Some more detail
+## Using Middleware
+
+The endpoint creators each accept a list of middleware as arguments. When the producer sends a message it passes top down through the list of middleware.
+
+### Producer middleware
 
 ```typescript
-import { createConsumer, createProducer } from 'rxjs-message';
-import { filter } from 'rxjs/opeerators';
-
-// createProducer accepts a list of middleware
-// the message passes top down
-// It returns an RxJS Observer that sends messages
 const producer = createProducer(
-  transformMessageSomehow,
-  broadCastsMessagesSomewhere
+  transformMessageSomehow, // Step 1 - Do some transformation
+  broadCastsMessagesSomewhere // Step 2 - The last middleware must do the broadcasting
 );
+```
 
-// createConsumer also accepts a list of middleware
-// the message also passes top down
-// It returns an RxJS Observable that will receive the message
+### Consumer middleware
+```typescript
 const consumer = createConsumer(
-  receivesMessagesFromSomewhere,
-  logOrTransformMessage,
-  doSomeMoreTransformation
+  receivesMessagesFromSomewhere, // Step 1 - The first middleware must emit the message.
+  logOrTransformMessage, // Step 2 - Send the message to a logger.
+  doSomeMoreTransformation // Step 3 - Run another transform on the message before subscription.
 );
+```
 
-// Use RxJS's Observable#next() method to send a message
-producer.next({
-  content: 'Hello World!',
-  route: 'hello'
-});
+### Manipulating messages
 
-// Note that because consumer is simply an RxJS observable
-// you can apply filtering and throttling or do whatever you want to it
+Note that because consumer is simply an RxJS observable you can apply filtering and throttling or do whatever you want to it
+
+```typescript
 const sub = consumer
   .pipe(filter(msg => msg.content.toLowerCase().includes('world')))
   .subscribe(msg => {
