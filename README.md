@@ -92,13 +92,13 @@ const sub = consumer
 
 ### Creating your own Middleware
 
-Middleware is simple and are effectively functions designed to decorate RxJS streams and looks like this:
+Middlewares are simple as they are only functions designed to decorate RxJS streams. Here is how you would describe them in TypeScript:
 
 ```typescript
 type Middleware = (stream: Observable) => Observable;
 ```
 
-You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions. Here is an example logging middleware:
+Here is an example:
 
 ```typescript
 function logger(stream) {
@@ -108,6 +108,15 @@ function logger(stream) {
     )
   );
 }
+```
+
+You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions.  
+
+```typescript
+const consumer = createConsumer(
+  amqpReceiver,
+  logger
+);
 ```
 
 ## Installation
