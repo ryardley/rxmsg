@@ -3,6 +3,9 @@
   "version": "1.0.1",
   "main": "index.js",
   "license": "MIT",
+  "repository": {
+    "url": "https://github.com/ryardley/rxjs-message"
+  },
   "devDependencies": {
     "@types/amqp-connection-manager": "^2.0.1",
     "@types/amqplib": "^0.5.8",
