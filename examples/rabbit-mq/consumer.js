@@ -1,28 +1,13 @@
-const { createConsumer } = require("rxjs-message");
-const { createAmqpConnector } = require("rxjs-message/amqp");
+const { createConsumer } = require('rxjs-message');
+const { createAmqpConnector } = require('rxjs-message/amqp');
+const { amqpConfig } = require('./amqpConfig');
 
-require("dotenv").config();
-
-const { receiver } = createAmqpConnector({
-  declarations: {
-    queues: [
-      {
-        durable: false,
-        name: "hello"
-      }
-    ]
-  },
-  uri: process.env.RABBIT_URI
+const middleware = createAmqpConnector(amqpConfig).receiver({
+  noAck: true,
+  queue: 'hello'
 });
-
-const consumer = createConsumer(
-  receiver({
-    noAck: true,
-    queue: "hello"
-  })
-);
+const consumer = createConsumer(middleware);
 
 consumer.subscribe(msg => {
-  // Check msg.content
   console.log(`Received: "${msg.content}"`);
 });
