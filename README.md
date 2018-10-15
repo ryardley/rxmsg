@@ -1,4 +1,4 @@
-# RxJS wrapper for messaging systems
+# Universal RxJS messaging wrapper
 
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers but initially via RabbitMQ.
