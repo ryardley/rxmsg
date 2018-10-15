@@ -1,5 +1,8 @@
+![RxJS Message Diagram](docs/images/diagram.png)
+
 # RxJS Message
-### A powerfully simple universal messaging wrapper for RxJS
+
+### A powerfully simple universal messaging wrapper
 
 This library makes it easy to send messages in a distributed network transparent way via various brokers using RxJS streams.
 
