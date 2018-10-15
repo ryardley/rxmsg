@@ -9,7 +9,8 @@ At a later point we should have plugins to make it work with various messaging p
 
 - [x] AMQP
 - [ ] Kafka
-- [ ] Communicate locally between threads / workers
+- [ ] threads
+- [ ] workers
 - [ ] socket.io (browser/server)
 
 #### Principles:
