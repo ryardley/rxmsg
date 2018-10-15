@@ -8,17 +8,12 @@ RxJS Message uses a versatile middleware pattern to create messaging endpoints t
 ## Sending a message
 
 ```typescript
-import { createProducer } from 'rxjs-message';
-import { createAmqpConnector } from 'rxjs-message/amqp';
+const { createProducer } = require('rxjs-message');
+const { createAmqpConnector } = require('rxjs-message/amqp');
+const { amqpConfig } = require('./amqpConfig');
 
-import declarations from './declareHelloQueue';
-
-const producer = createProducer(
-  createAmqpConnector({
-    declarations,
-    uri: 'amqp://user:password@somerabbitserver.io/user'
-  }).sender()
-);
+const middleware = createAmqpConnector(amqpConfig).sender();
+const producer = createProducer(middleware);
 
 // RxJS observer
 producer.next({content: 'Hello World!', route: 'hello');
@@ -27,25 +22,35 @@ producer.next({content: 'Hello World!', route: 'hello');
 ## Receiving a message
 
 ```typescript
-import { createConsumer } from 'rxjs-message';
-import { createAmqpConnector } from 'rxjs-message/amqp';
+const { createConsumer } = require('rxjs-message');
+const { createAmqpConnector } = require('rxjs-message/amqp');
+const { amqpConfig } = require('./amqpConfig');
 
-import declarations from './declareHelloQueue';
-
-const consumer = createConsumer(
-  createAmqpConnector({
-    declarations,
-    uri: 'amqp://user:password@somerabbitserver.io/user'
-  }).receiver({
-    queue: 'hello'
-  })
-);
+const middleware = createAmqpConnector(amqpConfig).receiver({ noAck: true, queue: 'hello' });
+const consumer = createConsumer(middleware);
 
 // RxJS observable
 consumer.subscribe(msg => {
-  console.log(`Received: ${msg.content}`);
-  msg.ack();
+  console.log(`Received: "${msg.content}"`);
 });
+```
+
+## Configuration
+
+```typescript
+module.exports.amqpConfig = {
+  declarations: {
+    // List the queues, exchanges etc. you want to use here.
+    queues: [ 
+      {
+        durable: false,
+        name: 'hello'
+      }
+    ]
+  },
+  uri: 'amqp://user:password@somerabbitserver.io/user'
+};
+
 ```
 
 ## Using Middleware
@@ -92,53 +97,6 @@ yarn add rxjs-message
 
 ```bash
 npm install rxjs-message --save
-```
-
-## AMQP Middleware
-
-AMQP Middleware is designed to work in Node environments only due to limitations with the amqplib package it is based on.
-
-### Basic Usecase with amqp middleware
-
-```javascript
-import { createConsumer, createProducer } from 'rxjs-message';
-
-import { createAmqpConnector } from 'rxjs-message/amqp';
-
-const { sender, receiver } = createAmqpConnector({
-  declarations: {
-    // This declares the queue you want to use
-    queues: [
-      {
-        durable: false,
-        name: 'hello'
-      }
-    ]
-  },
-  uri: 'amqp://user:password@somerabbitserver.io/user'
-});
-
-// Here is an RxJS Observer that sends the message
-const producer = createProducer(sender());
-
-producer.next({
-  content: 'Hello World!',
-  route: 'hello'
-});
-
-// Here is an RxJS Observable that will receive the message
-const consumer = createConsumer(
-  receiver({
-    noAck: true,
-    queue: 'hello'
-  })
-);
-
-const sub = consumer.subscribe(msg => {
-  console.log(`Received: ${msg.content}`);
-});
-
-sub.unsubscribe();
 ```
 
 ### Getting Started Examples
