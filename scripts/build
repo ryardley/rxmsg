@@ -9,3 +9,4 @@ $BIN/tsm build
 
 # copy package.json to the built loaction
 cp package.json ./build/src
+cp README.md ./build/src
