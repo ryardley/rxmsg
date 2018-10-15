@@ -3,6 +3,50 @@
 This library makes it easy to send messages in a distributed network transparent
 way via various brokers.
 
+RxJS Message uses a middleware pattern to make creating messaging endpoints extremely flexible and versatile. 
+
+## Send a message
+
+```typescript
+import { createProducer } from 'rxjs-message';
+import { createAmqpConnector } from 'rxjs-message/amqp';
+
+import declarations from './declareHelloQueue';
+
+const producer = createProducer(
+  createAmqpConnector({
+    declarations,
+    uri: 'amqp://user:password@somerabbitserver.io/user'
+  }).sender()
+);
+
+// RxJS observer
+producer.next({content: 'Hello World!', route: 'hello');
+```
+
+## Receive a message
+
+```typescript
+import { createConsumer } from 'rxjs-message';
+import { createAmqpConnector } from 'rxjs-message/amqp';
+
+import declarations from './declareHelloQueue';
+
+const consumer = createConsumer(
+  createAmqpConnector({
+    declarations,
+    uri: 'amqp://user:password@somerabbitserver.io/user'
+  }).receiver()
+);
+
+// RxJS observable
+consumer.subscribe(msg => {
+  console.log(`Received: ${msg.content}`);
+});
+```
+
+## Some more detail
+
 ```typescript
 import { createConsumer, createProducer } from 'rxjs-message';
 import { filter } from 'rxjs/opeerators';
