@@ -26,16 +26,10 @@ At a later point we should have plugins to make it work with various messaging p
 #### Environments
 
 - Basic framework should work in all V8 environments. eg.
-- Middleware might be environment specific. Eg. `blockbid-messages/amqp` requires node. `blockbid-messages/socketio-browser` may require browser objects. (YTBI)
+- Middleware might be environment specific. Eg. `rxjs-message/amqp` requires node. `rxjs-message/socketio-browser` may require browser objects. (YTBI)
 
 #### TODO
 
-- [x] Mock out tests properly
-- [x] Export proper typescript types
-- [x] Revisit `blockbid-tools` and ensure it supports versioning
-- [x] Implement connection resillience
-- [x] Fix concurrent connection issues
-- [x] Guard for configuration shape
 - [ ] Write docs on AMQP middleware
 
 ## Installation
@@ -43,13 +37,13 @@ At a later point we should have plugins to make it work with various messaging p
 You can install by referencing a version tag directly off the github repo.
 
 ```bash
-yarn add blockbid/blockbid-message#<semverish>
+yarn add rxjs-message
 ```
 
 ## Framework Usage
 
 ```typescript
-import { createConsumer, createProducer } from 'blockbid-message';
+import { createConsumer, createProducer } from 'rxjs-message';
 import { filter } from 'rxjs/opeerators';
 
 // createProducer accepts a list of middleware
@@ -141,9 +135,9 @@ AMQP Middleware is designed to work in Node environments only due to limitations
 ### Basic Usecase with amqp middleware
 
 ```javascript
-import { createConsumer, createProducer } from 'blockbid-message';
+import { createConsumer, createProducer } from 'rxjs-message';
 
-import { createAmqpConnector } from 'blockbid-message/amqp';
+import { createAmqpConnector } from 'rxjs-message/amqp';
 
 const { sender, receiver } = createAmqpConnector({
   declarations: {
@@ -205,7 +199,7 @@ For usage and examples please look at the basic tests thrown together [here](tes
 
 ### NOTE: Using version 6
 
-`blockbid-message` uses **RxJS v6.0** so you need to pipe all your operators:
+`rxjs-message` uses **RxJS v6.0** so you need to pipe all your operators:
 
 ```typescript
 import { filter } from 'rxjs/operators';

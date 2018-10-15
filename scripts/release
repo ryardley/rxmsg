@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+usage() {
+  echo ""
+  echo " ======================="
+  echo "  Release Script Usage: "
+  echo " ======================="
+  echo ""
+  echo " ./scripts/release <patch|minor|major>"
+  echo ""
+}
+
+
+if ! [[ "$1" =~ ^(patch|minor|major)$ ]]; then
+  usage
+  exit 1
+fi
+
+./scripts/test
+./scripts/build
+cd ./build/src
+# npm version $1
+# npm publish
+# git push --tags
+
+

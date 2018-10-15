@@ -1,5 +1,3 @@
-// TODO: Centralise blockbid-logging
-//       this follows a similar interface to https://github.com/Blockbid/blockbid-api-gateway/blob/develop/lib/logger/index.js
 /* tslint:disable:no-console */
 class Logger {
   public label: string;

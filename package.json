@@ -1,7 +1,7 @@
 {
   "name": "rxjs-message",
-  "version": "6.0.1",
-  "main": "dist/src/index.js",
+  "version": "0.0.0",
+  "main": "index.js",
   "license": "MIT",
   "devDependencies": {
     "@types/amqp-connection-manager": "^2.0.1",
@@ -11,6 +11,7 @@
     "@types/rx": "^4.1.1",
     "minimatch": "^3.0.4",
     "ts-node": "^7.0.0",
+    "tslint-config-prettier": "^1.15.0",
     "tsmill": "^3.1.4"
   },
   "scripts": {

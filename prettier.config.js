@@ -1,1 +1,4 @@
-module.exports = require("tslint-config-blockbid/prettier");
+module.exports = {
+  semi: true,
+  singleQuote: true
+};
