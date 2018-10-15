@@ -7,11 +7,13 @@ way via various brokers.
 
 At a later point we should have plugins to make it work with various messaging paradigms:
 
-- [x] AMQP
+- [x] AMQP / RabbitMQ
 - [ ] Kafka
-- [ ] threads
-- [ ] workers
-- [ ] socket.io (browser/server)
+- [ ] Node Processes
+- [ ] Web Workers
+- [ ] Socket.io
+
+Do you need this functionality? You can sponsor development of this package by messaging me over twitter: https://twitter.com/rudiyardley
 
 #### Principles:
 
@@ -182,8 +184,9 @@ You can checkout the getting started example here:
 
 1. [RabbitMQ](examples/rabbit-mq)
 1. Kafka (coming soon)
-1. Threads (coming soon)
-1. Socket.IO (coming soon)
+1. Node Processes (coming soon)
+1. Web Workers (coming soon)
+1. Socket.io (coming soon)
 
 ### RabbitMQ Examples as tests
 
