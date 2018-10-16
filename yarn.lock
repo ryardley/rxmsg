@@ -4446,8 +4446,8 @@ runtypes@^2.1.6:
   resolved "https://registry.yarnpkg.com/runtypes/-/runtypes-2.1.6.tgz#66442347a5ea322788fd32a1480dcdf216c1dfc5"
 
 rxjs@^6.2.2:
-  version "6.2.2"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.2.2.tgz#eb75fa3c186ff5289907d06483a77884586e1cf9"
+  version "6.3.3"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.3.3.tgz#3c6a7fa420e844a81390fb1158a9ec614f4bad55"
   dependencies:
     tslib "^1.9.0"
 
