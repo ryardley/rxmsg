@@ -1,6 +1,6 @@
 ![RxJS Message Diagram](docs/images/diagram.png?123)
 
-# RxJS Message
+# RxMsg
 
 ### A powerfully simple universal messaging wrapper
 
