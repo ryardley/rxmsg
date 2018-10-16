@@ -1,10 +1,10 @@
 {
-  "name": "rxjs-message",
+  "name": "rxmsg",
   "version": "1.1.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/ryardley/rxjs-message"
+    "url": "https://github.com/ryardley/rxmsg"
   },
   "devDependencies": {
     "@types/amqp-connection-manager": "^2.0.1",

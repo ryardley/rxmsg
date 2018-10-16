@@ -1,17 +1,17 @@
-# RxJS-Message Rabbit MQ example
+# rxmsg Rabbit MQ example
 
 ## Install the example
 
 Clone the repo
 
 ```bash
-git clone git@github.com:ryardley/rxjs-message.git
+git clone git@github.com:ryardley/rxmsg.git
 ```
 
 Move to the folder
 
 ```bash
-cd ./rxjs-message/examples/rabbit-mq
+cd ./rxmsg/examples/rabbit-mq
 ```
 
 Install dependencies

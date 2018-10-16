@@ -11,8 +11,8 @@ RxJS Message uses a versatile middleware pattern to create messaging endpoints t
 ## Sending a message
 
 ```typescript
-const { createProducer } = require('rxjs-message');
-const { createAmqpConnector } = require('rxjs-message/amqp');
+const { createProducer } = require('rxmsg');
+const { createAmqpConnector } = require('rxmsg/amqp');
 const { amqpConfig } = require('./amqpConfig');
 
 const middleware = createAmqpConnector(amqpConfig).sender();
@@ -25,8 +25,8 @@ producer.next({content: 'Hello World!', route: 'hello');
 ## Receiving a message
 
 ```typescript
-const { createConsumer } = require('rxjs-message');
-const { createAmqpConnector } = require('rxjs-message/amqp');
+const { createConsumer } = require('rxmsg');
+const { createAmqpConnector } = require('rxmsg/amqp');
 const { amqpConfig } = require('./amqpConfig');
 
 const middleware = createAmqpConnector(amqpConfig).receiver({ noAck: true, queue: 'hello' });
@@ -124,11 +124,11 @@ const consumer = createConsumer(
 You can install over npm.
 
 ```bash
-yarn add rxjs-message
+yarn add rxmsg
 ```
 
 ```bash
-npm install rxjs-message --save
+npm install rxmsg --save
 ```
 
 ### Getting Started Examples
@@ -190,7 +190,7 @@ producer.next({
 ### Environments
 
 - Basic framework should work in all V8 environments. eg.
-- Middleware is environment specific. Eg. `rxjs-message/amqp` requires node. `rxjs-message/socketio-browser` (coming soon) requires a browser environment eg. `window`, `document` etc.
+- Middleware is environment specific. Eg. `rxmsg/amqp` requires node. `rxmsg/socketio-browser` (coming soon) requires a browser environment eg. `window`, `document` etc.
 
 
 ## Broker Support
@@ -204,7 +204,7 @@ Currently we support the following brokers:
 
 Is there a message broker you would like to see on this list? Want to get a specific integration sooner? 
 
-[Create an issue](/ryardley/rxjs-message/issues) or [talk to me](https://twitter.com/rudiyardley) about sponsoring this project.
+[Create an issue](/ryardley/rxmsg/issues) or [talk to me](https://twitter.com/rudiyardley) about sponsoring this project.
 
 ## RxJS References
 
@@ -220,7 +220,7 @@ Is there a message broker you would like to see on this list? Want to get a spec
 
 ### NOTE: Using version 6
 
-`rxjs-message` uses **RxJS v6.0** so you need to pipe all your operators:
+`rxmsg` uses **RxJS v6.0** so you need to pipe all your operators:
 
 ```typescript
 import { filter } from 'rxjs/operators';
