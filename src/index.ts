@@ -1,2 +1,2 @@
-export { createProducer } from './producer';
-export { createConsumer } from './consumer';
+export { createProducer } from './endpoints/producer';
+export { createConsumer } from './endpoints/consumer';

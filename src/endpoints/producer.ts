@@ -1,6 +1,6 @@
 import { Observer, ReplaySubject } from 'rxjs';
-import { combineMiddleware } from './middleware';
-import { IMessage, Middleware } from './types';
+import { combineMiddleware } from '../middleware/middleware';
+import { IMessage, Middleware } from '../types';
 
 export function createProducer<T extends IMessage>(
   ...middleware: Array<Middleware<T>>

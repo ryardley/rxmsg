@@ -1,6 +1,6 @@
 import { Observable, Subscription } from 'rxjs';
-import Logger from '../../logger';
 import { Middleware } from '../../types';
+import Logger from '../../utils/logger';
 import { assertDeclarations } from './assertions';
 import {
   AmqpDeclarations,

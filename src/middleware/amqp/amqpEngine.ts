@@ -3,7 +3,7 @@ import * as amqp from 'amqp-connection-manager';
 import * as amqplib from 'amqplib';
 import { AmqpEngine, AmqpEngineFactory, ConnectionDescription } from './types';
 
-import Logger from '../../logger';
+import Logger from '../../utils/logger';
 const log = new Logger({ label: 'amqpEngine' });
 
 function ensureArray(possibleArray: string[] | string): string[] {
