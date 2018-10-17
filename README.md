@@ -78,18 +78,6 @@ const consumer = createConsumer(
 );
 ```
 
-### Manipulating messages
-
-Note that because consumer is simply an RxJS observable you can apply filtering and throttling or do whatever you want to it
-
-```typescript
-const sub = consumer
-  .pipe(filter(msg => msg.content.toLowerCase().includes('world')))
-  .subscribe(msg => {
-    console.log(`Received: ${msg.content}`);
-  });
-```
-
 ### Creating your own Middleware
 
 Middlewares are simple as they are only functions designed to decorate RxJS streams. Here is how you would describe them in TypeScript:
@@ -117,6 +105,18 @@ const consumer = createConsumer(
   amqpReceiver,
   logger
 );
+```
+
+### Manipulating messages
+
+Note that because consumer is simply an RxJS observable you can apply filtering and throttling or do whatever you want to it
+
+```typescript
+const sub = consumer
+  .pipe(filter(msg => msg.content.toLowerCase().includes('world')))
+  .subscribe(msg => {
+    console.log(`Received: ${msg.content}`);
+  });
 ```
 
 ## Installation
