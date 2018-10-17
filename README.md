@@ -2,7 +2,7 @@
 
 # RxMsg
 
-### A powerfully simple universal messaging wrapper
+### A powerfully simple universal messaging abstraction for JavaScript and TypeScript
 
 This library makes it easy to send messages in a distributed network transparent way via various brokers using RxJS streams.
 
@@ -85,10 +85,10 @@ const consumer = createConsumer(
 
 ### Creating your own Middleware
 
-Middlewares are simple as they are only functions designed to decorate RxJS streams. Here is how you would describe them in TypeScript:
+Middleware is simple as they are only functions designed to decorate RxJS streams. Here is their signature:
 
 ```typescript
-type Middleware = (stream: Observable) => Observable;
+type Middleware<T> = (stream: Observable<T>) => Observable<T>;
 ```
 
 Here is an example:
