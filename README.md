@@ -2,7 +2,7 @@
 
 # RxMsg
 
-### A powerfully simple universal messaging abstraction for JavaScript and TypeScript
+### A powerfull and simple universal messaging abstraction
 
 This library makes it easy to send messages in a distributed network transparent way via various brokers using RxJS streams.
 
