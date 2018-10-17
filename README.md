@@ -211,6 +211,9 @@ Is there a message broker you would like to see on this list? Want to get a spec
 
 [Create an issue](/ryardley/rxmsg/issues) or [talk to me](https://twitter.com/rudiyardley) about sponsoring this project.
 
+## Architectural Roadmap
+- [ ] Refactor to lerna
+
 ## RxJS References
 
 ### Docs
