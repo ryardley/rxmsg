@@ -62,6 +62,8 @@ The endpoint creators each accept a list of middleware as arguments. When the pr
 
 ### Producer middleware
 
+Messages come into the system top to bottom. In this case from a `producer.next(msg)` call.
+
 ```typescript
 const producer = createProducer(
   transformMessageSomehow,     // Step 1 - Do some transformation
@@ -70,6 +72,9 @@ const producer = createProducer(
 ```
 
 ### Consumer middleware
+
+Again, messages come into the system top to bottom. Here this would be from an external broker via the top middleware.
+
 ```typescript
 const consumer = createConsumer(
   receivesMessagesFromSomewhere, // Step 1 - The first middleware must emit the message.
