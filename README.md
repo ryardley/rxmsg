@@ -38,7 +38,7 @@ consumer.subscribe(msg => {
 });
 ```
 
-## AMQP Specific Configuration
+## Configure your broker 
 
 ```typescript
 module.exports.amqpConfig = {
