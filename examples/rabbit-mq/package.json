@@ -8,7 +8,6 @@
     "producer": "node producer.js"
   },
   "dependencies": {
-    "dotenv": "^6.1.0",
-    "rxmsg": "^2.0.0"
+    "dotenv": "^6.1.0"
   }
 }
