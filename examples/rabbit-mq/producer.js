@@ -1,5 +1,5 @@
-const { createProducer } = require('rxmsg');
-const { createAmqpConnector } = require('rxmsg/amqp');
+const { createProducer } = require('../../build/src');
+const { createAmqpConnector } = require('../../build/src/amqp');
 const { amqpConfig } = require('./amqpConfig');
 
 const middleware = createAmqpConnector(amqpConfig).sender();
