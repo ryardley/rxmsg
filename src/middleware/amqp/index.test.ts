@@ -48,6 +48,21 @@ describe('when I recieve messages from AMQP', () => {
       });
     });
 
+    it('should only consume an amqp source once', done => {
+      const mockSub = jest.fn();
+      channel.onReady(mockSub);
+
+      const observable = middewareReceiver(from([]));
+      observable.subscribe(mockSub);
+      observable.subscribe(mockSub);
+      observable.subscribe(mockSub);
+
+      setTimeout(() => {
+        expect(mockSub.mock.calls.length).toBe(1);
+        done();
+      }, 100);
+    });
+
     it('should deserialise messages that are JSON', done => {
       const m = { is: 'a', nested: { cat: 'bird' } };
       const jsonMessage = JSON.stringify(m);

@@ -1,4 +1,5 @@
 import { Observable, Observer } from 'rxjs';
+import { share } from 'rxjs/operators';
 import { Middleware } from '../../types';
 import Logger from '../../utils/logger';
 import {
@@ -110,7 +111,6 @@ async function setupReceiver(
     log.error('Could not create channel.', err);
   });
 }
-
 type CreateReceiver = (
   engineCreator: AmqpEngineFactory,
   config: AmqpDeclarations
@@ -131,7 +131,8 @@ const createReceiver: CreateReceiver = (
           log.error(`Error setting up message receiver: ${err}`);
         }
       );
-    });
+      return observer;
+    }).pipe(share()); // ensure observable can be read by multiple clients on a single endpoint
   };
 };
 

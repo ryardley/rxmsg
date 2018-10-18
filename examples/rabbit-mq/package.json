@@ -1,5 +1,5 @@
 {
-  "name": "foo",
+  "name": "rxmsg-rabbit-mq",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
