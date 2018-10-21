@@ -162,7 +162,9 @@ Generic message objects look like this:
 // Generic message
 export interface IMessage {
   body: any;
-  to?: any;
+  to: any;
+  correlationId?: string;
+  replyTo?: string;
 }
 ```
 
