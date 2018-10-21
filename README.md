@@ -29,10 +29,7 @@ const { createConsumer } = require('rxmsg');
 const { createAmqpConnector } = require('rxmsg/amqp');
 const { amqpConfig } = require('./amqpConfig');
 
-const middleware = createAmqpConnector(amqpConfig).receiver({
-  noAck: true,
-  queue: 'hello'
-});
+const middleware = createAmqpConnector(amqpConfig).receiver({ noAck: true, queue: 'hello' });
 const consumer = createConsumer(middleware);
 
 // RxJS observable
@@ -68,8 +65,8 @@ Messages come into the system top to bottom. In this case from a `producer.next(
 
 ```typescript
 const producer = createProducer(
-  transformMessageSomehow,     // Step 1 - Do some transformation
-  broadCastsMessagesSomewhere  // Step 2 - The last middleware must do the broadcasting
+  transformMessageSomehow,      // Step 1 - Do some transformation
+  broadCastsMessagesSomewhere   // Step 2 - The last middleware must do the broadcasting
 );
 ```
 
