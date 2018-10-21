@@ -19,7 +19,7 @@ const middleware = createAmqpConnector(amqpConfig).sender();
 const producer = createProducer(middleware);
 
 // RxJS observer
-producer.next({content: 'Hello World!', route: 'hello');
+producer.next({content: 'Hello World!', route: 'hello'});
 ```
 
 ## Receiving a message
