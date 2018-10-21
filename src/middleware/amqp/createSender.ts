@@ -45,18 +45,28 @@ async function setupSender(
       // ensure we are not already on a subscription
       await tearDownChannel();
 
-      subscription = stream.subscribe(({ to, ...msg }) => {
-        const { exchange, key } = getRouteValues(to);
+      subscription = stream.subscribe(
+        ({ to, replyTo, correlationId, ...msg }) => {
+          const { exchange, key } = getRouteValues(to);
 
-        // TODO: Perhaps give this a special verbose logging key
-        log.info(`Publishing message: ${JSON.stringify(msg)}`);
+          // TODO: Perhaps give this a special verbose logging key
+          log.info(`Publishing message: ${JSON.stringify(msg)}`);
 
-        const content = serializeMessage(msg.body);
+          log.info(
+            `Special info: ${JSON.stringify({ replyTo, correlationId })}`
+          );
 
-        if (!channel.publish(exchange, key, Buffer.from(content))) {
-          log.error('channel write buffer is full!');
+          const content = serializeMessage(msg.body);
+          const options = {
+            ...(replyTo ? { replyTo } : {}),
+            ...(correlationId ? { correlationId } : {})
+          };
+
+          if (!channel.publish(exchange, key, Buffer.from(content), options)) {
+            log.error('channel write buffer is full!');
+          }
         }
-      });
+      );
     }, 0);
     return channel;
   };

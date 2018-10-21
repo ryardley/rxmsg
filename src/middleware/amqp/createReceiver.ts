@@ -52,6 +52,7 @@ async function setupReceiver(
     queue = '',
     prefetch,
     bindings = [],
+    onReady,
     ...receiverConfig
   } = localConfig;
 
@@ -65,6 +66,7 @@ async function setupReceiver(
     if (typeof prefetch === 'number') {
       channel.prefetch(prefetch);
     }
+    if (onReady) { onReady({ consumptionQueue }); }
 
     // consume the channel
     channel
@@ -83,13 +85,16 @@ async function setupReceiver(
           // prepare content
           const {
             fields: { exchange, routingKey: key },
-            content
+            content,
+            properties: { replyTo, correlationId }
           } = msg;
 
           // send
           observer.next({
             ack: createAck(noAck, channel, msg),
             body: deserialiseMessage(content.toString()),
+            correlationId,
+            replyTo,
             to: { exchange, key }
           });
         },
