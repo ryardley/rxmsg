@@ -6,8 +6,7 @@ const producer = createProducer(createAmqpConnector(amqpConfig).sender());
 
 const consumer = createConsumer(
   createAmqpConnector(amqpConfig).receiver({
-    noAck: true,
-    queue: 'favouriteVegetable'
+    queue: 'rpc_queue'
   })
 );
 
@@ -16,7 +15,7 @@ consumer.subscribe(msg => {
   if (!replyTo) {
     return;
   }
-
+  msg.ack();
   const returnMessage = {
     body: process(msg.body),
     to: replyTo,
@@ -27,5 +26,5 @@ consumer.subscribe(msg => {
 });
 
 function process(message) {
-  return message === 'green' ? 'Brussel Sprouts' : 'Nope';
+  return `${message} World!`;
 }

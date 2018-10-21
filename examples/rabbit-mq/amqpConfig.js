@@ -9,7 +9,7 @@ module.exports.amqpConfig = {
       },
       {
         durable: false,
-        name: 'favouriteVegetable'
+        name: 'rpc_queue'
       }
     ]
   },

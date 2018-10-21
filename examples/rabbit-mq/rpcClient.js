@@ -12,11 +12,10 @@ async function getFavouriteVegetable(question) {
 
     const consumer = createConsumer(
       connector.receiver({
-        noAck: true,
         onReady: ({ consumptionQueue }) => {
           producer.next({
             body: question,
-            to: 'favouriteVegetable',
+            to: 'rpc_queue',
             replyTo: consumptionQueue,
             correlationId
           });
@@ -24,21 +23,16 @@ async function getFavouriteVegetable(question) {
       })
     );
     const subscription = consumer.subscribe(msg => {
+      msg.ack();
       if (msg.correlationId === correlationId) {
+        subscription.unsubscribe();
         resolve(msg.body);
-        setTimeout(() => {
-          subscription.unsubscribe();
-          process.exit(0);
-        }, 1000);
       }
     });
   });
 }
 
-getFavouriteVegetable('green').then(answer => {
-  console.log(`answer:${answer}`);
-});
-
-getFavouriteVegetable('purple').then(answer => {
-  console.log(`answer:${answer}`);
+getFavouriteVegetable('Hello').then(answer => {
+  console.log(answer);
+  process.exit(0);
 });
