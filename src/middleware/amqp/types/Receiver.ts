@@ -2,6 +2,7 @@ import {
   Array,
   Boolean,
   Dictionary,
+  Function,
   Number,
   Partial,
   Static,
@@ -15,6 +16,7 @@ export const ReceiverDescriptionSchema = Partial({
   consumerTag: String, // best to ignore this as given automatically
   exclusive: Boolean, // wont let anyone else consume this queue,
   noAck: Boolean, // if true will dequeue messages as soon as they have been sent
+  onReady: Function,
   prefetch: Number,
   priority: Number,
   queue: String // default to '' <- anon

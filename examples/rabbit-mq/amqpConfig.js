@@ -6,6 +6,10 @@ module.exports.amqpConfig = {
       {
         durable: false,
         name: 'hello'
+      },
+      {
+        durable: false,
+        name: 'favouriteVegetable'
       }
     ]
   },
