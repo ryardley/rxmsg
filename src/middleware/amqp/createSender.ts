@@ -57,12 +57,21 @@ async function setupSender(
           );
 
           const content = serializeMessage(msg.body);
-          const options = {
-            ...(replyTo ? { replyTo } : {}),
-            ...(correlationId ? { correlationId } : {})
-          };
 
-          if (!channel.publish(exchange, key, Buffer.from(content), options)) {
+          const optionArg = [
+            ...(replyTo || correlationId
+              ? [
+                  {
+                    ...(replyTo ? { replyTo } : {}),
+                    ...(correlationId ? { correlationId } : {})
+                  }
+                ]
+              : [])
+          ];
+
+          if (
+            !channel.publish(exchange, key, Buffer.from(content), ...optionArg)
+          ) {
             log.error('channel write buffer is full!');
           }
         }
