@@ -7,15 +7,15 @@ const consumer = createConsumer(receiver());
 const producer = createProducer(sender());
 
 consumer.subscribe(msg => {
-  console.log(`Received: "${msg.content}"`);
+  console.log(`Received: "${msg.body}"`);
 });
 
 setInterval(() => {
   const hex = Math.floor(Math.random() * 16777215).toString(16);
-  const content = `(${hex}) Hello World!`;
-  console.log(`Sending: "${content}"`);
+  const body = `(${hex}) Hello World!`;
+  console.log(`Sending: "${body}"`);
   producer.next({
-    content,
-    route: 'hello'
+    body,
+    to: 'hello'
   });
 }, 2000);

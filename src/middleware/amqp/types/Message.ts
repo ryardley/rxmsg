@@ -8,7 +8,7 @@ export type RouteDescription =
   | string;
 
 export type AmqpMessage = IMessage & {
-  route: RouteDescription;
+  to: RouteDescription;
   expiration?: string;
   userId?: string;
   persistent?: boolean;
@@ -35,7 +35,7 @@ export type AmqpMessageOut = AmqpMessage & {
 
 export type AmqpMessageIn = AmqpMessage & {
   ack: () => void;
-  route: {
+  to: {
     exchange: string;
     key?: string;
   };

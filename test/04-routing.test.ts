@@ -52,17 +52,17 @@ it('should be able to handle routing', done => {
       ['publish', 'direct_logs', 'warn', Buffer.from('"Hi I am a warning"')],
       ['publish', 'direct_logs', 'error', Buffer.from('"Hi I am an error"')]
     ]);
-    expect(msg.content).toEqual('Hi I am an error');
+    expect(msg.body).toEqual('Hi I am an error');
     done();
   });
 
   producer.next({
-    content: 'Hi I am a warning',
-    route: { exchange: 'direct_logs', key: 'warn' }
+    body: 'Hi I am a warning',
+    to: { exchange: 'direct_logs', key: 'warn' }
   });
 
   producer.next({
-    content: 'Hi I am an error',
-    route: { exchange: 'direct_logs', key: 'error' }
+    body: 'Hi I am an error',
+    to: { exchange: 'direct_logs', key: 'error' }
   });
 });

@@ -9,5 +9,5 @@ const middleware = createAmqpConnector(amqpConfig).receiver({
 const consumer = createConsumer(middleware);
 
 consumer.subscribe(msg => {
-  console.log(`Received: "${msg.content}"`);
+  console.log(`Received: "${msg.body}"`);
 });

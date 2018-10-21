@@ -6,7 +6,7 @@
 
 This library makes it easy to send messages in a distributed network transparent way via various brokers using RxJS streams.
 
-RxJS Message uses a versatile middleware pattern to create messaging endpoints that are extremely flexible. 
+RxMsg uses a versatile middleware pattern to create messaging endpoints that are extremely flexible.
 
 ## Sending a message
 
@@ -19,7 +19,7 @@ const middleware = createAmqpConnector(amqpConfig).sender();
 const producer = createProducer(middleware);
 
 // RxJS observer
-producer.next({content: 'Hello World!', route: 'hello'});
+producer.next({ body: 'Hello World!', to: 'hello' });
 ```
 
 ## Receiving a message
@@ -34,17 +34,17 @@ const consumer = createConsumer(middleware);
 
 // RxJS observable
 consumer.subscribe(msg => {
-  console.log(`Received: "${msg.content}"`);
+  console.log(`Received: "${msg.body}"`);
 });
 ```
 
-## Configure your broker 
+## Configure your broker
 
 ```typescript
 module.exports.amqpConfig = {
   declarations: {
     // List the queues, exchanges etc. you want to use here.
-    queues: [ 
+    queues: [
       {
         durable: false,
         name: 'hello'
@@ -53,7 +53,6 @@ module.exports.amqpConfig = {
   },
   uri: 'amqp://user:password@somerabbitserver.io/user'
 };
-
 ```
 
 ## Using Middleware
@@ -66,8 +65,8 @@ Messages come into the system top to bottom. In this case from a `producer.next(
 
 ```typescript
 const producer = createProducer(
-  transformMessageSomehow,     // Step 1 - Do some transformation
-  broadCastsMessagesSomewhere  // Step 2 - The last middleware must do the broadcasting
+  transformMessageSomehow,      // Step 1 - Do some transformation
+  broadCastsMessagesSomewhere   // Step 2 - The last middleware must do the broadcasting
 );
 ```
 
@@ -97,19 +96,16 @@ Here is an example:
 function logger(stream) {
   return stream.pipe(
     tap(
-      (msg) => console.log(`Stream logged: ${msg.content}`
+      (msg) => console.log(`Stream logged: ${msg.body}`
     )
   );
 }
 ```
 
-You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions.  
+You might use a middleware by passing it as one of the arguments to the `createProducer()` or `createConsumer()` functions.
 
 ```typescript
-const consumer = createConsumer(
-  amqpReceiver,
-  logger
-);
+const consumer = createConsumer(amqpReceiver, logger);
 ```
 
 ### Manipulating messages
@@ -118,9 +114,9 @@ Note that because consumer is simply an RxJS observable you can apply filtering 
 
 ```typescript
 const sub = consumer
-  .pipe(filter(msg => msg.content.toLowerCase().includes('world')))
+  .pipe(filter(msg => msg.body.toLowerCase().includes('world')))
   .subscribe(msg => {
-    console.log(`Received: ${msg.content}`);
+    console.log(`Received: ${msg.body}`);
   });
 ```
 
@@ -156,7 +152,6 @@ For usage and examples please look at the basic tests thrown together [here](tes
 1.  [Routing](test/04-routing.test.ts)
 1.  [Topics](test/05-topics.test.ts)
 
-
 ### Usage with Typescript
 
 #### Messages
@@ -166,8 +161,10 @@ Generic message objects look like this:
 ```typescript
 // Generic message
 export interface IMessage {
-  content: any;
-  route?: any;
+  body: any;
+  to: any;
+  correlationId?: string;
+  replyTo?: string;
 }
 ```
 
@@ -175,11 +172,10 @@ You might use a message by sending it to the `next()` method of a producer.
 
 ```typescript
 producer.next({
-  content: 'Hi there!',
-  route: 'some-queue'
+  body: 'Hi there!',
+  to: 'some-queue'
 });
 ```
-
 
 ## Project Principles:
 
@@ -197,8 +193,8 @@ producer.next({
 - Basic framework should work in all V8 environments. eg.
 - Middleware is environment specific. Eg. `rxmsg/amqp` requires node. `rxmsg/socketio-browser` (coming soon) requires a browser environment eg. `window`, `document` etc.
 
-
 ## Broker Support
+
 Currently we support the following brokers:
 
 - [x] AMQP / RabbitMQ
@@ -207,11 +203,12 @@ Currently we support the following brokers:
 - [ ] Web Workers
 - [ ] Socket.io
 
-Is there a message broker you would like to see on this list? Want to get a specific integration sooner? 
+Is there a message broker you would like to see on this list? Want to get a specific integration sooner?
 
 [Create an issue](/ryardley/rxmsg/issues) or [talk to me](https://twitter.com/rudiyardley) about sponsoring this project.
 
 ## Architectural Roadmap
+
 - [ ] Refactor to lerna
 
 ## RxJS References
@@ -237,7 +234,7 @@ import { filter } from 'rxjs/operators';
 
 consumer.pipe(filter(forUserEvents(userId))).subscribe(
   msg => {
-    dealWithMessage(msg.content);
+    dealWithMessage(msg.body);
   },
   () => {}
 );
