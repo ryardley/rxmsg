@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 export interface IMessage {
   content: any;
   route: any;
+  correlationId?: string;
+  replyTo?: string;
 }
 
 // Generic Middleware decorates a stream
