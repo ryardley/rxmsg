@@ -21,9 +21,9 @@ it('should simulate work queues', done => {
   const producer = createProducer<AmqpMessageOut>(sender());
 
   producer.next({
-    content: 'Hello World!',
+    body: 'Hello World!',
     persistent: true,
-    route: 'task_queue'
+    to: 'task_queue'
   });
 
   const consumer = createConsumer(
@@ -35,10 +35,10 @@ it('should simulate work queues', done => {
 
   const output: any[] = [];
   consumer.subscribe(msg => {
-    const secs = msg.content.split('.').length - 1;
+    const secs = msg.body.split('.').length - 1;
 
-    output.push(`Received ${msg.content}`);
-    expect(msg.content).toEqual('Hello World!');
+    output.push(`Received ${msg.body}`);
+    expect(msg.body).toEqual('Hello World!');
 
     setTimeout(() => {
       output.push('Done');

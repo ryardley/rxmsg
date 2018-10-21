@@ -37,14 +37,14 @@ it('should be able to run a fanout exchange', done => {
       ['consume', 'server-queue', '_FUNCTION_', { noAck: true }],
       ['publish', 'logs', '', Buffer.from('"Hello World!"')]
     ]);
-    expect(msg.content).toEqual('Hello World!');
+    expect(msg.body).toEqual('Hello World!');
     done();
   });
 
   const producer = createProducer(sender());
 
   producer.next({
-    content: 'Hello World!',
-    route: { exchange: 'logs' }
+    body: 'Hello World!',
+    to: { exchange: 'logs' }
   });
 });

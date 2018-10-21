@@ -51,7 +51,7 @@ it('should handle topics', done => {
 
   const output: any[] = [];
   consumer.subscribe(msg => {
-    output.push(`${msg.route.key}: '${msg.content}'`);
+    output.push(`${msg.to.key}: '${msg.body}'`);
 
     if (output.length >= 2) {
       expect(engine.jestSpyCalls.mock.calls).toEqual([
@@ -80,17 +80,17 @@ it('should handle topics', done => {
   });
 
   producer.next({
-    content: 'I am a JPG image',
-    route: { exchange: 'topic_logs', key: 'cat.jpg' }
+    body: 'I am a JPG image',
+    to: { exchange: 'topic_logs', key: 'cat.jpg' }
   });
 
   producer.next({
-    content: 'I am a Fish image',
-    route: { exchange: 'topic_logs', key: 'fish.png' }
+    body: 'I am a Fish image',
+    to: { exchange: 'topic_logs', key: 'fish.png' }
   });
 
   producer.next({
-    content: 'I am a Dog exe',
-    route: { exchange: 'topic_logs', key: 'dog.exe' }
+    body: 'I am a Dog exe',
+    to: { exchange: 'topic_logs', key: 'dog.exe' }
   });
 });

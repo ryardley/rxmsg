@@ -89,8 +89,8 @@ async function setupReceiver(
           // send
           observer.next({
             ack: createAck(noAck, channel, msg),
-            content: deserialiseMessage(content.toString()),
-            route: { exchange, key }
+            body: deserialiseMessage(content.toString()),
+            to: { exchange, key }
           });
         },
         receiverConfig

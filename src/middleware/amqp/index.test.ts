@@ -71,7 +71,7 @@ describe('when I recieve messages from AMQP', () => {
       });
 
       middewareReceiver(from([])).subscribe(msg => {
-        expect(msg.content).toEqual(m);
+        expect(msg.body).toEqual(m);
         done();
       });
     });
@@ -82,7 +82,7 @@ describe('when I recieve messages from AMQP', () => {
       });
 
       middewareReceiver(from([])).subscribe(msg => {
-        expect(msg.content).toEqual('Foo');
+        expect(msg.body).toEqual('Foo');
         done();
       });
     });

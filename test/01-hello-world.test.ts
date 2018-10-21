@@ -19,8 +19,8 @@ describe('when the message arrives', () => {
     const producer = createProducer(sender());
 
     producer.next({
-      content: 'Hello World!',
-      route: 'hello'
+      body: 'Hello World!',
+      to: 'hello'
     });
 
     const consumer = createConsumer(
@@ -40,7 +40,7 @@ describe('when the message arrives', () => {
       ]);
 
       // Check msg.content
-      expect(msg.content).toEqual('Hello World!');
+      expect(msg.body).toEqual('Hello World!');
       done();
     });
   });
