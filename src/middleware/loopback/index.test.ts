@@ -13,18 +13,19 @@ describe('Using the loopback middleware synchronously', () => {
       log.push(msg);
     });
 
-    producer.next({ content: 'One' });
-    producer.next({ content: 'Two' });
-    producer.next({ content: 'Three' });
-    producer.next({ content: 'Four' });
+    producer.next({ body: 'One' });
+    producer.next({ body: 'Two' });
+    producer.next({ body: 'Three' });
+    producer.next({ body: 'Four' });
 
     expect(log).toEqual([
-      { content: 'One' },
-      { content: 'Two' },
-      { content: 'Three' },
-      { content: 'Four' }
+      { body: 'One' },
+      { body: 'Two' },
+      { body: 'Three' },
+      { body: 'Four' }
     ]);
   });
+
   it('should route over the loopback middleware', () => {
     const log: any[] = [];
     const log2: any[] = [];
@@ -39,21 +40,21 @@ describe('Using the loopback middleware synchronously', () => {
     consumer2.subscribe(msg => {
       log2.push(msg);
     });
-    producer.next({ content: 'One', route: 'aaaa' });
-    producer.next({ content: 'Two', route: 'aaaa' });
-    producer.next({ content: 'Three' });
-    producer.next({ content: 'Four' });
+    producer.next({ body: 'One', to: 'aaaa' });
+    producer.next({ body: 'Two', to: 'aaaa' });
+    producer.next({ body: 'Three' });
+    producer.next({ body: 'Four' });
 
     expect(log).toEqual([
-      { content: 'One', route: 'aaaa' },
-      { content: 'Two', route: 'aaaa' }
+      { body: 'One', to: 'aaaa' },
+      { body: 'Two', to: 'aaaa' }
     ]);
 
     expect(log2).toEqual([
-      { content: 'One', route: 'aaaa' },
-      { content: 'Two', route: 'aaaa' },
-      { content: 'Three' },
-      { content: 'Four' }
+      { body: 'One', to: 'aaaa' },
+      { body: 'Two', to: 'aaaa' },
+      { body: 'Three' },
+      { body: 'Four' }
     ]);
   });
 });
@@ -72,19 +73,19 @@ describe('Using the loopback middleware asynchronously', () => {
       log.push(msg);
       if (log.length === 4) {
         expect(log).toEqual([
-          { content: 'One' },
-          { content: 'Two' },
-          { content: 'Three' },
-          { content: 'Four' }
+          { body: 'One' },
+          { body: 'Two' },
+          { body: 'Three' },
+          { body: 'Four' }
         ]);
         done();
       }
     });
 
-    producer.next({ content: 'One' });
-    producer.next({ content: 'Two' });
-    producer.next({ content: 'Three' });
-    producer.next({ content: 'Four' });
+    producer.next({ body: 'One' });
+    producer.next({ body: 'Two' });
+    producer.next({ body: 'Three' });
+    producer.next({ body: 'Four' });
 
     expect(log).toEqual([]);
   });
