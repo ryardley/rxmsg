@@ -8,7 +8,6 @@ const uuid = require('uuid/v4');
 
 const { receiver, sender } = createLoopbackConnector();
 const emitter = createEventEmitter({ sender: sender(), receiver: receiver() });
-// const emitter = new EventEmitter();
 
 function sendRequest(name, payload) {
   return new Promise((res, rej) => {
