@@ -2,7 +2,8 @@ import { Observable, Observer, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { createConsumer } from '../endpoints/consumer';
 import { createProducer } from '../endpoints/producer';
-import { Middleware } from '../types';
+import { Connector, Middleware } from '../types';
+
 type CallBackFn = (payload: any) => void;
 class RxMsgEventEmitter<T, P> {
   private producer: Observer<{ to: string; body: T }> | void;
@@ -50,9 +51,8 @@ class RxMsgEventEmitter<T, P> {
   };
 }
 
-export default function createEventEmitter<T, P>(o: {
-  sender?: Middleware<{ to: string; body: T }>;
-  receiver?: Middleware<{ to: string; body: P }>;
-}): RxMsgEventEmitter<T, P> {
-  return new RxMsgEventEmitter(o.sender, o.receiver);
+export default function createEventEmitter<T, P>(
+  o: Connector<{ body: T; to: any }, { body: P; to: any }>
+): RxMsgEventEmitter<T, P> {
+  return new RxMsgEventEmitter(o.sender(), o.receiver());
 }

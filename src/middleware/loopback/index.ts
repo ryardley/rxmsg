@@ -1,5 +1,6 @@
 import { Observable, Subject } from 'rxjs';
 import { delay, filter } from 'rxjs/operators';
+import { Connector, IMessage } from '../../types';
 
 const receiveStream = new Subject<any>();
 
@@ -13,12 +14,12 @@ type ReceiverConfig = {
 
 function createReceiver(route?: string) {
   const stream = receiveStream.asObservable();
-  return () => (route ? stream.pipe(filter(m => m.route === route)) : stream);
+  return () => (route ? stream.pipe(filter(m => m.to === route)) : stream);
 }
 
 // Forward messages
-const createSender = (config: LoopBackConfig) => (
-  sendStream: Observable<any>
+const createSender = <T extends IMessage>(config: LoopBackConfig) => (
+  sendStream: Observable<T>
 ) => {
   const delayAmount = config.delay || 0;
   const mappedStream = delayAmount
@@ -34,7 +35,11 @@ function receiver(options?: ReceiverConfig) {
   return createReceiver(route);
 }
 
-export default (config: LoopBackConfig = {}) => ({
-  receiver,
-  sender: () => createSender(config)
-});
+export default function createConnector<T extends IMessage, P extends IMessage>(
+  config: LoopBackConfig = {}
+): Connector<T, P> {
+  return {
+    receiver,
+    sender: () => createSender(config)
+  };
+}

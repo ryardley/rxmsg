@@ -6,8 +6,7 @@ const {
 } = require('../../build/src');
 const uuid = require('uuid/v4');
 
-const { receiver, sender } = createLoopbackConnector();
-const emitter = createEventEmitter({ sender: sender(), receiver: receiver() });
+const emitter = createEventEmitter(createLoopbackConnector());
 
 function sendRequest(name, payload) {
   return new Promise((res, rej) => {
