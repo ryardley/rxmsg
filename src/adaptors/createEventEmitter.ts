@@ -10,11 +10,15 @@ class RxMsgEventEmitter<T, P> {
   private subscriptions: { [k: string]: Map<CallBackFn, Subscription> } = {};
 
   constructor(
-    sender: Middleware<{ to: string; body: T }>,
-    receiver: Middleware<{ to: string; body: P }>
+    sender: Middleware<{ to: string; body: T }> | undefined,
+    receiver: Middleware<{ to: string; body: P }> | undefined
   ) {
-    this.producer = createProducer<{ to: string; body: T }>(sender);
-    this.consumer = createConsumer<{ to: string; body: P }>(receiver);
+    if (sender) {
+      this.producer = createProducer<{ to: string; body: T }>(sender);
+    }
+    if (receiver) {
+      this.consumer = createConsumer<{ to: string; body: P }>(receiver);
+    }
   }
 
   public on = (eventName: string, callback: CallBackFn) => {
@@ -39,8 +43,8 @@ class RxMsgEventEmitter<T, P> {
 }
 
 export default function createEventEmitter<T, P>(o: {
-  sender: Middleware<{ to: string; body: T }>;
-  receiver: Middleware<{ to: string; body: P }>;
+  sender?: Middleware<{ to: string; body: T }>;
+  receiver?: Middleware<{ to: string; body: P }>;
 }): RxMsgEventEmitter<T, P> {
   return new RxMsgEventEmitter(o.sender, o.receiver);
 }
