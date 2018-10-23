@@ -3,9 +3,13 @@ import { delay, filter } from 'rxjs/operators';
 
 const receiveStream = new Subject<any>();
 
-interface ILoopBackConfig {
+type LoopBackConfig = {
   delay?: number;
-}
+};
+
+type ReceiverConfig = {
+  route: string;
+};
 
 function createReceiver(route?: string) {
   const stream = receiveStream.asObservable();
@@ -13,7 +17,7 @@ function createReceiver(route?: string) {
 }
 
 // Forward messages
-const createSender = (config: ILoopBackConfig) => (
+const createSender = (config: LoopBackConfig) => (
   sendStream: Observable<any>
 ) => {
   const delayAmount = config.delay || 0;
@@ -25,12 +29,12 @@ const createSender = (config: ILoopBackConfig) => (
   return sendStream;
 };
 
-function receiver(options?: { route: string }) {
+function receiver(options?: ReceiverConfig) {
   const route = options && options.route;
   return createReceiver(route);
 }
 
-export default (config: ILoopBackConfig = {}) => ({
+export default (config: LoopBackConfig = {}) => ({
   receiver,
   sender: () => createSender(config)
 });
