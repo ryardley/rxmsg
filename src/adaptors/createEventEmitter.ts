@@ -5,7 +5,7 @@ import { createProducer } from '../endpoints/producer';
 import { Connector, Middleware } from '../types';
 
 type CallBackFn = (payload: any) => void;
-class RxMsgEventEmitter<T, P> {
+export class RxMsgEventEmitter<T, P> {
   private producer: Observer<{ to: string; body: T }> | void;
   private consumer: Observable<{ to: string; body: P }> | void;
   private subscriptions: { [k: string]: Map<CallBackFn, Subscription> } = {};
