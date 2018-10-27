@@ -58,7 +58,37 @@ describe('Using the loopback middleware synchronously', () => {
     ]);
   });
 });
+describe('Using the loopback middleware with persist', () => {
+  it('should run the persist function for each message', done => {
+    const mockPersist = jest.fn();
+    const { receiver, sender } = loopbackMiddleware({
+      persist: mockPersist
+    });
+    const producer = createProducer(sender());
+    const consumer = createConsumer(receiver());
 
+    let count = 0;
+
+    consumer.subscribe(() => {
+      count++;
+      if (count === 4) {
+        expect(mockPersist.mock.calls.length).toEqual(4);
+        expect(mockPersist.mock.calls).toEqual([
+          [{ body: 'One' }],
+          [{ body: 'Two' }],
+          [{ body: 'Three' }],
+          [{ body: 'Four' }]
+        ]);
+        done();
+      }
+    });
+
+    producer.next({ body: 'One' });
+    producer.next({ body: 'Two' });
+    producer.next({ body: 'Three' });
+    producer.next({ body: 'Four' });
+  });
+});
 describe('Using the loopback middleware asynchronously', () => {
   const { receiver, sender } = loopbackMiddleware({
     delay: 300

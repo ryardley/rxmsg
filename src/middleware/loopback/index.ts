@@ -1,20 +1,27 @@
-import { Observable, Subject } from 'rxjs';
-import { delay, filter } from 'rxjs/operators';
+import { identity, Observable, Subject } from 'rxjs';
+import { delay, filter, tap } from 'rxjs/operators';
 import { Connector, IMessage } from '../../types';
 
 const receiveStream = new Subject<any>();
-
+type PersistFn = (payload: any) => Promise<boolean>;
 type LoopBackConfig = {
   delay?: number;
+  persist?: PersistFn;
 };
 
 type ReceiverConfig = {
   route: string;
 };
 
-function createReceiver(route?: string) {
-  const stream = receiveStream.asObservable();
-  return () => (route ? stream.pipe(filter(m => m.to === route)) : stream);
+function createReceiver<P extends IMessage>(
+  route?: string,
+  persistFn?: PersistFn
+) {
+  return () =>
+    receiveStream.asObservable().pipe(
+      persistFn ? tap(persistFn) : identity,
+      route ? filter((m: P) => m.to === route) : identity
+    );
 }
 
 // Forward messages
@@ -22,24 +29,19 @@ const createSender = <T extends IMessage>(config: LoopBackConfig) => (
   sendStream: Observable<T>
 ) => {
   const delayAmount = config.delay || 0;
-  const mappedStream = delayAmount
-    ? sendStream.pipe(delay(delayAmount))
-    : sendStream;
-
-  mappedStream.subscribe(receiveStream);
+  // Fork the stream to receive
+  sendStream
+    .pipe(delayAmount ? delay(delayAmount) : identity)
+    .subscribe(receiveStream);
   return sendStream;
 };
-
-function receiver(options?: ReceiverConfig) {
-  const route = options && options.route;
-  return createReceiver(route);
-}
 
 export default function createConnector<T extends IMessage, P extends IMessage>(
   config: LoopBackConfig = {}
 ): Connector<T, P> {
   return {
-    receiver,
+    receiver: (options?: ReceiverConfig) =>
+      createReceiver(options && options.route, config.persist),
     sender: () => createSender(config)
   };
 }
