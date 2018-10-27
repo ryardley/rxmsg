@@ -4,3 +4,4 @@ export {
   default as createEventEmitter,
   RxMsgEventEmitter
 } from './adaptors/createEventEmitter';
+export * from './types';
