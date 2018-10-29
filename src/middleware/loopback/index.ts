@@ -16,12 +16,11 @@ type ReceiverConfig = {
 export default function createConnector<T extends IMessage, P extends IMessage>(
   config: LoopBackConfig = {}
 ): Connector<T, P> {
-  function createReceiver(route?: string, persistFn?: PersistFn) {
+  function createReceiver(route?: string) {
     return () =>
-      receiveStream.asObservable().pipe(
-        persistFn ? tap(persistFn) : identity,
-        route ? filter((m: P) => m.to === route) : identity
-      );
+      receiveStream
+        .asObservable()
+        .pipe(route ? filter((m: P) => m.to === route) : identity);
   }
 
   // Forward messages
@@ -30,14 +29,18 @@ export default function createConnector<T extends IMessage, P extends IMessage>(
   ) => {
     const delayAmount = loopBackConfig.delay || 0;
     // Fork the stream to receive
+    const { persist } = loopBackConfig;
     sendStream
-      .pipe(delayAmount ? delay(delayAmount) : identity)
+      .pipe(
+        persist ? tap(persist) : identity,
+        delayAmount ? delay(delayAmount) : identity
+      )
       .subscribe(receiveStream);
     return sendStream;
   };
   return {
     receiver: (options?: ReceiverConfig) =>
-      createReceiver(options && options.route, config.persist),
+      createReceiver(options && options.route),
     sender: () => createSender(config)
   };
 }
